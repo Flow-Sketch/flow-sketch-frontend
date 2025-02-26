@@ -1,11 +1,9 @@
 import { css } from '@emotion/react';
-import { drawRect } from '@/utils/drawingUtils.ts';
-import { useCanvas, useDrawCanvas, useScaleCanvas } from '@/hooks';
+import { useCanvas, useTranslateCanvas } from '@/hooks';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
-  const { handleWheel } = useScaleCanvas(canvasRef);
-  const { handleMouseUp, handleMouseDown, handleDraw } = useDrawCanvas(canvasRef, [drawRect]);
+  const { handleWheel, handleMove, handleMouseDown, handleMouseUp } = useTranslateCanvas(canvasRef);
 
   return (
     <div
@@ -18,7 +16,7 @@ export const Canvas = () => {
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onMouseMove={handleDraw}
+        onMouseMove={handleMove}
         onMouseLeave={handleMouseUp}
       />
     </div>

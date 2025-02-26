@@ -11,9 +11,11 @@ export function useCanvas() {
     if (!ctx) return;
 
     // 캔버스 초기화;
-    canvas.width = 1000;
-    canvas.height = 800;
-    canvas.style.background = '#dfdfdf';
+    canvas.width = 1300;
+    canvas.height = 900;
+
+    // 캔버스의 가상공간을 표현
+    ctx.fillStyle = '#dfdfdf';
 
     // 필요한 경우 cleanup 함수 추가
     return () => {
