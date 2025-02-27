@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 
+// 추후
+const CANVAS_WIDTH = 2000; // 실제 캔버스의 크기
+const CANVAS_HEIGHT = 2000; // 실제 캔버스의 크기
+const VIEW_WIDTH = 1000; // 사용자가 보는 화면의 크기
+const VIEW_HEIGHT = 800; // 사용자가 보는 화면의 크기
+
 export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
   /** 시점 변경에 필요한 상태들
    * ### 동작원리
@@ -10,7 +16,7 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
    * - 지점은 절대좌표 기준으로 잡는다.
    */
   const [offset, setOffset] = useState({ x: 0, y: 0 }); // 최종 마우스로 이동시킨 거리
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 }); // 마우스를 클릭한 순간의 지정
+  const [startPosition, setStartPosition] = useState({ x: -20, y: -20 }); // 마우스를 클릭한 순간의 지정
 
   const [scale, setScale] = useState(1);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -29,8 +35,8 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     ctx.save();
 
     // 배율을 적용해 페인팅을 한다.
-    ctx.scale(scale, scale);
     ctx.translate(offset.x, offset.y);
+    ctx.scale(scale, scale);
     drawShapes(ctx);
 
     // 다시 원래배율로 적용, 이미 페인팅된 pixel 들은 변경되지 않는다.
@@ -46,12 +52,21 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const minWidthScale = VIEW_WIDTH / CANVAS_WIDTH;
+    const minHeightScale = VIEW_HEIGHT / CANVAS_HEIGHT;
+
     event.preventDefault();
-    const MIN_SCALE = 0.5;
     const MAX_SCALE = 3;
+    const MIN_SCALE = Math.max(minWidthScale, minHeightScale);
     const scaleAmount = event.deltaY > 0 ? 0.9 : 1.1;
     const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * scaleAmount));
     setScale(newScale);
+
+    // 보정하기
+    setOffset((prev) => ({
+      x: rangePosition(prev.x, -(CANVAS_WIDTH * scale) + VIEW_WIDTH, 0),
+      y: rangePosition(prev.y, -(CANVAS_HEIGHT * scale) + VIEW_HEIGHT, 0),
+    }));
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -84,8 +99,15 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     const deltaY = event.nativeEvent.offsetY - startPosition.y;
 
     // 한번의 mouseEvent 가 끝나면 startPosition 을 초기화한다.
-    setStartPosition({ x: event.nativeEvent.offsetX, y: event.nativeEvent.offsetY });
-    setOffset((prev) => ({ x: deltaX + prev.x, y: deltaY + prev.y }));
+    setStartPosition({
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    });
+
+    setOffset((prev) => ({
+      x: rangePosition(deltaX + prev.x, -(2000 * scale) + 1000, 0),
+      y: rangePosition(deltaY + prev.y, -(2000 * scale) + 800, 0),
+    }));
   };
 
   return {
@@ -94,6 +116,12 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     handleMouseUp,
     handleMove,
   };
+}
+
+function rangePosition(prev: number, min: number, max: number) {
+  if (prev < min) return min;
+  if (prev > max) return max;
+  return prev;
 }
 
 function drawShapes(ctx: CanvasRenderingContext2D) {
