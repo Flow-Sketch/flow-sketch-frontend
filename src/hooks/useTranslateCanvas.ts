@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { RectSketchElement } from '@/models/sketchElement';
 
 // 추후
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
@@ -134,6 +135,22 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
   }
 
   // 사각형
+
+  const rect = new RectSketchElement('123123', {
+    width: 300,
+    height: 400,
+    x: 1200,
+    y: 2400,
+  });
+  const rect2 = new RectSketchElement('123123', {
+    width: 300,
+    height: 400,
+    x: 3400,
+    y: 10000,
+  });
+  rect.draw(ctx);
+  rect2.draw(ctx);
+
   ctx.fillStyle = 'blue';
   ctx.fillRect(500, 500, 100, 100);
 
