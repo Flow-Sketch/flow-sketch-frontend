@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import * as React from 'react';
 
 // 추후
-const CANVAS_WIDTH = 2000; // 실제 캔버스의 크기
-const CANVAS_HEIGHT = 2000; // 실제 캔버스의 크기
+const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
+const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
 const VIEW_WIDTH = 1000; // 사용자가 보는 화면의 크기
 const VIEW_HEIGHT = 800; // 사용자가 보는 화면의 크기
 
@@ -105,8 +105,8 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     });
 
     setOffset((prev) => ({
-      x: rangePosition(deltaX + prev.x, -(2000 * scale) + 1000, 0),
-      y: rangePosition(deltaY + prev.y, -(2000 * scale) + 800, 0),
+      x: rangePosition(deltaX + prev.x, -(CANVAS_WIDTH * scale) + VIEW_WIDTH, 0),
+      y: rangePosition(deltaY + prev.y, -(CANVAS_HEIGHT * scale) + VIEW_HEIGHT, 0),
     }));
   };
 
@@ -136,6 +136,9 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
   // 사각형
   ctx.fillStyle = 'blue';
   ctx.fillRect(500, 500, 100, 100);
+
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(CANVAS_WIDTH - 250, CANVAS_HEIGHT - 250, 100, 100);
 
   // 원
   ctx.beginPath();
