@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { RectSketchElement, EllipseSketchElement } from '@/models/sketchElement';
+import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 
 // 추후
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
@@ -8,7 +8,7 @@ const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
 const VIEW_WIDTH = 1000; // 사용자가 보는 화면의 크기
 const VIEW_HEIGHT = 800; // 사용자가 보는 화면의 크기
 
-export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
+export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, registry: ElementRegistry) {
   /** 시점 변경에 필요한 상태들
    * ### 동작원리
    * - 시점 이동(x축, y축)시, 클릭한 지점(startPosition)을 시작 지점으로 잡음
@@ -38,7 +38,7 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     // 배율을 적용해 페인팅을 한다.
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
-    drawShapes(ctx);
+    drawShapes(ctx, registry);
 
     // 다시 원래배율로 적용, 이미 페인팅된 pixel 들은 변경되지 않는다.
     ctx.restore();
@@ -125,7 +125,9 @@ function rangePosition(prev: number, min: number, max: number) {
   return prev;
 }
 
-function drawShapes(ctx: CanvasRenderingContext2D) {
+function drawShapes(ctx: CanvasRenderingContext2D, registry: ElementRegistry) {
+  const { elements, layerOrder } = registry;
+
   // 큰 배경 격자 그리기 (10x10칸)
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
@@ -134,49 +136,8 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
     }
   }
 
-  // 사각형 그리기
-  const rect = new RectSketchElement('123123', {
-    width: 300,
-    height: 400,
-    x: 1200,
-    y: 2400,
-  });
-  const rect2 = new RectSketchElement('123123', {
-    width: 300,
-    height: 400,
-    x: 3400,
-    y: 10000,
-  });
-
-  // 원형 그리기
-  const ellipse = new EllipseSketchElement('ddd', {
-    width: 700,
-    height: 700,
-    x: 1800,
-    y: 1800,
-  });
-  const ellipse2 = new EllipseSketchElement('ddd', {
-    width: 1700,
-    height: 700,
-    x: 6999,
-    y: 1800,
-  });
-
-  // 여기에 확인할 수 있는 그림 그리기
-  rect.draw(ctx);
-  rect2.draw(ctx);
-  ellipse.draw(ctx);
-  ellipse2.draw(ctx);
-
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(500, 500, 100, 100);
-
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(CANVAS_WIDTH - 250, CANVAS_HEIGHT - 250, 100, 100);
-
-  // 원
-  ctx.beginPath();
-  ctx.arc(1500, 1500, 50, 0, Math.PI * 2);
-  ctx.fillStyle = 'red';
-  ctx.fill();
+  // `useCanvasElementManager` Hook 에 대한 각 도형 요소들 모두 draw
+  for (const elementId of layerOrder) {
+    elements[elementId].draw(ctx);
+  }
 }

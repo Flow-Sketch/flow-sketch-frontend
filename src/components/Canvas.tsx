@@ -1,9 +1,10 @@
 import { css } from '@emotion/react';
-import { useCanvas, useTranslateCanvas } from '@/hooks';
+import { useCanvas, useCanvasElementManager, useTranslateCanvas } from '@/hooks';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
-  const { handleWheel, handleMove, handleMouseDown, handleMouseUp } = useTranslateCanvas(canvasRef);
+  const { elementRegistry } = useCanvasElementManager();
+  const { handleWheel, handleMove, handleMouseDown, handleMouseUp } = useTranslateCanvas(canvasRef, elementRegistry);
 
   return (
     <div
