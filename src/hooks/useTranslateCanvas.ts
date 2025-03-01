@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 
 // 추후
-const CANVAS_WIDTH = 2000; // 실제 캔버스의 크기
-const CANVAS_HEIGHT = 2000; // 실제 캔버스의 크기
+const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
+const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
 const VIEW_WIDTH = 1000; // 사용자가 보는 화면의 크기
 const VIEW_HEIGHT = 800; // 사용자가 보는 화면의 크기
 
-export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
+export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, registry: ElementRegistry) {
   /** 시점 변경에 필요한 상태들
    * ### 동작원리
    * - 시점 이동(x축, y축)시, 클릭한 지점(startPosition)을 시작 지점으로 잡음
@@ -37,7 +38,7 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     // 배율을 적용해 페인팅을 한다.
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
-    drawShapes(ctx);
+    drawShapes(ctx, registry);
 
     // 다시 원래배율로 적용, 이미 페인팅된 pixel 들은 변경되지 않는다.
     ctx.restore();
@@ -105,8 +106,8 @@ export function useTranslateCanvas(canvasRef: React.RefObject<HTMLCanvasElement 
     });
 
     setOffset((prev) => ({
-      x: rangePosition(deltaX + prev.x, -(2000 * scale) + 1000, 0),
-      y: rangePosition(deltaY + prev.y, -(2000 * scale) + 800, 0),
+      x: rangePosition(deltaX + prev.x, -(CANVAS_WIDTH * scale) + VIEW_WIDTH, 0),
+      y: rangePosition(deltaY + prev.y, -(CANVAS_HEIGHT * scale) + VIEW_HEIGHT, 0),
     }));
   };
 
@@ -124,7 +125,9 @@ function rangePosition(prev: number, min: number, max: number) {
   return prev;
 }
 
-function drawShapes(ctx: CanvasRenderingContext2D) {
+function drawShapes(ctx: CanvasRenderingContext2D, registry: ElementRegistry) {
+  const { elements, layerOrder } = registry;
+
   // 큰 배경 격자 그리기 (10x10칸)
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
@@ -133,13 +136,8 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
     }
   }
 
-  // 사각형
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(500, 500, 100, 100);
-
-  // 원
-  ctx.beginPath();
-  ctx.arc(1500, 1500, 50, 0, Math.PI * 2);
-  ctx.fillStyle = 'red';
-  ctx.fill();
+  // `useCanvasElementManager` Hook 에 대한 각 도형 요소들 모두 draw
+  for (const elementId of layerOrder) {
+    elements[elementId].draw(ctx);
+  }
 }
