@@ -1,17 +1,17 @@
 import { BaseSketchElement } from '@/models/sketchElement/BaseSketchElement.ts';
 
-interface RectSketchElementParams {
+interface EllipseSketchElementParams {
   width: number;
   height: number;
   x: number;
   y: number;
 }
 
-export class RectSketchElement extends BaseSketchElement {
-  constructor(id: string, params: RectSketchElementParams) {
+export class EllipseSketchElement extends BaseSketchElement {
+  constructor(id: string, params: EllipseSketchElementParams) {
     super({
       id,
-      type: 'rect',
+      type: 'ellipse',
       width: params.width,
       height: params.height,
       x: params.x,
@@ -32,20 +32,24 @@ export class RectSketchElement extends BaseSketchElement {
     ctx.strokeStyle = this.elementStyle.borderColor ?? '#000';
     ctx.fillStyle = this.elementStyle.background ?? 'transparent';
 
-    // 사각형 그리기
+    // 타원(원) 그리기
     ctx.beginPath(); // 다른 도형들과 분리되어 독립적으로 처리
-    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.ellipse(this.x, this.y, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
   }
 }
 
-/** ### `rect()` 사용법
- * ctx.rect(
- *   x,      // 사각형의 시작 X 좌표 (좌측 상단 기준)
- *   y,      // 사각형의 시작 Y 좌표 (좌측 상단 기준)
- *   width,  // 사각형의 너비
- *   height, // 사각형의 높이
+/** ### `ellipse()` 사용법
+ * ctx.ellipse(
+ *   x,            // 타원의 중심 X 좌표
+ *   y,            // 타원의 중심 Y 좌표
+ *   radiusX,      // X축 방향 반지름
+ *   radiusY,      // Y축 방향 반지름
+ *   rotation,     // 타원의 회전각 (라디안 단위)
+ *   startAngle,   // 타원 호 그리기의 시작 각도 (라디안)
+ *   endAngle,     // 타원 호 그리기의 끝 각도 (라디안)
+ *   anticlockwise // (선택적) true면 반시계방향, false면 시계방향 (기본값: false)
  * );
  */

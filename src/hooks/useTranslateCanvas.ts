@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { RectSketchElement } from '@/models/sketchElement';
+import { useEffect, useState } from 'react';
+import { RectSketchElement, EllipseSketchElement } from '@/models/sketchElement';
 
 // 추후
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
@@ -134,8 +134,7 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
     }
   }
 
-  // 사각형
-
+  // 사각형 그리기
   const rect = new RectSketchElement('123123', {
     width: 300,
     height: 400,
@@ -148,8 +147,26 @@ function drawShapes(ctx: CanvasRenderingContext2D) {
     x: 3400,
     y: 10000,
   });
+
+  // 원형 그리기
+  const ellipse = new EllipseSketchElement('ddd', {
+    width: 700,
+    height: 700,
+    x: 1800,
+    y: 1800,
+  });
+  const ellipse2 = new EllipseSketchElement('ddd', {
+    width: 1700,
+    height: 700,
+    x: 6999,
+    y: 1800,
+  });
+
+  // 여기에 확인할 수 있는 그림 그리기
   rect.draw(ctx);
   rect2.draw(ctx);
+  ellipse.draw(ctx);
+  ellipse2.draw(ctx);
 
   ctx.fillStyle = 'blue';
   ctx.fillRect(500, 500, 100, 100);
