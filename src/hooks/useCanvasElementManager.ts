@@ -8,6 +8,7 @@ export interface ElementRegistry {
 }
 
 // 임시로 element 하드코딩
+// 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
 export function useCanvasElementManager() {
   const elementRegistry: ElementRegistry = {
     elements: {

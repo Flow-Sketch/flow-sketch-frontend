@@ -1,4 +1,6 @@
 export { useCanvas } from './useCanvas';
-export { useDrawCanvas } from './useDrawCanvas';
-export { useTranslateCanvas } from './useTranslateCanvas';
 export { useCanvasElementManager } from './useCanvasElementManager';
+export { useCanvasViewManager } from './useCanvasViewManager';
+export { usePaintingCanvas } from './usePaintingCanvas';
+export { useCanvasSelectManager } from './useCanvasSelectManager';
+export { useActionHandler } from './useActionHandler';
