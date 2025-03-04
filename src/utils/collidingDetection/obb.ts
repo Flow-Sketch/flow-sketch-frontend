@@ -6,7 +6,7 @@ import {
   subtract,
   Point,
   RectangleInfo,
-} from '@/utils/collidingDetection/common.ts';
+} from '../collidingDetection/common.ts';
 
 /** 두 구간이 겹치는지 확인 */
 function isOverlapping(minA: number, maxA: number, minB: number, maxB: number): boolean {
