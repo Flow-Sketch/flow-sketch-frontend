@@ -1,6 +1,7 @@
 import { BaseSketchElement } from '@/models/sketchElement/BaseSketchElement.ts';
 
-interface EllipseSketchElementParams {
+export interface EllipseSketchElementParams {
+  id: string;
   width: number;
   height: number;
   x: number;
@@ -8,9 +9,9 @@ interface EllipseSketchElementParams {
 }
 
 export class EllipseSketchElement extends BaseSketchElement {
-  constructor(id: string, params: EllipseSketchElementParams) {
+  constructor(params: EllipseSketchElementParams) {
     super({
-      id,
+      id: params.id,
       type: 'ellipse',
       width: params.width,
       height: params.height,
