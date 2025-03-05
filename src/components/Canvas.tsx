@@ -12,7 +12,7 @@ export const Canvas = () => {
   const { canvasRef } = useCanvas();
   const { elementRegistry } = useCanvasElementManager();
   const { viewState, viewAction } = useCanvasViewManager();
-  const { selectState, selectAction } = useCanvasSelectManager();
+  const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
   const { isViewMode, changeViewMode, handler } = useActionHandler(viewAction, selectAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState);
 

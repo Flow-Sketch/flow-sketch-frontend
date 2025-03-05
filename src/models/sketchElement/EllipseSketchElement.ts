@@ -38,6 +38,13 @@ export class EllipseSketchElement extends BaseSketchElement {
     ctx.fill();
     ctx.stroke();
     ctx.restore();
+
+    // 편집가능 시 형태 그리기
+    if (this.isEditable) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'blue';
+      ctx.stroke();
+    }
   }
 }
 
