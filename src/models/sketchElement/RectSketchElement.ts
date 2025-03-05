@@ -5,6 +5,7 @@ interface RectSketchElementParams {
   height: number;
   x: number;
   y: number;
+  background?: string;
 }
 
 export class RectSketchElement extends BaseSketchElement {
@@ -19,7 +20,7 @@ export class RectSketchElement extends BaseSketchElement {
       rotation: 0, // 최초 생성 시, rotation 은 0 으로 시작
       elementStyle: {
         borderWidth: 2,
-        background: '#dfdfdf',
+        background: params.background ? params.background : '#dfdfdf',
         borderColor: '#000000',
       },
     });
@@ -34,10 +35,16 @@ export class RectSketchElement extends BaseSketchElement {
 
     // 사각형 그리기
     ctx.beginPath(); // 다른 도형들과 분리되어 독립적으로 처리
-    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
+
+    // 글자 작성
+    ctx.font = '80px';
+    ctx.fillStyle = 'black';
+    ctx.fillText(`x : ${this.x}, y : ${this.y}`, this.x, this.y);
+    ctx.fillText(`x : ${this.width}, y : ${this.height}`, this.x, this.y + 20);
   }
 }
 

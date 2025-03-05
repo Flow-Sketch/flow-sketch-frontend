@@ -26,8 +26,8 @@ export type ViewManagerAction = {
  *
  * @returns {object} - 뷰 상태와 뷰 조작 메소드를 포함하는 객체
  *   - `viewState`: 뷰 상태를 포함하는 객체
- *     - `offset`: { x: number, y: number } - 캔버스의 현재 오프셋
- *     - `alignmentPoint`: { x: number, y: number } - 뷰의 정렬 포인트
+ *     - `offset`: { x: number, y: number } - 캔버스의 현재 오프셋(View 좌표계, offset <0)
+ *     - `alignmentPoint`: { x: number, y: number } - 뷰의 정렬 포인트(View 좌표계)
  *     - `scale`: number - 캔버스의 현재 배율
  *   - `viewAction` : 뷰 조작 메소드를 포함하는 객체
  *     - `changeViewAlignmentPoint`: (event: React.MouseEvent<HTMLCanvasElement>) => void
@@ -50,9 +50,9 @@ export function useCanvasViewManager(): {
    * ### 특징
    * - 지점은 절대좌표 기준으로 잡는다.
    */
-  const [offset, setOffset] = useState({ x: 0, y: 0 }); // 최종 마우스로 이동시킨 거리
+  const [offset, setOffset] = useState({ x: -200, y: -200 }); // 최종 마우스로 이동시킨 거리
   const [alignmentPoint, setAlignmentPoint] = useState({ x: 0, y: 0 }); // 마우스를 클릭한 순간의 지정
-  const [scale, setScale] = useState<number>(1);
+  const [scale, setScale] = useState<number>(0.3);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
 
   /**

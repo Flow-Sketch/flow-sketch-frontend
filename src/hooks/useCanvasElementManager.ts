@@ -36,8 +36,15 @@ export function useCanvasElementManager() {
         x: 6999,
         y: 1800,
       }),
+      'a-5': new RectSketchElement('a-5', {
+        x: 1740,
+        y: 1313.3333333,
+        width: 2080,
+        height: 1933.33333,
+        background: 'rgba(100, 100, 100, 0.2)',
+      }),
     },
-    layerOrder: ['a-3', 'a-1', 'a-2', 'a-4'],
+    layerOrder: ['a-3', 'a-1', 'a-2', 'a-4', 'a-5'],
   };
   return { elementRegistry };
 }

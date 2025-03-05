@@ -64,4 +64,24 @@ describe('OBB Collision Detection', () => {
     // 이 구현에서는 경계가 딱 맞아떨어져도 겹치는 것으로 판단
     expect(isOBBColliding(rectA, rectB)).toBe(true);
   });
+
+  test('실제 사례', () => {
+    const rectA: RectangleInfo = {
+      cx: 1740,
+      cy: 1313.3333333,
+      width: 2080,
+      height: 1933.33333,
+      angle: 0,
+    };
+
+    const rectB: RectangleInfo = {
+      cx: 1200,
+      cy: 2400,
+      width: 300,
+      height: 400,
+      angle: 0,
+    };
+
+    expect(isOBBColliding(rectA, rectB)).toBe(true);
+  });
 });
