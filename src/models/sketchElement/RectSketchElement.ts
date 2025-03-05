@@ -30,7 +30,7 @@ export class RectSketchElement extends BaseSketchElement {
 
     // 스타일 적용
     ctx.lineWidth = this.elementStyle.borderWidth ?? 2;
-    ctx.strokeStyle = this.elementStyle.borderColor ?? '#000';
+    ctx.strokeStyle = this.elementStyle.borderColor ?? 'transparent';
     ctx.fillStyle = this.elementStyle.background ?? 'transparent';
 
     // 사각형 그리기
@@ -45,6 +45,13 @@ export class RectSketchElement extends BaseSketchElement {
     ctx.fillStyle = 'black';
     ctx.fillText(`x : ${this.x}, y : ${this.y}`, this.x, this.y);
     ctx.fillText(`x : ${this.width}, y : ${this.height}`, this.x, this.y + 20);
+
+    // 편집가능 시 형태 그리기
+    if (this.isEditable) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'blue';
+      ctx.stroke();
+    }
   }
 }
 

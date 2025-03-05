@@ -23,6 +23,7 @@ export abstract class BaseSketchElement {
   y: number;
   elementStyle: FlowCanvasStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
+  isEditable: boolean; //
   points?: { x: number; y: number }[];
   constructor(params: BaseSketchElementParams) {
     this.id = params.id;
@@ -34,6 +35,7 @@ export abstract class BaseSketchElement {
     this.elementStyle = params.elementStyle;
     this.points = params.points;
     this.rotation = params.rotation;
+    this.isEditable = false;
   }
 
   // 모든 객체가 공통적으로 가지는 메서드
@@ -43,5 +45,15 @@ export abstract class BaseSketchElement {
   move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
+  }
+
+  // 편집가능 변경 메소드
+  enableEditing() {
+    this.isEditable = true;
+  }
+
+  // 편집불가 변경 메소드
+  disableEditing() {
+    this.isEditable = false;
   }
 }

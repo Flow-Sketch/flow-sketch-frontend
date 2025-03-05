@@ -80,12 +80,15 @@ export function useCanvasSelectManager(
       });
 
       if (isObb) {
+        element.enableEditing();
         newSelectElement.push(element);
+      } else {
+        element.disableEditing();
       }
     }
     setSelectElement(newSelectElement);
     console.log(newSelectElement);
-  }, [viewState, startPoint, endPoint]);
+  }, [startPoint, endPoint]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;

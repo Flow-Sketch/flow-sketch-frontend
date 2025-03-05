@@ -1,4 +1,5 @@
 import { EllipseSketchElement, RectSketchElement } from '@/models/sketchElement';
+import { useState } from 'react';
 
 export interface ElementRegistry {
   elements: {
@@ -7,10 +8,11 @@ export interface ElementRegistry {
   layerOrder: string[];
 }
 
-// 임시로 element 하드코딩
+// 임시로 element 를 useState 로 상태지정
+// 추후에 전역상태로 변경할 예정
 // 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
 export function useCanvasElementManager() {
-  const elementRegistry: ElementRegistry = {
+  const [elementRegistry] = useState<ElementRegistry>({
     elements: {
       'a-1': new RectSketchElement('a-1', {
         width: 300,
@@ -45,6 +47,6 @@ export function useCanvasElementManager() {
       }),
     },
     layerOrder: ['a-3', 'a-1', 'a-2', 'a-4', 'a-5'],
-  };
+  });
   return { elementRegistry };
 }
