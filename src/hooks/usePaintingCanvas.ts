@@ -3,6 +3,7 @@ import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { useEffect } from 'react';
 import { SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
+import { colorToken } from '@/style/color';
 
 export type PaintingCanvasFunc = () => void;
 
@@ -48,13 +49,21 @@ export function usePaintingCanvas(
     // 변환 상태 복원
     ctx.restore();
 
+    // 선택된 요소 그리기
+    if (Object.keys(selectState.selectElement).length > 0) {
+      const objectKeys = Object.keys(selectState.selectElement);
+      for (const elementId of objectKeys) {
+        selectState.selectElement[elementId].draw(ctx);
+      }
+    }
+
     // 선택 박스 그리기
     if (selectState.dragBox.startPoint && selectState.dragBox.endPoint) {
       const { startPoint, endPoint } = selectState.dragBox;
 
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000';
-      ctx.fillStyle = 'transparent';
+      ctx.strokeStyle = colorToken['dragColor'];
+      ctx.fillStyle = colorToken['dragBackground'];
 
       ctx.beginPath();
       ctx.rect(
