@@ -3,6 +3,7 @@ import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { useEffect } from 'react';
 import { SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
+import { colorToken } from '@/style/color';
 
 export type PaintingCanvasFunc = () => void;
 
@@ -61,8 +62,8 @@ export function usePaintingCanvas(
       const { startPoint, endPoint } = selectState.dragBox;
 
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000';
-      ctx.fillStyle = 'transparent';
+      ctx.strokeStyle = colorToken['dragColor'];
+      ctx.fillStyle = colorToken['dragBackground'];
 
       ctx.beginPath();
       ctx.rect(

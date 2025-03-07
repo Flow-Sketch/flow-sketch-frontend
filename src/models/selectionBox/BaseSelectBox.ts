@@ -1,3 +1,5 @@
+import { colorToken } from '@/style/color';
+
 interface BaseSelectBoxParams {
   id: string;
   x: number;
@@ -55,12 +57,21 @@ export class BaseSelectBox {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
+    const resizeAnchorWidth = 8; // 앵커의 길이
+    const resizeAnchorRadius = 2; // 모서리 반경 설정
+    const resizeAnchorPosition = [
+      { x: this.viewX - this.width / 2, y: this.viewY - this.height / 2 }, // 왼쪽 상단
+      { x: this.viewX - this.width / 2, y: this.viewY + this.height / 2 }, // 왼쪽 하단
+      { x: this.viewX + this.width / 2, y: this.viewY - this.height / 2 }, // 오른쪽 상단
+      { x: this.viewX + this.width / 2, y: this.viewY + this.height / 2 }, // 오른쪽 하단
+    ];
 
     // 스타일 적용
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = colorToken['focusColor'];
     ctx.fillStyle = 'transparent';
 
+    // 회전축 변경
     ctx.translate(this.viewX, this.viewY); // 회전하고자 하는 평면의 중점을 x, y  로 이동
     ctx.rotate(this.rotation); // 중점에서 좌표평면을 `rotation` 만큼 회전
     ctx.translate(-this.viewX, -this.viewY); // 다시 좌표평면의 위치를 x, y 로 이동
@@ -71,6 +82,19 @@ export class BaseSelectBox {
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
+
+    // 앵커 사각형 그리기
+    for (const anchorPosition of resizeAnchorPosition) {
+      const { x, y } = anchorPosition;
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = colorToken['focusColor'];
+      ctx.fillStyle = colorToken['white'];
+
+      ctx.beginPath();
+      ctx.roundRect(x - resizeAnchorWidth / 2, y - resizeAnchorWidth / 2, resizeAnchorWidth, resizeAnchorWidth, resizeAnchorRadius);
+      ctx.stroke();
+      ctx.fill();
+    }
     ctx.restore();
   }
 }
