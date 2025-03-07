@@ -30,6 +30,7 @@ export function useCanvasElementManager(): {
         height: 400,
         x: 1200,
         y: 2400,
+        rotation: Math.PI / 4,
       }),
       'a-2': new RectSketchElement({
         id: 'a-2',
@@ -40,10 +41,11 @@ export function useCanvasElementManager(): {
       }),
       'a-3': new EllipseSketchElement({
         id: 'a-3',
-        width: 700,
-        height: 700,
+        width: 1000,
+        height: 600,
         x: 1800,
         y: 1800,
+        rotation: Math.PI / 5,
       }),
       'a-4': new EllipseSketchElement({
         id: 'a-4',

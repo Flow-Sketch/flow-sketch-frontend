@@ -36,14 +36,14 @@ export class BaseSelectBox {
     this.rotation = param.rotation;
   }
 
-  private convertAxis({ x, y, width, height, offsetX, offsetY, rotation, scale }: Omit<BaseSelectBoxParams, 'id'>) {
+  private convertAxis({ x, y, width, height, offsetX, offsetY, scale }: Omit<BaseSelectBoxParams, 'id' | 'rotation'>) {
     // 절대 좌표를 View 좌표로 변환
     const viewX = offsetX + scale * x;
     const viewY = offsetY + scale * y;
 
     // 회전된 사각형의 너비와 높이 계산
-    const rotatedWidth = width * scale * Math.cos(rotation);
-    const rotatedHeight = height * scale * Math.cos(Math.PI - rotation);
+    const rotatedWidth = width * scale;
+    const rotatedHeight = height * scale;
 
     return {
       viewX,
@@ -60,6 +60,10 @@ export class BaseSelectBox {
     ctx.lineWidth = 10;
     ctx.strokeStyle = 'red';
     ctx.fillStyle = 'transparent';
+
+    ctx.translate(this.viewX, this.viewY); // 회전하고자 하는 평면의 중점을 x, y  로 이동
+    ctx.rotate(this.rotation); // 중점에서 좌표평면을 `rotation` 만큼 회전
+    ctx.translate(-this.viewX, -this.viewY); // 다시 좌표평면의 위치를 x, y 로 이동
 
     // 사각형 그리기
     ctx.beginPath(); // 다른 도형들과 분리되어 독립적으로 처리
