@@ -46,13 +46,6 @@ export class RectSketchElement extends BaseSketchElement {
     ctx.fillStyle = 'black';
     ctx.fillText(`x : ${this.x}, y : ${this.y}`, this.x, this.y);
     ctx.fillText(`x : ${this.width}, y : ${this.height}`, this.x, this.y + 20);
-
-    // 편집가능 시 형태 그리기
-    if (this.isEditable) {
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'blue';
-      ctx.stroke();
-    }
   }
 }
 

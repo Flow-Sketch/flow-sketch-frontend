@@ -3,14 +3,16 @@ import { useEffect, useState } from 'react';
 import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { isOBBColliding } from '@/utils/collidingDetection';
-import { BaseSketchElement } from '@/models/sketchElement/BaseSketchElement.ts';
+import { BaseSelectBox } from '@/models/selectionBox';
 
 export type SelectManagerState = {
   dragBox: {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
   };
-  selectElement: BaseSketchElement[];
+  selectElement: {
+    [id: string]: BaseSelectBox;
+  };
 };
 
 export type SelectManagerAction = {
@@ -24,7 +26,6 @@ export type SelectManagerAction = {
  * #### 설명
  * - 캔버스 내에서 요소를 드래그하여 선택할 수 있는 기능
  * - 사용자는 마우스를 드래그하여 선택 박스를 생성하고, 선택 영역을 지정할 수 있음
- * - ![속성 설명](https://raw.githubusercontent.com/IceBear9028/image-storage/flow-sketch/useSelectManager-1.png)
  *
  * @returns {object} - 선택 상태와 선택 조작 메소드를 포함하는 객체
  *   - `selectState`: 선택 상태를 포함하는 객체
@@ -49,13 +50,14 @@ export function useCanvasSelectManager(
   const [isSelectable, setSelectable] = useState<boolean>(false);
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
-  const [selectElement, setSelectElement] = useState<BaseSketchElement[]>([]);
+  const [selectElement, setSelectElement] = useState<SelectManagerState['selectElement']>({});
 
+  // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
     if (!startPoint || !endPoint) return;
 
     const { offset, scale } = viewState;
-    const newSelectElement = [];
+    const newSelectElement: SelectManagerState['selectElement'] = {};
     const dragRectWidth = Math.abs(endPoint.x - startPoint.x) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
@@ -81,7 +83,17 @@ export function useCanvasSelectManager(
 
       if (isObb) {
         element.enableEditing();
-        newSelectElement.push(element);
+        newSelectElement[element.id] = new BaseSelectBox({
+          id: element.id,
+          x: element.x,
+          y: element.y,
+          width: element.width,
+          height: element.height,
+          offsetX: viewState.offset.x,
+          offsetY: viewState.offset.y,
+          rotation: element.rotation,
+          scale: viewState.scale,
+        });
       } else {
         element.disableEditing();
       }
@@ -89,6 +101,30 @@ export function useCanvasSelectManager(
     setSelectElement(newSelectElement);
     console.log(newSelectElement);
   }, [startPoint, endPoint]);
+
+  // offset 을 변경하거나 scale 을 변경했을 때, 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
+  useEffect(() => {
+    const selectElementIdArr = Object.keys(selectElement);
+    if (selectElementIdArr.length) {
+      const newSelectElement: SelectManagerState['selectElement'] = {};
+      for (const elementId of selectElementIdArr) {
+        const originalElement = registry.elements[elementId];
+        newSelectElement[elementId] = new BaseSelectBox({
+          id: originalElement.id,
+          x: originalElement.x,
+          y: originalElement.y,
+          width: originalElement.width,
+          height: originalElement.height,
+          offsetX: viewState.offset.x,
+          offsetY: viewState.offset.y,
+          rotation: originalElement.rotation,
+          scale: viewState.scale,
+        });
+      }
+      // 최종 상태 압데이트
+      setSelectElement(newSelectElement);
+    }
+  }, [viewState.offset, viewState.scale]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
