@@ -2,7 +2,7 @@ import { useCanvasRemoteStore } from '@/hooks';
 import { css } from '@emotion/react';
 
 export const Remote = () => {
-  const { mode, shapeMode, ...action } = useCanvasRemoteStore();
+  const { mode, shapeType, ...action } = useCanvasRemoteStore();
 
   return (
     <div
@@ -24,7 +24,7 @@ export const Remote = () => {
           <p
             onClick={() => {
               action.setMode('view');
-              action.setShapeMode(null);
+              action.setShapeType(null);
             }}
           >
             편집
@@ -34,22 +34,22 @@ export const Remote = () => {
       <div>
         <p
           css={css`
-            font-weight: ${shapeMode === 'rect' ? 700 : 500};
+            font-weight: ${shapeType === 'rect' ? 700 : 500};
           `}
           onClick={() => {
             action.setMode('edit');
-            action.setShapeMode('rect');
+            action.setShapeType('rect');
           }}
         >
           네모네모
         </p>
         <p
           css={css`
-            font-weight: ${shapeMode === 'ellipse' ? 700 : 500};
+            font-weight: ${shapeType === 'ellipse' ? 700 : 500};
           `}
           onClick={() => {
             action.setMode('edit');
-            action.setShapeMode('ellipse');
+            action.setShapeType('ellipse');
           }}
         >
           둥글둥글

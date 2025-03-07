@@ -6,13 +6,13 @@ export type ShapeType = null | 'rect' | 'ellipse';
 interface RemoteState {
   mode: RemoteMode;
   isAddingShape: boolean;
-  shapeMode: ShapeType;
+  shapeType: ShapeType;
 }
 
 interface RemoteActions {
   setMode: (mode: RemoteMode) => void;
   setIsAddingShape: (isAdding: boolean) => void;
-  setShapeMode: (shapeMode: ShapeType) => void;
+  setShapeType: (shapeType: ShapeType) => void;
 }
 
 /**
@@ -74,9 +74,9 @@ interface RemoteActions {
  */
 export const useCanvasRemoteStore = create<RemoteState & RemoteActions>((set) => ({
   mode: 'view',
-  shapeMode: null,
+  shapeType: null,
   isAddingShape: false,
   setMode: (mode) => set({ mode }),
   setIsAddingShape: (isAddingShape) => set({ isAddingShape }),
-  setShapeMode: (shapeMode) => set({ shapeMode }),
+  setShapeType: (shapeType) => set({ shapeType }),
 }));

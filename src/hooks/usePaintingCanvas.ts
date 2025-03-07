@@ -4,6 +4,7 @@ import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { useEffect } from 'react';
 import { SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
 import { colorToken } from '@/style/color';
+import { CreateElementManagerState } from '@/hooks/useCanvasCreateElementManger.ts';
 
 export type PaintingCanvasFunc = () => void;
 
@@ -18,12 +19,14 @@ export type PaintingCanvasFunc = () => void;
  * @param registry - 캔버스에 그릴 요소들의 레지스트리
  * @param viewState - 캔버스의 뷰 상태 (배율 및 오프셋)
  * @param selectState - 선택 상태 (드래그 박스의 시작 및 끝 지점)
+ * @param createState - 객체 생성 상태 (가이드 박스의 시작 및 끝 지점, 생성객체타입)
  */
 export function usePaintingCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   registry: ElementRegistry,
   viewState: ViewManagerState,
   selectState: SelectManagerState,
+  createState: CreateElementManagerState,
 ) {
   useEffect(() => {
     const { elements, layerOrder } = registry;
@@ -64,6 +67,24 @@ export function usePaintingCanvas(
       ctx.lineWidth = 2;
       ctx.strokeStyle = colorToken['dragColor'];
       ctx.fillStyle = colorToken['dragBackground'];
+
+      ctx.beginPath();
+      ctx.rect(
+        Math.min(startPoint.x, endPoint.x),
+        Math.min(startPoint.y, endPoint.y),
+        Math.abs(startPoint.x - endPoint.x),
+        Math.abs(startPoint.y - endPoint.y),
+      );
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    if (createState.guideBox.startPoint && createState.guideBox.endPoint) {
+      const { startPoint, endPoint } = createState.guideBox;
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = colorToken['focusColor'];
+      ctx.fillStyle = 'transparent';
 
       ctx.beginPath();
       ctx.rect(
