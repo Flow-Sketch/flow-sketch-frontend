@@ -6,14 +6,17 @@ import {
   useCanvasViewManager,
   usePaintingCanvas,
   useActionHandler,
+  useCanvasRemoteStore,
 } from '@/hooks';
 
 export const Canvas = () => {
+  const remoteMode = useCanvasRemoteStore((store) => store.mode);
   const { canvasRef } = useCanvas();
   const { elementRegistry } = useCanvasElementManager();
   const { viewState, viewAction } = useCanvasViewManager();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
-  const { isViewMode, changeViewMode, handler } = useActionHandler(viewAction, selectAction);
+  const { handler } = useActionHandler(remoteMode, viewAction, selectAction);
+
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState);
 
   return (
@@ -22,7 +25,6 @@ export const Canvas = () => {
         display: flex;
       `}
     >
-      {isViewMode ? <p onClick={changeViewMode}>보기모드</p> : <p onClick={changeViewMode}>편집모드</p>}
       <canvas
         ref={canvasRef}
         onWheel={handler.handleWheel}

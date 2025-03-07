@@ -1,21 +1,14 @@
-import { useState } from 'react';
+import { RemoteMode } from '@/hooks/useCanvasRemoteStore.ts';
 import { ViewManagerAction } from '@/hooks/useCanvasViewManager.ts';
 import { SelectManagerAction } from '@/hooks/useCanvasSelectManager.ts';
 
-export function useActionHandler(viewAction: ViewManagerAction, selectAction: SelectManagerAction) {
-  const [isViewMode, setViewMode] = useState<boolean>(true);
-  const handleWheel = isViewMode ? viewAction.handleWheel : undefined;
-  const handleMouseDown = isViewMode ? viewAction.handleMouseDown : selectAction.handleMouseDown;
-  const handleMouseUp = isViewMode ? viewAction.handleMouseUp : selectAction.handleMouseUp;
-  const handleMouseMove = isViewMode ? viewAction.handleMouseMove : selectAction.handleMouseMove;
-
-  function changeViewMode() {
-    setViewMode((prev) => !prev);
-  }
+export function useActionHandler(mode: RemoteMode, viewAction: ViewManagerAction, selectAction: SelectManagerAction) {
+  const handleWheel = mode === 'view' ? viewAction.handleWheel : undefined;
+  const handleMouseDown = mode === 'view' ? viewAction.handleMouseDown : selectAction.handleMouseDown;
+  const handleMouseUp = mode === 'view' ? viewAction.handleMouseUp : selectAction.handleMouseUp;
+  const handleMouseMove = mode === 'view' ? viewAction.handleMouseMove : selectAction.handleMouseMove;
 
   return {
-    isViewMode,
-    changeViewMode,
     handler: {
       handleWheel,
       handleMouseDown,
