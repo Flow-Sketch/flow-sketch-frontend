@@ -1,15 +1,34 @@
 import { css } from '@emotion/react';
+import { DeleteManagerAction, DeleteManagerState } from '@/hooks/useCanvasDeleteElementManager.ts';
 
-export const SelectionMenu = () => {
+interface SelectionMenuProps {
+  deleteState: DeleteManagerState;
+  deleteAction: DeleteManagerAction;
+}
+
+export const SelectionMenu = ({ deleteState, deleteAction }: SelectionMenuProps) => {
+  if (!deleteState.menuPosition?.x || !deleteState.menuPosition?.y) {
+    return;
+  }
+
   return (
     <div
       css={css`
         display: flex;
         position: fixed;
-        // 여기에  menu 의 x, y 위치를 계산해야 함.
+        background: white;
+        left: ${deleteState.menuPosition.x}px;
+        top: ${deleteState.menuPosition.y}px;
       `}
     >
-      <p></p>
+      <div
+        css={css`
+          display: flex;
+          gap: 12px;
+        `}
+      >
+        <p onClick={deleteAction.handleOnClick}>삭제</p>
+      </div>
     </div>
   );
 };

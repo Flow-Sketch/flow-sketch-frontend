@@ -6,8 +6,10 @@ import {
   useCanvasViewManager,
   usePaintingCanvas,
   useActionHandler,
+  useCanvasDeleteElementManager,
 } from '@/hooks';
 import { useCanvasCreateElementManger } from '@/hooks/useCanvasCreateElementManger.ts';
+import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
@@ -15,6 +17,7 @@ export const Canvas = () => {
   const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
+  const { deleteState, deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
 
   const handler = useActionHandler(viewAction, selectAction, createAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
@@ -28,6 +31,7 @@ export const Canvas = () => {
         top: 0;
       `}
     >
+      <SelectionMenu deleteState={deleteState} deleteAction={deleteAction} />
       <canvas
         ref={canvasRef}
         onWheel={handler.handleWheel}

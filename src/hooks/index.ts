@@ -3,5 +3,6 @@ export { useCanvasElementManager } from './useCanvasElementManager';
 export { useCanvasViewManager } from './useCanvasViewManager';
 export { usePaintingCanvas } from './usePaintingCanvas';
 export { useCanvasSelectManager } from './useCanvasSelectManager';
+export { useCanvasDeleteElementManager } from './useCanvasDeleteElementManager';
 export { useActionHandler } from './useActionHandler';
 export { useCanvasRemoteStore } from './useCanvasRemoteStore';

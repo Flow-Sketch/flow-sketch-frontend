@@ -26,6 +26,7 @@ export type SelectManagerAction = {
   handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseUp: () => void;
+  resetElement: () => void;
 };
 
 /**
@@ -170,11 +171,19 @@ export function useCanvasSelectManager(
     });
   };
 
+  /** 임시로 작성
+   * 추후 SelectElement 는 Store 로 분리할 예정
+   */
+  const resetElement = () => {
+    setSelectElement({});
+  };
+
   return {
     selectAction: {
       handleMouseMove,
       handleMouseDown,
       handleMouseUp,
+      resetElement,
     },
     selectState: {
       dragBox: {
