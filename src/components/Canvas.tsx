@@ -7,14 +7,17 @@ import {
   usePaintingCanvas,
   useActionHandler,
 } from '@/hooks';
+import { useCanvasCreateElementManger } from '@/hooks/useCanvasCreateElementManger.ts';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
-  const { elementRegistry } = useCanvasElementManager();
   const { viewState, viewAction } = useCanvasViewManager();
+  const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
-  const { isViewMode, changeViewMode, handler } = useActionHandler(viewAction, selectAction);
-  usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState);
+  const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
+
+  const handler = useActionHandler(viewAction, selectAction, createAction);
+  usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
 
   return (
     <div
@@ -22,7 +25,6 @@ export const Canvas = () => {
         display: flex;
       `}
     >
-      {isViewMode ? <p onClick={changeViewMode}>보기모드</p> : <p onClick={changeViewMode}>편집모드</p>}
       <canvas
         ref={canvasRef}
         onWheel={handler.handleWheel}
