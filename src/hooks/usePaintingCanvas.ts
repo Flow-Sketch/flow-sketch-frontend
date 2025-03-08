@@ -79,6 +79,7 @@ export function usePaintingCanvas(
       ctx.stroke();
     }
 
+    // 도형(객체) 생성 가이드박스
     if (createState.guideBox.startPoint && createState.guideBox.endPoint) {
       const { startPoint, endPoint } = createState.guideBox;
 

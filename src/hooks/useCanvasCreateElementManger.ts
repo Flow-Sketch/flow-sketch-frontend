@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType } from '@/hooks/useCanvasRemoteStore.ts';
+import { ShapeType, useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
 import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
 
@@ -20,7 +20,6 @@ export type CreateElementMangerAction = {
 };
 
 export function useCanvasCreateElementManger(
-  shapeType: ShapeType,
   viewState: ViewManagerState,
   elementRegistryAction: ElementRegistryAction,
 ): {
@@ -30,6 +29,8 @@ export function useCanvasCreateElementManger(
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
+  const shapeType = useCanvasRemoteStore((store) => store.shapeType);
+  const setShapeType = useCanvasRemoteStore((store) => store.setShapeType);
 
   /**
    * > 도형을 그릴 때 처음 point(좌측 상단)
@@ -70,6 +71,7 @@ export function useCanvasCreateElementManger(
       y: convertOffsetY + convertHeight / 2,
     });
 
+    setShapeType(null);
     setIsDrawing(false);
     setStartPosition(null);
     setEndPosition(null);
