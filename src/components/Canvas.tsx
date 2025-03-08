@@ -23,6 +23,9 @@ export const Canvas = () => {
     <div
       css={css`
         display: flex;
+        position: fixed;
+        left: 0;
+        top: 0;
       `}
     >
       <canvas

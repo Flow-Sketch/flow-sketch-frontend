@@ -6,8 +6,6 @@ import { SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
 import { colorToken } from '@/style/color';
 import { CreateElementManagerState } from '@/hooks/useCanvasCreateElementManger.ts';
 
-export type PaintingCanvasFunc = () => void;
-
 /**
  * ### usePaintingCanvas()
  * #### 설명
