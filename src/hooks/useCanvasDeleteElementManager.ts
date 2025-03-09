@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SelectManagerAction, SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
 import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
 
@@ -12,6 +12,7 @@ export type DeleteManagerState = {
 
 export type DeleteManagerAction = {
   handleOnClick: () => void;
+  handleKeyDown: (event: React.KeyboardEvent<HTMLCanvasElement>) => void;
 };
 
 export function useCanvasDeleteElementManager(
@@ -32,13 +33,24 @@ export function useCanvasDeleteElementManager(
     });
   }, [selectState.boundingBox.width, selectState.boundingBox.height]);
 
-  const handleOnClick = () => {
+  const deleteElement = () => {
     const { selectElement } = selectState;
     const elementKeys = Object.keys(selectElement);
     for (const elementKey of elementKeys) {
       registryAction.deleteElement(elementKey);
     }
     selectAction.resetElement();
+  };
+
+  const handleOnClick = () => {
+    deleteElement();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (!event) return;
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      deleteElement();
+    }
   };
 
   return {
@@ -48,6 +60,7 @@ export function useCanvasDeleteElementManager(
     },
     deleteAction: {
       handleOnClick,
+      handleKeyDown,
     },
   };
 }

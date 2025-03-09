@@ -1,14 +1,14 @@
 import { css } from '@emotion/react';
 import {
   useCanvas,
-  useCanvasElementManager,
-  useCanvasSelectManager,
-  useCanvasViewManager,
   usePaintingCanvas,
-  useActionHandler,
+  useCanvasViewManager,
+  useCanvasSelectManager,
+  useCanvasActionHandler,
+  useCanvasElementManager,
+  useCanvasCreateElementManger,
   useCanvasDeleteElementManager,
 } from '@/hooks';
-import { useCanvasCreateElementManger } from '@/hooks/useCanvasCreateElementManger.ts';
 import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
 export const Canvas = () => {
@@ -19,7 +19,7 @@ export const Canvas = () => {
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
   const { deleteState, deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
 
-  const handler = useActionHandler(viewAction, selectAction, createAction);
+  const handler = useCanvasActionHandler(viewAction, selectAction, createAction, deleteAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
 
   return (
@@ -33,12 +33,21 @@ export const Canvas = () => {
     >
       <SelectionMenu deleteState={deleteState} deleteAction={deleteAction} />
       <canvas
+        css={css`
+          outline: none;
+          &:focus {
+            outline: none;
+            box-shadow: none;
+          }
+        `}
+        tabIndex={1}
         ref={canvasRef}
         onWheel={handler.handleWheel}
         onMouseDown={handler.handleMouseDown}
         onMouseUp={handler.handleMouseUp}
         onMouseMove={handler.handleMouseMove}
         onMouseLeave={handler.handleMouseUp}
+        onKeyDown={handler.handleKeyDown}
       />
     </div>
   );
