@@ -19,15 +19,15 @@ export const Remote = () => {
           gap: 12px;
         `}
       >
-        {mode === 'view' && <p onClick={() => action.setMode('select')}>보기</p>}
-        {mode === 'select' && (
+        {mode === 'view' && <p onClick={() => action.setMode('edit')}>보기</p>}
+        {mode === 'edit' && (
           <p
             onClick={() => {
               action.setMode('view');
               action.setShapeType(null);
             }}
           >
-            선택
+            편집
           </p>
         )}
       </div>

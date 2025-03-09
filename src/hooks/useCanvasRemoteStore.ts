@@ -1,18 +1,16 @@
 import { create } from 'zustand/react';
 
-export type RemoteMode = 'view' | 'edit' | 'select';
+export type RemoteMode = 'view' | 'edit';
 export type ShapeType = null | 'rect' | 'ellipse';
 
 interface RemoteState {
   mode: RemoteMode;
-  isSelecting: boolean;
   shapeType: ShapeType;
 }
 
 interface RemoteActions {
   setMode: (mode: RemoteMode) => void;
   setShapeType: (shapeType: ShapeType) => void;
-  setIsSelecting: (isSelecting: boolean) => void;
 }
 
 /**
@@ -79,8 +77,6 @@ interface RemoteActions {
 export const useCanvasRemoteStore = create<RemoteState & RemoteActions>((set) => ({
   mode: 'view',
   shapeType: null,
-  isSelecting: false,
   setMode: (mode) => set({ mode }),
   setShapeType: (shapeType) => set({ shapeType }),
-  setIsSelecting: (isSelecting) => set({ isSelecting }),
 }));

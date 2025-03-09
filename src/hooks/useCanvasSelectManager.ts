@@ -142,7 +142,7 @@ export function useCanvasSelectManager(
       // 최종 상태 압데이트
       setSelectElement(newSelectElement);
     }
-  }, [viewState.offset, viewState.scale]);
+  }, [viewState.offset, viewState.scale, registry.elements]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
