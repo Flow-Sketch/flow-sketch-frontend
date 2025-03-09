@@ -4,11 +4,18 @@ import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
 import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
 import { isOBBColliding } from '@/utils/collidingDetection';
 import { BaseSelectBox } from '@/models/selectionBox';
+import { getBoundingBox } from '@/utils/boundingBox';
 
 export type SelectManagerState = {
   dragBox: {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
+  };
+  boundingBox: {
+    cx: number;
+    cy: number;
+    width: number;
+    height: number;
   };
   selectElement: {
     [id: string]: BaseSelectBox;
@@ -19,6 +26,7 @@ export type SelectManagerAction = {
   handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseUp: () => void;
+  resetElement: () => void;
 };
 
 /**
@@ -51,6 +59,15 @@ export function useCanvasSelectManager(
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
   const [selectElement, setSelectElement] = useState<SelectManagerState['selectElement']>({});
+  const boundingBox = getBoundingBox(
+    Object.values(selectElement).map((item) => ({
+      cx: item.viewX,
+      cy: item.viewY,
+      width: item.width,
+      height: item.height,
+      rotation: item.rotation,
+    })),
+  );
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -154,16 +171,30 @@ export function useCanvasSelectManager(
     });
   };
 
+  /** 임시로 작성
+   * 추후 SelectElement 는 Store 로 분리할 예정
+   */
+  const resetElement = () => {
+    setSelectElement({});
+  };
+
   return {
     selectAction: {
       handleMouseMove,
       handleMouseDown,
       handleMouseUp,
+      resetElement,
     },
     selectState: {
       dragBox: {
         startPoint,
         endPoint,
+      },
+      boundingBox: {
+        cx: boundingBox.cx,
+        cy: boundingBox.cy,
+        width: boundingBox.width,
+        height: boundingBox.height,
       },
       selectElement,
     },

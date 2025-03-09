@@ -2,11 +2,13 @@ import { ViewManagerAction } from '@/hooks/useCanvasViewManager.ts';
 import { SelectManagerAction } from '@/hooks/useCanvasSelectManager.ts';
 import { CreateElementMangerAction } from '@/hooks/useCanvasCreateElementManger.ts';
 import { useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
+import { DeleteManagerAction } from '@/hooks/useCanvasDeleteElementManager.ts';
 
-export function useActionHandler(
+export function useCanvasActionHandler(
   viewAction: ViewManagerAction,
   selectAction: SelectManagerAction,
   createAction: CreateElementMangerAction,
+  deleteAction: DeleteManagerAction,
 ) {
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const remoteMode = useCanvasRemoteStore((store) => store.mode);
@@ -32,10 +34,17 @@ export function useActionHandler(
     return selectAction.handleMouseMove;
   })();
 
+  const handleKeyDown = (() => {
+    if (remoteMode === 'edit') {
+      return deleteAction.handleKeyDown;
+    }
+  })();
+
   return {
     handleWheel,
     handleMouseDown,
     handleMouseUp,
     handleMouseMove,
+    handleKeyDown,
   };
 }
