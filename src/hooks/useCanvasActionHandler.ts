@@ -3,12 +3,14 @@ import { SelectManagerAction } from '@/hooks/useCanvasSelectManager.ts';
 import { CreateElementMangerAction } from '@/hooks/useCanvasCreateElementManger.ts';
 import { useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
 import { DeleteManagerAction } from '@/hooks/useCanvasDeleteElementManager.ts';
+import { MoveManagerAction } from '@/hooks/useCanvasMoveElementManager.ts';
 
 export function useCanvasActionHandler(
   viewAction: ViewManagerAction,
   selectAction: SelectManagerAction,
   createAction: CreateElementMangerAction,
   deleteAction: DeleteManagerAction,
+  moveAction: MoveManagerAction,
 ) {
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const remoteMode = useCanvasRemoteStore((store) => store.mode);
@@ -18,19 +20,28 @@ export function useCanvasActionHandler(
 
   const handleMouseDown = (() => {
     if (remoteMode === 'view') return viewAction.handleMouseDown;
-    if (shapeType) return createAction.handleMouseDown;
+    if (remoteMode === 'edit') {
+      if (shapeType) return createAction.handleMouseDown;
+      return moveAction.handleMouseDown;
+    }
     return selectAction.handleMouseDown;
   })();
 
   const handleMouseUp = (() => {
     if (remoteMode === 'view') return viewAction.handleMouseUp;
-    if (shapeType) return createAction.handleMouseUp;
+    if (remoteMode === 'edit') {
+      if (shapeType) return createAction.handleMouseUp;
+      return moveAction.handleMouseUp;
+    }
     return selectAction.handleMouseUp;
   })();
 
   const handleMouseMove = (() => {
     if (remoteMode === 'view') return viewAction.handleMouseMove;
-    if (shapeType) return createAction.handleMouseMove;
+    if (remoteMode === 'edit') {
+      if (shapeType) return createAction.handleMouseMove;
+      return moveAction.handleMouseMove;
+    }
     return selectAction.handleMouseMove;
   })();
 

@@ -8,6 +8,7 @@ import {
   useCanvasElementManager,
   useCanvasCreateElementManger,
   useCanvasDeleteElementManager,
+  useCanvasMoveElementManager,
 } from '@/hooks';
 import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
@@ -18,8 +19,9 @@ export const Canvas = () => {
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
   const { deleteState, deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
+  const { moveAction } = useCanvasMoveElementManager(viewState, selectState, elementRegistryAction);
 
-  const handler = useCanvasActionHandler(viewAction, selectAction, createAction, deleteAction);
+  const handler = useCanvasActionHandler(viewAction, selectAction, createAction, deleteAction, moveAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
 
   return (

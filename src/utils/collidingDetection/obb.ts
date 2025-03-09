@@ -45,3 +45,36 @@ export function isOBBColliding(rect1: RectangleInfo, rect2: RectangleInfo): bool
   // 모든 축에서 투영 구간이 겹치면, 충돌하는 것으로 판별.
   return true;
 }
+
+/**
+ * 주어진 점이 회전된 사각형(OBB) 내부에 있는지 판별
+ *
+ * @param rect - 사각형 정보 (중심점, 너비, 높이, 회전각)
+ * @param point - 판별할 점의 좌표
+ * @returns 점이 사각형 내부에 있으면 true, 아니면 false
+ */
+export function isPointInOBB(
+  rect: { cx: number; cy: number; width: number; height: number; rotation: number },
+  point: { x: number; y: number },
+): boolean {
+  // 1. 점을 사각형의 로컬 좌표계로 변환 (회전 취소)
+  // 먼저 사각형 중심을 원점으로 이동
+  const translatedX = point.x - rect.cx;
+  const translatedY = point.y - rect.cy;
+
+  // 회전 취소 (역회전)
+  const cosA = Math.cos(-rect.rotation);
+  const sinA = Math.sin(-rect.rotation);
+
+  // 회전 변환 적용
+  const rotatedX = translatedX * cosA - translatedY * sinA;
+  const rotatedY = translatedX * sinA + translatedY * cosA;
+
+  // 2. 로컬 좌표계에서 점이 사각형 내부에 있는지 확인
+  // 사각형의 절반 크기
+  const halfWidth = rect.width / 2;
+  const halfHeight = rect.height / 2;
+
+  // 점이 사각형 내부에 있는지 확인 (AABB 충돌 검사)
+  return rotatedX >= -halfWidth && rotatedX <= halfWidth && rotatedY >= -halfHeight && rotatedY <= halfHeight;
+}

@@ -1,1 +1,1 @@
-export { isOBBColliding } from './obb';
+export { isOBBColliding, isPointInOBB } from './obb';
