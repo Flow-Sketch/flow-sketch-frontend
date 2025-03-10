@@ -8,8 +8,9 @@ import {
   useCanvasElementManager,
   useCanvasCreateElementManger,
   useCanvasDeleteElementManager,
+  useCanvasMoveElementManager,
+  useCanvasResizeElementManager,
 } from '@/hooks';
-import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
@@ -17,9 +18,11 @@ export const Canvas = () => {
   const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
-  const { deleteState, deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
+  const { deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
+  const { moveAction } = useCanvasMoveElementManager(viewState, selectState, elementRegistryAction);
+  const { resizeAction } = useCanvasResizeElementManager(viewState, selectState, elementRegistryAction);
 
-  const handler = useCanvasActionHandler(viewAction, selectAction, createAction, deleteAction);
+  const handler = useCanvasActionHandler(selectState, viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
 
   return (
@@ -31,7 +34,10 @@ export const Canvas = () => {
         top: 0;
       `}
     >
+      {/*
+      // 임시 비활성화
       <SelectionMenu deleteState={deleteState} deleteAction={deleteAction} />
+      */}
       <canvas
         css={css`
           outline: none;

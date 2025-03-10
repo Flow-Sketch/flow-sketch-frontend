@@ -7,6 +7,7 @@ import { BaseSelectBox } from '@/models/selectionBox';
 import { getBoundingBox } from '@/utils/boundingBox';
 
 export type SelectManagerState = {
+  isSelecting: boolean;
   dragBox: {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
@@ -55,7 +56,7 @@ export function useCanvasSelectManager(
   selectState: SelectManagerState;
   selectAction: SelectManagerAction;
 } {
-  const [isSelectable, setSelectable] = useState<boolean>(false);
+  const [isSelecting, setSelectable] = useState<boolean>(false); // 현재 편집중인지를 확인
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
   const [selectElement, setSelectElement] = useState<SelectManagerState['selectElement']>({});
@@ -141,7 +142,7 @@ export function useCanvasSelectManager(
       // 최종 상태 압데이트
       setSelectElement(newSelectElement);
     }
-  }, [viewState.offset, viewState.scale]);
+  }, [viewState.offset, viewState.scale, registry.elements]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
@@ -163,7 +164,7 @@ export function useCanvasSelectManager(
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !isSelectable || !startPoint) return;
+    if (!event || !isSelecting || !startPoint) return;
 
     setEndPosition({
       x: event.nativeEvent.offsetX,
@@ -186,16 +187,12 @@ export function useCanvasSelectManager(
       resetElement,
     },
     selectState: {
+      isSelecting,
       dragBox: {
         startPoint,
         endPoint,
       },
-      boundingBox: {
-        cx: boundingBox.cx,
-        cy: boundingBox.cy,
-        width: boundingBox.width,
-        height: boundingBox.height,
-      },
+      boundingBox,
       selectElement,
     },
   };
