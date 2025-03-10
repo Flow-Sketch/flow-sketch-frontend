@@ -3,7 +3,13 @@ import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models
 import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
 
-interface TransformParams {
+interface ResizeParams {
+  resizeX: number;
+  resizeY: number;
+  pointDirection: ('right' | 'left' | 'top' | 'bottom')[];
+}
+
+interface MoveParams {
   moveX: number;
   moveY: number;
 }
@@ -18,7 +24,8 @@ export interface ElementRegistry {
 export interface ElementRegistryAction {
   createElement: <T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) => void;
   deleteElement: (id: string) => void;
-  transformElement: (id: string, transformParam: TransformParams) => void;
+  moveElement: (id: string, transformParam: MoveParams) => void;
+  resizeElement: (id: string, transformParam: ResizeParams) => void;
 }
 
 // 임시로 element 를 useState 로 상태지정
@@ -91,11 +98,24 @@ export function useCanvasElementManager(): {
     }));
   }
 
-  function transformElement(id: string, params: TransformParams) {
+  function moveElement(id: string, params: MoveParams) {
     const updateElement = elementRegistry.elements[id];
     const updateElements = { ...elementRegistry.elements };
     if (updateElement) {
       updateElement.move(params.moveX, params.moveY);
+      updateElements[id] = updateElement;
+    }
+    setElementRegistry((prev) => ({
+      elements: updateElements,
+      layerOrder: prev.layerOrder,
+    }));
+  }
+
+  function resizeElement(id: string, params: ResizeParams) {
+    const updateElement = elementRegistry.elements[id];
+    const updateElements = { ...elementRegistry.elements };
+    if (updateElement) {
+      updateElement.resize(params.resizeX, params.resizeY, params.pointDirection);
       updateElements[id] = updateElement;
     }
     setElementRegistry((prev) => ({
@@ -109,7 +129,8 @@ export function useCanvasElementManager(): {
     elementRegistryAction: {
       createElement,
       deleteElement,
-      transformElement,
+      moveElement,
+      resizeElement,
     },
   };
 }

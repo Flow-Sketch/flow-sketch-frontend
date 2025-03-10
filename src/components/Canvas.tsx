@@ -9,6 +9,7 @@ import {
   useCanvasCreateElementManger,
   useCanvasDeleteElementManager,
   useCanvasMoveElementManager,
+  useCanvasResizeElementManager,
 } from '@/hooks';
 
 export const Canvas = () => {
@@ -19,8 +20,9 @@ export const Canvas = () => {
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
   const { deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
   const { moveAction } = useCanvasMoveElementManager(viewState, selectState, elementRegistryAction);
+  const { resizeAction } = useCanvasResizeElementManager(viewState, selectState, elementRegistryAction);
 
-  const handler = useCanvasActionHandler(selectState, viewAction, selectAction, createAction, deleteAction, moveAction);
+  const handler = useCanvasActionHandler(selectState, viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction);
   usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
 
   return (

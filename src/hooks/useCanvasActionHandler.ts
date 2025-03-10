@@ -7,6 +7,7 @@ import { DeleteManagerAction } from '@/hooks/useCanvasDeleteElementManager.ts';
 import { MoveManagerAction } from '@/hooks/useCanvasMoveElementManager.ts';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/constants';
 import { isPointInOBB } from '@/utils/collidingDetection';
+import { ResizeManagerAction } from '@/hooks/useCanvasResizeElementManager.ts';
 
 export function useCanvasActionHandler(
   selectState: SelectManagerState,
@@ -15,6 +16,7 @@ export function useCanvasActionHandler(
   createAction: CreateElementMangerAction,
   deleteAction: DeleteManagerAction,
   moveAction: MoveManagerAction,
+  resizeAction: ResizeManagerAction,
 ) {
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const remoteMode = useCanvasRemoteStore((store) => store.mode);
@@ -34,24 +36,26 @@ export function useCanvasActionHandler(
         y: event.nativeEvent.offsetY,
       };
       const outerBox = {
-        cx: cx + TRANSFORM_CONTROL_CORNER_WIDTH / 2,
-        cy: cy + TRANSFORM_CONTROL_CORNER_WIDTH / 2,
-        width,
-        height,
+        cx: cx,
+        cy: cy,
+        width: width + TRANSFORM_CONTROL_CORNER_WIDTH,
+        height: height + TRANSFORM_CONTROL_CORNER_WIDTH,
         rotation: 0,
       };
-      //
-      // const innerBox = {
-      //   cx: cx - TRANSFORM_CONTROL_CORNER_WIDTH / 2,
-      //   cy: cy - TRANSFORM_CONTROL_CORNER_WIDTH / 2,
-      //   width,
-      //   height,
-      //   rotation: 0,
-      // };
+      const innerBox = {
+        cx: cx,
+        cy: cy,
+        width: width - TRANSFORM_CONTROL_CORNER_WIDTH,
+        height: height - TRANSFORM_CONTROL_CORNER_WIDTH,
+        rotation: 0,
+      };
       if (isPointInOBB(outerBox, point)) {
-        // 여기에 resize, move 핸들러를 변경할 수 있는 조건문 추가예정
-        setEditMode('move');
-        return moveAction.handleMouseDown(event);
+        if (isPointInOBB(innerBox, point)) {
+          setEditMode('move');
+          return moveAction.handleMouseDown(event);
+        }
+        setEditMode('resize');
+        return resizeAction.handleMouseDown(event);
       }
       return selectAction.handleMouseDown(event);
     }
@@ -62,6 +66,10 @@ export function useCanvasActionHandler(
     if (remoteMode === 'edit') {
       if (shapeType) return createAction.handleMouseUp();
       if (editMode === 'select') selectAction.handleMouseUp();
+      if (editMode === 'resize') {
+        resizeAction.handleMouseUp();
+        setEditMode('select');
+      }
       if (editMode === 'move') {
         moveAction.handleMouseUp();
         setEditMode('select');
@@ -75,6 +83,7 @@ export function useCanvasActionHandler(
     if (remoteMode === 'edit') {
       if (shapeType) return createAction.handleMouseMove(event);
       if (editMode === 'select') selectAction.handleMouseMove(event);
+      if (editMode === 'resize') resizeAction.handleMouseMove(event);
       if (editMode === 'move') {
         moveAction.handleMouseMove(event);
       }

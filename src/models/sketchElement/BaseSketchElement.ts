@@ -47,6 +47,30 @@ export abstract class BaseSketchElement {
     this.y += dy;
   }
 
+  /**
+   * 요소의 크기와 위치를 조정하는 메소드
+   *
+   * @param dx - X축 방향으로의 마우스 이동량
+   * @param dy - Y축 방향으로의 마우스 이동량
+   * @param directions - 리사이즈가 시작된 방향들 (top, right, bottom, left)
+   */
+  resize(dx: number, dy: number, directions: ('top' | 'right' | 'bottom' | 'left')[]) {
+    const adjustedDeltaX = directions.includes('left') ? -dx : directions.includes('right') ? dx : 0;
+    const adjustedDeltaY = directions.includes('top') ? -dy : directions.includes('bottom') ? dy : 0;
+    const deltaX = !directions.includes('left') && !directions.includes('right') ? 0 : dx;
+    const deltaY = !directions.includes('top') && !directions.includes('bottom') ? 0 : dy;
+
+    const newWidth = Math.max(this.width + adjustedDeltaX, 10);
+    const newHeight = Math.max(this.height + adjustedDeltaY, 10);
+    const newX = this.x + deltaX / 2;
+    const newY = this.y + deltaY / 2;
+
+    this.x = newX;
+    this.y = newY;
+    this.width = newWidth;
+    this.height = newHeight;
+  }
+
   // 편집가능 변경 메소드
   enableEditing() {
     this.isEditable = true;

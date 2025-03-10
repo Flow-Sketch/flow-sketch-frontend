@@ -54,7 +54,7 @@ export function useCanvasMoveElementManager(
 
     // 선택된 요소를 같은 크기로 이동시킴
     for (const selectKey of Object.keys(selectState.selectElement)) {
-      elementRegistryAction.transformElement(selectKey, { moveX: deltaX, moveY: deltaY });
+      elementRegistryAction.moveElement(selectKey, { moveX: deltaX, moveY: deltaY });
     }
     setAlignmentPoint({ x: currentX, y: currentY });
   };
