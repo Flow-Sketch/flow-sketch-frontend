@@ -90,9 +90,9 @@ export function useCanvasActionHandler(
     }
   };
 
-  const handleKeyDown = () => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (remoteMode === 'edit') {
-      return deleteAction.handleKeyDown;
+      return deleteAction.handleKeyDown(event);
     }
   };
 
