@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models/sketchElement';
 import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
+import { FlowCanvasStyle } from '@/types/canvas.ts';
 
 interface ResizeParams {
   resizeX: number;
@@ -26,6 +27,7 @@ export interface ElementRegistryAction {
   deleteElement: (id: string) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
+  updateStyleElement: (id: string, transformParam: FlowCanvasStyle) => void;
 }
 
 // 임시로 element 를 useState 로 상태지정
@@ -124,6 +126,19 @@ export function useCanvasElementManager(): {
     }));
   }
 
+  function updateStyleElement(id: string, param: FlowCanvasStyle) {
+    const updateElement = elementRegistry.elements[id];
+    const updateElements = { ...elementRegistry.elements };
+    if (updateElement) {
+      updateElement.elementStyle = { ...updateElement.elementStyle, ...param };
+      updateElements[id] = updateElement;
+    }
+    setElementRegistry((prev) => ({
+      elements: updateElements,
+      layerOrder: prev.layerOrder,
+    }));
+  }
+
   return {
     elementRegistry,
     elementRegistryAction: {
@@ -131,6 +146,7 @@ export function useCanvasElementManager(): {
       deleteElement,
       moveElement,
       resizeElement,
+      updateStyleElement,
     },
   };
 }
