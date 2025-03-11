@@ -1,5 +1,6 @@
 import { create } from 'zustand/react';
 import { EllipseSketchElement, RectSketchElement } from '@/models/sketchElement';
+import { BaseSelectBox } from '@/models/selectionBox';
 
 export interface ElementRegistry {
   elements: {
@@ -8,8 +9,27 @@ export interface ElementRegistry {
   layerOrder: string[];
 }
 
+export interface SelectElementRegistry {
+  dragBox: {
+    startPoint: { x: number; y: number } | null;
+    endPoint: { x: number; y: number } | null;
+  };
+  boundingBox: {
+    cx: number;
+    cy: number;
+    width: number;
+    height: number;
+  };
+  selectElement: {
+    [id: string]: BaseSelectBox;
+  };
+}
+
 interface RegistryState {
   elementRegistry: ElementRegistry;
+  selectElement: {
+    testUser: SelectElementRegistry;
+  };
 }
 
 // 캔버스 요소 레지스트리를 관리하는 전역 상태 스토어
@@ -57,5 +77,20 @@ export const useElementRegistryStore = create<RegistryState>(() => ({
       }),
     },
     layerOrder: ['a-3', 'a-1', 'a-2', 'a-4', 'a-5'],
+  },
+  selectElement: {
+    testUser: {
+      dragBox: {
+        startPoint: null,
+        endPoint: null,
+      },
+      boundingBox: {
+        cx: 0,
+        cy: 0,
+        width: 0,
+        height: 0,
+      },
+      selectElement: {},
+    },
   },
 }));

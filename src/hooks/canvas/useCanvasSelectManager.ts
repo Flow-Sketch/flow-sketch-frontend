@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { ElementRegistry } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { useEffect } from 'react';
+import { ElementRegistry } from '@/store';
 import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import { isOBBColliding } from '@/utils/collidingDetection';
 import { BaseSelectBox } from '@/models/selectionBox';
 import { getBoundingBox } from '@/utils/boundingBox';
+import { useElementRegistryStore } from '@/store/useElementRegistryStore.ts';
 
 export type SelectManagerState = {
-  isSelecting: boolean;
   dragBox: {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
@@ -56,12 +56,17 @@ export function useCanvasSelectManager(
   selectState: SelectManagerState;
   selectAction: SelectManagerAction;
 } {
-  const [isSelecting, setSelectable] = useState<boolean>(false); // 현재 편집중인지를 확인
-  const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
-  const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
-  const [selectElement, setSelectElement] = useState<SelectManagerState['selectElement']>({});
+  // Zustand 스토어에서 상태와 업데이트 함수 가져오기
+  const store = useElementRegistryStore();
+  const setState = useElementRegistryStore.setState;
+  const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
+
+  // 스토어에서 현재 사용자의 선택 상태 가져오기
+  const userSelectState = store.selectElement[userId];
+
+  // 바운딩 박스 계산
   const boundingBox = getBoundingBox(
-    Object.values(selectElement).map((item) => ({
+    Object.values(userSelectState.selectElement).map((item) => ({
       cx: item.viewX,
       cy: item.viewY,
       width: item.width,
@@ -72,10 +77,11 @@ export function useCanvasSelectManager(
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
+    const { startPoint, endPoint } = userSelectState.dragBox;
     if (!startPoint || !endPoint) return;
 
     const { offset, scale } = viewState;
-    const newSelectElement: SelectManagerState['selectElement'] = {};
+    const newSelectElement: { [id: string]: BaseSelectBox } = {};
     const dragRectWidth = Math.abs(endPoint.x - startPoint.x) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
@@ -116,31 +122,56 @@ export function useCanvasSelectManager(
         element.disableEditing();
       }
     }
-    setSelectElement(newSelectElement);
+
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          selectElement: newSelectElement,
+        },
+      },
+    }));
+
     console.log(newSelectElement);
-  }, [startPoint, endPoint]);
+  }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
 
   // offset 을 변경하거나 scale 을 변경했을 때, 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
   useEffect(() => {
-    const selectElementIdArr = Object.keys(selectElement);
+    const selectElementIdArr = Object.keys(userSelectState.selectElement);
     if (selectElementIdArr.length) {
-      const newSelectElement: SelectManagerState['selectElement'] = {};
+      const newSelectElement: { [id: string]: BaseSelectBox } = {};
       for (const elementId of selectElementIdArr) {
         const originalElement = registry.elements[elementId];
-        newSelectElement[elementId] = new BaseSelectBox({
-          id: originalElement.id,
-          x: originalElement.x,
-          y: originalElement.y,
-          width: originalElement.width,
-          height: originalElement.height,
-          offsetX: viewState.offset.x,
-          offsetY: viewState.offset.y,
-          rotation: originalElement.rotation,
-          scale: viewState.scale,
-        });
+        if (originalElement) {
+          // 요소가 존재하는지 확인
+          newSelectElement[elementId] = new BaseSelectBox({
+            id: originalElement.id,
+            x: originalElement.x,
+            y: originalElement.y,
+            width: originalElement.width,
+            height: originalElement.height,
+            offsetX: viewState.offset.x,
+            offsetY: viewState.offset.y,
+            rotation: originalElement.rotation,
+            scale: viewState.scale,
+          });
+        }
       }
-      // 최종 상태 압데이트
-      setSelectElement(newSelectElement);
+
+      // 스토어 업데이트
+      setState((state) => ({
+        ...state,
+        selectElement: {
+          ...state.selectElement,
+          [userId]: {
+            ...state.selectElement[userId],
+            selectElement: newSelectElement,
+          },
+        },
+      }));
     }
   }, [viewState.offset, viewState.scale, registry.elements]);
 
@@ -152,31 +183,74 @@ export function useCanvasSelectManager(
       y: event.nativeEvent.offsetY,
     };
 
-    setStartPosition(newStartPosition);
-    setEndPosition(newStartPosition); // 사각형이 0,0에서 그려지는 문제 방지
-    setSelectable(true);
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          dragBox: {
+            startPoint: newStartPosition,
+            endPoint: newStartPosition, // 사각형이 0,0에서 그려지는 문제 방지
+          },
+        },
+      },
+    }));
   };
 
   const handleMouseUp = () => {
-    setSelectable(false);
-    setStartPosition(null);
-    setEndPosition(null);
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          dragBox: {
+            startPoint: null,
+            endPoint: null,
+          },
+        },
+      },
+    }));
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !isSelecting || !startPoint) return;
+    if (!event || !userSelectState.dragBox.startPoint) return;
 
-    setEndPosition({
-      x: event.nativeEvent.offsetX,
-      y: event.nativeEvent.offsetY,
-    });
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          dragBox: {
+            ...state.selectElement[userId].dragBox,
+            endPoint: {
+              x: event.nativeEvent.offsetX,
+              y: event.nativeEvent.offsetY,
+            },
+          },
+        },
+      },
+    }));
   };
 
-  /** 임시로 작성
-   * 추후 SelectElement 는 Store 로 분리할 예정
-   */
+  /** 선택 요소 초기화 */
   const resetElement = () => {
-    setSelectElement({});
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          selectElement: {},
+        },
+      },
+    }));
   };
 
   return {
@@ -187,13 +261,9 @@ export function useCanvasSelectManager(
       resetElement,
     },
     selectState: {
-      isSelecting,
-      dragBox: {
-        startPoint,
-        endPoint,
-      },
+      dragBox: userSelectState.dragBox,
       boundingBox,
-      selectElement,
+      selectElement: userSelectState.selectElement,
     },
   };
 }
