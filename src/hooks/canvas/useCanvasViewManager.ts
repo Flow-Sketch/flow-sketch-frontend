@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useCanvasViewStore } from '@/store';
 
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
 const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
@@ -50,10 +50,9 @@ export function useCanvasViewManager(): {
    * ### 특징
    * - 지점은 절대좌표 기준으로 잡는다.
    */
-  const [offset, setOffset] = useState({ x: -200, y: -200 }); // 최종 마우스로 이동시킨 거리
-  const [alignmentPoint, setAlignmentPoint] = useState({ x: 0, y: 0 }); // 마우스를 클릭한 순간의 지정
-  const [scale, setScale] = useState<number>(0.3);
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  // Zustand 스토어에서 상태 가져오기
+  const viewState = useCanvasViewStore();
+  const setState = useCanvasViewStore.setState;
 
   /**
    * > View 시점 변경 시, 변화량 측정에 필요한 기준점을 지정하는 함수
@@ -65,10 +64,12 @@ export function useCanvasViewManager(): {
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
 
-    setIsDrawing(true);
-    setAlignmentPoint({
-      x: currentX,
-      y: currentY,
+    setState({
+      isDrawing: true,
+      alignmentPoint: {
+        x: currentX,
+        y: currentY,
+      },
     });
   };
 
@@ -85,23 +86,26 @@ export function useCanvasViewManager(): {
     const MAX_SCALE = 3;
     const MIN_SCALE = Math.max(minWidthScale, minHeightScale);
     const scaleAmount = event.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * scaleAmount));
-    setScale(newScale);
+    const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, viewState.scale * scaleAmount));
 
-    // 보정하기
-    setOffset((prev) => ({
-      x: rangePosition(prev.x, -(CANVAS_WIDTH * scale) + VIEW_WIDTH, 0),
-      y: rangePosition(prev.y, -(CANVAS_HEIGHT * scale) + VIEW_HEIGHT, 0),
-    }));
+    setState({
+      scale: newScale,
+      offset: {
+        x: rangePosition(viewState.offset.x, -(CANVAS_WIDTH * newScale) + VIEW_WIDTH, 0),
+        y: rangePosition(viewState.offset.y, -(CANVAS_HEIGHT * newScale) + VIEW_HEIGHT, 0),
+      },
+    });
   };
 
   /** > View 시점의 기준점을 초기화하는 함수
    */
   const handleMouseUp = () => {
-    setIsDrawing(false);
-    setAlignmentPoint({
-      x: 0,
-      y: 0,
+    setState({
+      isDrawing: false,
+      alignmentPoint: {
+        x: 0,
+        y: 0,
+      },
     });
   };
 
@@ -110,29 +114,33 @@ export function useCanvasViewManager(): {
    * > - `offset` : 전체 캔버스에서 특정 지점의 View 시점의 위치
    */
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !isDrawing) return;
+    if (!event || !viewState.isDrawing) return;
 
     // 클릭한 시점을 기준으로, 한번의 mouseEvent 로 변경된 delta 값을 offset 에 반영한다.
-    const deltaX = event.nativeEvent.offsetX - alignmentPoint.x;
-    const deltaY = event.nativeEvent.offsetY - alignmentPoint.y;
+    const deltaX = event.nativeEvent.offsetX - viewState.alignmentPoint.x;
+    const deltaY = event.nativeEvent.offsetY - viewState.alignmentPoint.y;
 
-    // 한번의 mouseEvent 가 끝나면 startPoint 을 초기화한다.
-    setAlignmentPoint({
-      x: event.nativeEvent.offsetX,
-      y: event.nativeEvent.offsetY,
+    // 새로운 오프셋 계산
+    const newOffsetX = rangePosition(deltaX + viewState.offset.x, -(CANVAS_WIDTH * viewState.scale) + VIEW_WIDTH, 0);
+    const newOffsetY = rangePosition(deltaY + viewState.offset.y, -(CANVAS_HEIGHT * viewState.scale) + VIEW_HEIGHT, 0);
+
+    setState({
+      alignmentPoint: {
+        x: event.nativeEvent.offsetX,
+        y: event.nativeEvent.offsetY,
+      },
+      offset: {
+        x: newOffsetX,
+        y: newOffsetY,
+      },
     });
-
-    setOffset((prev) => ({
-      x: rangePosition(deltaX + prev.x, -(CANVAS_WIDTH * scale) + VIEW_WIDTH, 0),
-      y: rangePosition(deltaY + prev.y, -(CANVAS_HEIGHT * scale) + VIEW_HEIGHT, 0),
-    }));
   };
 
   return {
     viewState: {
-      offset,
-      alignmentPoint,
-      scale,
+      offset: viewState.offset,
+      alignmentPoint: viewState.alignmentPoint,
+      scale: viewState.scale,
     },
     viewAction: {
       handleMouseDown,
