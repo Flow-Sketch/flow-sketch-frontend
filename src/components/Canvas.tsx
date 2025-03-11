@@ -50,7 +50,6 @@ export const Canvas = () => {
         onMouseDown={handler.handleMouseDown}
         onMouseUp={handler.handleMouseUp}
         onMouseMove={handler.handleMouseMove}
-        onMouseLeave={handler.handleMouseUp}
         onKeyDown={handler.handleKeyDown}
       />
     </div>

@@ -2,6 +2,8 @@ import { css } from '@emotion/react';
 import { useElementRegistryStore } from '@/store';
 import { MoveManagerState } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
 import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
+import { ColorPicker } from '@/components/ColorPicker.tsx';
+import { useElementOptionColorManager } from '@/hooks/elementOption';
 
 interface SelectionMenuProps {
   moveState: MoveManagerState;
@@ -11,9 +13,8 @@ interface SelectionMenuProps {
 export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) => {
   const userId = 'testUser';
   const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElement[userId]);
-  const positionX = boundingBox.cx;
-  const positionY = boundingBox.cy - boundingBox.height / 2 + 20;
   const isActivate = !moveState.isMoving && Object.keys(elements).length > 0;
+  const { colors, changeBackground } = useElementOptionColorManager();
 
   return (
     isActivate && (
@@ -22,8 +23,8 @@ export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) =
           display: flex;
           position: fixed;
           background: white;
-          left: ${positionX}px;
-          top: ${positionY}px;
+          left: ${boundingBox.cx}px;
+          top: ${boundingBox.cy - boundingBox.height / 2 + 20}px;
         `}
       >
         <div
@@ -33,6 +34,7 @@ export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) =
           `}
         >
           <p onClick={deleteAction.handleOnClick}>삭제</p>
+          <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
         </div>
       </div>
     )
