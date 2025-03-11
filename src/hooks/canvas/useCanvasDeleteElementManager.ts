@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { SelectManagerAction, SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { SelectManagerAction } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
 import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { useElementRegistryStore } from '@/store';
 
 export type DeleteManagerState = {
   isActivate: boolean;
@@ -16,15 +17,16 @@ export type DeleteManagerAction = {
 };
 
 export function useCanvasDeleteElementManager(
-  selectState: SelectManagerState,
   selectAction: SelectManagerAction,
   registryAction: ElementRegistryAction,
 ): {
   deleteState: DeleteManagerState;
   deleteAction: DeleteManagerAction;
 } {
+  const userId = 'testUser';
   const [isActivate] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
 
   useEffect(() => {
     setMenuPosition({
@@ -34,8 +36,8 @@ export function useCanvasDeleteElementManager(
   }, [selectState.boundingBox.width, selectState.boundingBox.height]);
 
   const deleteElement = () => {
-    const { selectElement } = selectState;
-    const elementKeys = Object.keys(selectElement);
+    const { elements } = selectState;
+    const elementKeys = Object.keys(elements);
     for (const elementKey of elementKeys) {
       registryAction.deleteElement(elementKey);
     }

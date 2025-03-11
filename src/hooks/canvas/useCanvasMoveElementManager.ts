@@ -1,10 +1,13 @@
+import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { isPointInOBB } from '@/utils/collidingDetection';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
 import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
-import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
-import * as React from 'react';
+import { useCanvasViewStore, useElementRegistryStore } from '@/store';
+
+export type MoveManagerState = {
+  isMoving: boolean;
+};
 
 export type MoveManagerAction = {
   handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -12,15 +15,15 @@ export type MoveManagerAction = {
   handleMouseUp: () => void;
 };
 
-export function useCanvasMoveElementManager(
-  viewState: ViewManagerState,
-  selectState: SelectManagerState,
-  elementRegistryAction: ElementRegistryAction,
-): {
+export function useCanvasMoveElementManager(elementRegistryAction: ElementRegistryAction): {
+  moveState: MoveManagerState;
   moveAction: MoveManagerAction;
 } {
+  const userId = 'testUser';
   const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
-  const [isDrawing, setDrawing] = useState<boolean>(false);
+  const [isMoving, setIsMoving] = useState<boolean>(false);
+  const viewState = useCanvasViewStore();
+  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
 
   const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
@@ -40,12 +43,12 @@ export function useCanvasMoveElementManager(
         y: event.nativeEvent.offsetY,
       };
       setAlignmentPoint(newStartPosition);
-      setDrawing(true);
+      setIsMoving(true);
     }
   };
 
   const handleMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !isDrawing || !alignmentPoint) return;
+    if (!event || !isMoving || !alignmentPoint) return;
 
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
@@ -53,20 +56,23 @@ export function useCanvasMoveElementManager(
     const deltaY = (currentY - alignmentPoint.y) / viewState.scale;
 
     // 선택된 요소를 같은 크기로 이동시킴
-    for (const selectKey of Object.keys(selectState.selectElement)) {
+    for (const selectKey of Object.keys(selectState.elements)) {
       elementRegistryAction.moveElement(selectKey, { moveX: deltaX, moveY: deltaY });
     }
     setAlignmentPoint({ x: currentX, y: currentY });
   };
 
   const handleMouseUp = () => {
-    if (!isDrawing || !alignmentPoint) return;
+    if (!isMoving || !alignmentPoint) return;
 
-    setDrawing(false);
+    setIsMoving(false);
     setAlignmentPoint(null);
   };
 
   return {
+    moveState: {
+      isMoving,
+    },
     moveAction: {
       handleMouseDown,
       handleMouseMove,

@@ -15,12 +15,16 @@ export interface SelectElementRegistry {
     endPoint: { x: number; y: number } | null;
   };
   boundingBox: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
     cx: number;
     cy: number;
     width: number;
     height: number;
   };
-  selectElement: {
+  elements: {
     [id: string]: BaseSelectBox;
   };
 }
@@ -85,12 +89,16 @@ export const useElementRegistryStore = create<RegistryState>(() => ({
         endPoint: null,
       },
       boundingBox: {
+        minX: 0,
+        maxX: 0,
+        minY: 0,
+        maxY: 0,
         cx: 0,
         cy: 0,
         width: 0,
         height: 0,
       },
-      selectElement: {},
+      elements: {},
     },
   },
 }));

@@ -7,7 +7,7 @@ export function useElementOptionColorManager() {
   const selectElementStore = useElementRegistryStore((store) => store.selectElement[userId]);
 
   function changeBackground(colorCode: string) {
-    const selectElementKeys = Object.keys(selectElementStore.selectElement);
+    const selectElementKeys = Object.keys(selectElementStore.elements);
     for (const elementKey of selectElementKeys) {
       elementRegistryAction.updateStyleElement(elementKey, { background: colorCode });
     }

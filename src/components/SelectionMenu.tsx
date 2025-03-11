@@ -1,34 +1,40 @@
 import { css } from '@emotion/react';
-import { DeleteManagerAction, DeleteManagerState } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
+import { useElementRegistryStore } from '@/store';
+import { MoveManagerState } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
+import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
 
 interface SelectionMenuProps {
-  deleteState: DeleteManagerState;
+  moveState: MoveManagerState;
   deleteAction: DeleteManagerAction;
 }
 
-export const SelectionMenu = ({ deleteState, deleteAction }: SelectionMenuProps) => {
-  if (!deleteState.menuPosition?.x || !deleteState.menuPosition?.y) {
-    return;
-  }
+export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) => {
+  const userId = 'testUser';
+  const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElement[userId]);
+  const positionX = boundingBox.cx;
+  const positionY = boundingBox.cy - boundingBox.height / 2 + 20;
+  const isActivate = !moveState.isMoving && Object.keys(elements).length > 0;
 
   return (
-    <div
-      css={css`
-        display: flex;
-        position: fixed;
-        background: white;
-        left: ${deleteState.menuPosition.x}px;
-        top: ${deleteState.menuPosition.y}px;
-      `}
-    >
+    isActivate && (
       <div
         css={css`
           display: flex;
-          gap: 12px;
+          position: fixed;
+          background: white;
+          left: ${positionX}px;
+          top: ${positionY}px;
         `}
       >
-        <p onClick={deleteAction.handleOnClick}>삭제</p>
+        <div
+          css={css`
+            display: flex;
+            gap: 12px;
+          `}
+        >
+          <p onClick={deleteAction.handleOnClick}>삭제</p>
+        </div>
       </div>
-    </div>
+    )
   );
 };

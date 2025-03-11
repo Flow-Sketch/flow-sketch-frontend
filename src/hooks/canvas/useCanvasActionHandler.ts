@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ViewManagerAction } from '@/hooks/canvas/useCanvasViewManager.ts';
-import { SelectManagerAction, SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { SelectManagerAction } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
 import { CreateElementMangerAction } from '@/hooks/canvas/useCanvasCreateElementManger.ts';
-import { useCanvasRemoteStore } from '@/store';
+import { useCanvasRemoteStore, useElementRegistryStore } from '@/store';
 import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
 import { MoveManagerAction } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/constants';
@@ -10,7 +10,6 @@ import { isPointInOBB } from '@/utils/collidingDetection';
 import { ResizeManagerAction } from '@/hooks/canvas/useCanvasResizeElementManager.ts';
 
 export function useCanvasActionHandler(
-  selectState: SelectManagerState,
   viewAction: ViewManagerAction,
   selectAction: SelectManagerAction,
   createAction: CreateElementMangerAction,
@@ -18,8 +17,10 @@ export function useCanvasActionHandler(
   moveAction: MoveManagerAction,
   resizeAction: ResizeManagerAction,
 ) {
+  const userId = 'testUser';
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const remoteMode = useCanvasRemoteStore((store) => store.mode);
+  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
   const [editMode, setEditMode] = useState<'select' | 'resize' | 'move'>('select');
 
   const handleWheel = (() => {

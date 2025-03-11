@@ -3,6 +3,7 @@ import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
 import { FlowCanvasStyle } from '@/types/canvas.ts';
 import { useElementRegistryStore } from '@/store';
+import { getBoundingBox } from '@/utils/boundingBox';
 
 interface ResizeParams {
   resizeX: number;
@@ -37,7 +38,9 @@ export function useCanvasElementManager(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 } {
+  const userId = 'testUser';
   const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
+  const selectElementRegistry = useElementRegistryStore((store) => store.selectElement[userId].elements);
   const setElementRegistry = useElementRegistryStore.setState;
 
   function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
@@ -55,12 +58,24 @@ export function useCanvasElementManager(): {
       return;
     }
     const updateElement = { ...elementRegistry.elements };
+    const updateSelectElement = { ...selectElementRegistry };
+
     delete updateElement[id];
+    delete updateSelectElement[id];
+
     setElementRegistry((prev) => ({
       ...prev,
       elementRegistry: {
         elements: updateElement,
         layerOrder: prev.elementRegistry.layerOrder.filter((key) => key !== id),
+      },
+      selectElement: {
+        ...prev.selectElement,
+        [userId]: {
+          ...prev.selectElement[userId],
+          elements: updateSelectElement,
+          boundingBox: getBoundingBox([]),
+        },
       },
     }));
   }

@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { ElementRegistry } from '@/store';
-import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import { isOBBColliding } from '@/utils/collidingDetection';
 import { BaseSelectBox } from '@/models/selectionBox';
 import { getBoundingBox } from '@/utils/boundingBox';
 import { useElementRegistryStore } from '@/store/useElementRegistryStore.ts';
+import { useCanvasViewStore } from '@/store';
 
 export type SelectManagerState = {
   dragBox: {
@@ -31,7 +30,7 @@ export type SelectManagerAction = {
 };
 
 /**
- * ### useCanvasSelectManager()
+ * ### useCanvasSelectElementManager()
  * #### 설명
  * - 캔버스 내에서 요소를 드래그하여 선택할 수 있는 기능
  * - 사용자는 마우스를 드래그하여 선택 박스를 생성하고, 선택 영역을 지정할 수 있음
@@ -49,31 +48,18 @@ export type SelectManagerAction = {
  *     - `handleMouseUp`: () => void
  *       - 드래그 종료 시 호출되는 함수로, 드래그 상태를 초기화합니다.
  */
-export function useCanvasSelectManager(
-  registry: ElementRegistry,
-  viewState: ViewManagerState,
-): {
+export function useCanvasSelectElementManager(): {
   selectState: SelectManagerState;
   selectAction: SelectManagerAction;
 } {
   // Zustand 스토어에서 상태와 업데이트 함수 가져오기
   const store = useElementRegistryStore();
   const setState = useElementRegistryStore.setState;
-  const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
+  const viewState = useCanvasViewStore();
 
   // 스토어에서 현재 사용자의 선택 상태 가져오기
+  const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
   const userSelectState = store.selectElement[userId];
-
-  // 바운딩 박스 계산
-  const boundingBox = getBoundingBox(
-    Object.values(userSelectState.selectElement).map((item) => ({
-      cx: item.viewX,
-      cy: item.viewY,
-      width: item.width,
-      height: item.height,
-      rotation: item.rotation,
-    })),
-  );
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -95,8 +81,8 @@ export function useCanvasSelectManager(
       angle: 0,
     };
 
-    for (const elementId of registry.layerOrder) {
-      const element = registry.elements[elementId];
+    for (const elementId of store.elementRegistry.layerOrder) {
+      const element = store.elementRegistry.elements[elementId];
       const isObb = isOBBColliding(dragRect, {
         cx: element.x,
         cy: element.y,
@@ -130,7 +116,16 @@ export function useCanvasSelectManager(
         ...state.selectElement,
         [userId]: {
           ...state.selectElement[userId],
-          selectElement: newSelectElement,
+          elements: newSelectElement,
+          boundingBox: getBoundingBox(
+            Object.values(newSelectElement).map((item) => ({
+              cx: item.viewX,
+              cy: item.viewY,
+              width: item.width,
+              height: item.height,
+              rotation: item.rotation,
+            })),
+          ),
         },
       },
     }));
@@ -140,11 +135,11 @@ export function useCanvasSelectManager(
 
   // offset 을 변경하거나 scale 을 변경했을 때, 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
   useEffect(() => {
-    const selectElementIdArr = Object.keys(userSelectState.selectElement);
+    const selectElementIdArr = Object.keys(userSelectState.elements);
     if (selectElementIdArr.length) {
       const newSelectElement: { [id: string]: BaseSelectBox } = {};
       for (const elementId of selectElementIdArr) {
-        const originalElement = registry.elements[elementId];
+        const originalElement = store.elementRegistry.elements[elementId];
         if (originalElement) {
           // 요소가 존재하는지 확인
           newSelectElement[elementId] = new BaseSelectBox({
@@ -168,12 +163,21 @@ export function useCanvasSelectManager(
           ...state.selectElement,
           [userId]: {
             ...state.selectElement[userId],
-            selectElement: newSelectElement,
+            elements: newSelectElement,
+            boundingBox: getBoundingBox(
+              Object.values(newSelectElement).map((item) => ({
+                cx: item.viewX,
+                cy: item.viewY,
+                width: item.width,
+                height: item.height,
+                rotation: item.rotation,
+              })),
+            ),
           },
         },
       }));
     }
-  }, [viewState.offset, viewState.scale, registry.elements]);
+  }, [viewState.offset, viewState.scale, store.elementRegistry.elements]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
@@ -247,7 +251,7 @@ export function useCanvasSelectManager(
         ...state.selectElement,
         [userId]: {
           ...state.selectElement[userId],
-          selectElement: {},
+          elements: {},
         },
       },
     }));
@@ -262,8 +266,8 @@ export function useCanvasSelectManager(
     },
     selectState: {
       dragBox: userSelectState.dragBox,
-      boundingBox,
-      selectElement: userSelectState.selectElement,
+      boundingBox: userSelectState.boundingBox,
+      selectElement: userSelectState.elements,
     },
   };
 }

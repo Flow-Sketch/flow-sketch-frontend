@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ElementRegistry } from '@/hooks/canvas/useCanvasElementManager.ts';
 import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import { useEffect } from 'react';
-import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
 import { colorToken } from '@/style/color';
 import { CreateElementManagerState } from '@/hooks/canvas/useCanvasCreateElementManger.ts';
 
