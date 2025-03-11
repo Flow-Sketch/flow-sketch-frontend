@@ -1,10 +1,10 @@
+import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { isPointInOBB } from '@/utils/collidingDetection';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { SelectManagerState } from '@/hooks/useCanvasSelectManager';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager';
-import * as React from 'react';
+import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { useCanvasViewStore, useElementRegistryStore } from '@/store';
 
 // 리사이즈 핸들 위치 타입 정의
 export type ResizeHandlePosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'right' | 'bottom' | 'left' | null;
@@ -27,13 +27,13 @@ export type ResizeManagerAction = {
  * @param elementRegistryAction - 요소 레지스트리 액션
  * @returns 리사이즈 관련 액션
  */
-export function useCanvasResizeElementManager(
-  viewState: ViewManagerState,
-  selectState: SelectManagerState,
-  elementRegistryAction: ElementRegistryAction,
-): {
+export function useCanvasResizeElementManager(elementRegistryAction: ElementRegistryAction): {
   resizeAction: ResizeManagerAction;
 } {
+  const userId = 'testUser';
+  const viewState = useCanvasViewStore();
+  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [isResizing, setIsResizing] = useState<boolean>(false); // 현재 드래그 중인지 여부
   const [activeHandle, setActiveHandle] = useState<ResizeHandlePosition>(null); // 현재 드래그 중인 핸들 위치
@@ -55,7 +55,7 @@ export function useCanvasResizeElementManager(
     const currentY = event.nativeEvent.offsetY;
 
     // 선택된 요소가 없으면 리턴
-    if (Object.keys(selectState.selectElement).length === 0) return;
+    if (Object.keys(selectState.elements).length === 0) return;
 
     // 마우스 위치가 어떤 핸들 위에 있는지 확인
     const handlePosition = getResizeHandleAtPosition(currentX, currentY, selectState.boundingBox);
@@ -83,7 +83,7 @@ export function useCanvasResizeElementManager(
     const deltaY = (currentY - startPoint.y) / viewState.scale;
 
     // 선택된 모든 요소에 대해 크기 조절 적용
-    for (const selectKey of Object.keys(selectState.selectElement)) {
+    for (const selectKey of Object.keys(selectState.elements)) {
       elementRegistryAction.resizeElement(selectKey, {
         resizeX: deltaX,
         resizeY: deltaY,

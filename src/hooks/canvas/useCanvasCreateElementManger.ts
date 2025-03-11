@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType, useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
+import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from '@/store';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
 
 export type CreateElementManagerState = {
   guideBox: {
@@ -19,10 +18,7 @@ export type CreateElementMangerAction = {
   handleMouseUp: () => void;
 };
 
-export function useCanvasCreateElementManger(
-  viewState: ViewManagerState,
-  elementRegistryAction: ElementRegistryAction,
-): {
+export function useCanvasCreateElementManger(elementRegistryAction: ElementRegistryAction): {
   createState: CreateElementManagerState;
   createAction: CreateElementMangerAction;
 } {
@@ -31,6 +27,7 @@ export function useCanvasCreateElementManger(
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const setShapeType = useCanvasRemoteStore((store) => store.setShapeType);
+  const viewState = useCanvasViewStore();
 
   /**
    * > 도형을 그릴 때 처음 point(좌측 상단)

@@ -1,5 +1,5 @@
-import { useCanvasRemoteStore } from '@/hooks';
 import { css } from '@emotion/react';
+import { useCanvasRemoteStore } from '@/store';
 
 export const Remote = () => {
   const { mode, shapeType, ...action } = useCanvasRemoteStore();

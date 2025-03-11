@@ -1,34 +1,42 @@
 import { css } from '@emotion/react';
-import { DeleteManagerAction, DeleteManagerState } from '@/hooks/useCanvasDeleteElementManager.ts';
+import { useElementRegistryStore } from '@/store';
+import { MoveManagerState } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
+import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
+import { ColorPicker } from '@/components/ColorPicker.tsx';
+import { useElementOptionColorManager } from '@/hooks/elementOption';
 
 interface SelectionMenuProps {
-  deleteState: DeleteManagerState;
+  moveState: MoveManagerState;
   deleteAction: DeleteManagerAction;
 }
 
-export const SelectionMenu = ({ deleteState, deleteAction }: SelectionMenuProps) => {
-  if (!deleteState.menuPosition?.x || !deleteState.menuPosition?.y) {
-    return;
-  }
+export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) => {
+  const userId = 'testUser';
+  const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElement[userId]);
+  const isActivate = !moveState.isMoving && Object.keys(elements).length > 0;
+  const { colors, changeBackground } = useElementOptionColorManager();
 
   return (
-    <div
-      css={css`
-        display: flex;
-        position: fixed;
-        background: white;
-        left: ${deleteState.menuPosition.x}px;
-        top: ${deleteState.menuPosition.y}px;
-      `}
-    >
+    isActivate && (
       <div
         css={css`
           display: flex;
-          gap: 12px;
+          position: fixed;
+          background: white;
+          left: ${boundingBox.cx}px;
+          top: ${boundingBox.cy - boundingBox.height / 2 + 20}px;
         `}
       >
-        <p onClick={deleteAction.handleOnClick}>삭제</p>
+        <div
+          css={css`
+            display: flex;
+            gap: 12px;
+          `}
+        >
+          <p onClick={deleteAction.handleOnClick}>삭제</p>
+          <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
+        </div>
       </div>
-    </div>
+    )
   );
 };

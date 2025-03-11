@@ -1,7 +1,9 @@
-import { useState } from 'react';
 import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models/sketchElement';
 import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
+import { FlowCanvasStyle } from '@/types/canvas.ts';
+import { useElementRegistryStore } from '@/store';
+import { getBoundingBox } from '@/utils/boundingBox';
 
 interface ResizeParams {
   resizeX: number;
@@ -26,6 +28,7 @@ export interface ElementRegistryAction {
   deleteElement: (id: string) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
+  updateStyleElement: (id: string, transformParam: FlowCanvasStyle) => void;
 }
 
 // 임시로 element 를 useState 로 상태지정
@@ -35,54 +38,18 @@ export function useCanvasElementManager(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 } {
-  const [elementRegistry, setElementRegistry] = useState<ElementRegistry>({
-    elements: {
-      'a-1': new RectSketchElement({
-        id: 'a-1',
-        width: 300,
-        height: 400,
-        x: 1200,
-        y: 2400,
-        rotation: Math.PI / 4,
-      }),
-      'a-2': new RectSketchElement({
-        id: 'a-2',
-        width: 300,
-        height: 400,
-        x: 3400,
-        y: 10000,
-      }),
-      'a-3': new EllipseSketchElement({
-        id: 'a-3',
-        width: 1000,
-        height: 600,
-        x: 1800,
-        y: 1800,
-        rotation: Math.PI / 5,
-      }),
-      'a-4': new EllipseSketchElement({
-        id: 'a-4',
-        width: 1700,
-        height: 700,
-        x: 6999,
-        y: 1800,
-      }),
-      'a-5': new RectSketchElement({
-        id: 'a-5',
-        x: 1740,
-        y: 1313.3333333,
-        width: 2080,
-        height: 1933.33333,
-        background: 'rgba(100, 100, 100, 0.2)',
-      }),
-    },
-    layerOrder: ['a-3', 'a-1', 'a-2', 'a-4', 'a-5'],
-  });
+  const userId = 'testUser';
+  const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
+  const selectElementRegistry = useElementRegistryStore((store) => store.selectElement[userId].elements);
+  const setElementRegistry = useElementRegistryStore.setState;
 
   function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
     setElementRegistry((prev) => ({
-      elements: { ...prev.elements, [params.id]: SketchElement.createElement(type, params) },
-      layerOrder: [...prev.layerOrder, params.id],
+      ...prev,
+      elementRegistry: {
+        elements: { ...prev.elementRegistry.elements, [params.id]: SketchElement.createElement(type, params) },
+        layerOrder: [...prev.elementRegistry.layerOrder, params.id],
+      },
     }));
   }
 
@@ -91,10 +58,25 @@ export function useCanvasElementManager(): {
       return;
     }
     const updateElement = { ...elementRegistry.elements };
+    const updateSelectElement = { ...selectElementRegistry };
+
     delete updateElement[id];
+    delete updateSelectElement[id];
+
     setElementRegistry((prev) => ({
-      elements: updateElement,
-      layerOrder: prev.layerOrder.filter((key) => key !== id),
+      ...prev,
+      elementRegistry: {
+        elements: updateElement,
+        layerOrder: prev.elementRegistry.layerOrder.filter((key) => key !== id),
+      },
+      selectElement: {
+        ...prev.selectElement,
+        [userId]: {
+          ...prev.selectElement[userId],
+          elements: updateSelectElement,
+          boundingBox: getBoundingBox([]),
+        },
+      },
     }));
   }
 
@@ -106,8 +88,11 @@ export function useCanvasElementManager(): {
       updateElements[id] = updateElement;
     }
     setElementRegistry((prev) => ({
-      elements: updateElements,
-      layerOrder: prev.layerOrder,
+      ...prev,
+      elementRegistry: {
+        elements: updateElements,
+        layerOrder: prev.elementRegistry.layerOrder,
+      },
     }));
   }
 
@@ -119,8 +104,27 @@ export function useCanvasElementManager(): {
       updateElements[id] = updateElement;
     }
     setElementRegistry((prev) => ({
-      elements: updateElements,
-      layerOrder: prev.layerOrder,
+      ...prev,
+      elementRegistry: {
+        elements: updateElements,
+        layerOrder: prev.elementRegistry.layerOrder,
+      },
+    }));
+  }
+
+  function updateStyleElement(id: string, param: FlowCanvasStyle) {
+    const updateElement = elementRegistry.elements[id];
+    const updateElements = { ...elementRegistry.elements };
+    if (updateElement) {
+      updateElement.elementStyle = { ...updateElement.elementStyle, ...param };
+      updateElements[id] = updateElement;
+    }
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: updateElements,
+        layerOrder: prev.elementRegistry.layerOrder,
+      },
     }));
   }
 
@@ -131,6 +135,7 @@ export function useCanvasElementManager(): {
       deleteElement,
       moveElement,
       resizeElement,
+      updateStyleElement,
     },
   };
 }
