@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { DeleteManagerAction, DeleteManagerState } from '@/hooks/useCanvasDeleteElementManager.ts';
+import { DeleteManagerAction, DeleteManagerState } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
 
 interface SelectionMenuProps {
   deleteState: DeleteManagerState;

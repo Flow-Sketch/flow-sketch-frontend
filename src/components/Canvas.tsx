@@ -10,7 +10,7 @@ import {
   useCanvasDeleteElementManager,
   useCanvasMoveElementManager,
   useCanvasResizeElementManager,
-} from '@/hooks';
+} from '@/hooks/canvas';
 
 export const Canvas = () => {
   const { canvasRef } = useCanvas();

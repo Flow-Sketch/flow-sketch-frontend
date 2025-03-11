@@ -1,9 +1,9 @@
 import { MouseEvent, useState } from 'react';
 import { isPointInOBB } from '@/utils/collidingDetection';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { SelectManagerState } from '@/hooks/useCanvasSelectManager';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager';
+import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import * as React from 'react';
 
 // 리사이즈 핸들 위치 타입 정의

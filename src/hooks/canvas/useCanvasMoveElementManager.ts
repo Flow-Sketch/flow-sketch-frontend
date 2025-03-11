@@ -1,9 +1,9 @@
 import { MouseEvent, useState } from 'react';
 import { isPointInOBB } from '@/utils/collidingDetection';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
+import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import * as React from 'react';
 
 export type MoveManagerAction = {

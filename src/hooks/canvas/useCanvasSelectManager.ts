@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { ElementRegistry } from '@/hooks/useCanvasElementManager.ts';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
+import { ElementRegistry } from '@/hooks/canvas/useCanvasElementManager.ts';
+import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import { isOBBColliding } from '@/utils/collidingDetection';
 import { BaseSelectBox } from '@/models/selectionBox';
 import { getBoundingBox } from '@/utils/boundingBox';

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType, useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
-import { ViewManagerState } from '@/hooks/useCanvasViewManager.ts';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
+import { ShapeType, useCanvasRemoteStore } from '@/store';
+import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
 
 export type CreateElementManagerState = {
   guideBox: {

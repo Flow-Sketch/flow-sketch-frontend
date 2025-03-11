@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { SelectManagerAction, SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
-import { ElementRegistryAction } from '@/hooks/useCanvasElementManager.ts';
+import { SelectManagerAction, SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
 
 export type DeleteManagerState = {
   isActivate: boolean;

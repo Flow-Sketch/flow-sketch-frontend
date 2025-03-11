@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { ViewManagerAction } from '@/hooks/useCanvasViewManager.ts';
-import { SelectManagerAction, SelectManagerState } from '@/hooks/useCanvasSelectManager.ts';
-import { CreateElementMangerAction } from '@/hooks/useCanvasCreateElementManger.ts';
-import { useCanvasRemoteStore } from '@/hooks/useCanvasRemoteStore.ts';
-import { DeleteManagerAction } from '@/hooks/useCanvasDeleteElementManager.ts';
-import { MoveManagerAction } from '@/hooks/useCanvasMoveElementManager.ts';
+import { ViewManagerAction } from '@/hooks/canvas/useCanvasViewManager.ts';
+import { SelectManagerAction, SelectManagerState } from '@/hooks/canvas/useCanvasSelectManager.ts';
+import { CreateElementMangerAction } from '@/hooks/canvas/useCanvasCreateElementManger.ts';
+import { useCanvasRemoteStore } from '@/store';
+import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
+import { MoveManagerAction } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/constants';
 import { isPointInOBB } from '@/utils/collidingDetection';
-import { ResizeManagerAction } from '@/hooks/useCanvasResizeElementManager.ts';
+import { ResizeManagerAction } from '@/hooks/canvas/useCanvasResizeElementManager.ts';
 
 export function useCanvasActionHandler(
   selectState: SelectManagerState,
