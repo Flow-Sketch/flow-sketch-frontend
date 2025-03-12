@@ -15,6 +15,7 @@ interface IconButtonGroupProps<Value = unknown> {
   onChange?: (input: Value[]) => void;
   defaultValue?: Value[] | Value;
   value?: Value[] | Value;
+  isBorder?: boolean;
 }
 
 export const IconButton = <T,>({ _isFocus_ = false, ...props }: IconButtonProps<T>) => {
@@ -25,7 +26,7 @@ export const IconButton = <T,>({ _isFocus_ = false, ...props }: IconButtonProps<
   );
 };
 
-export const IconButtonGroup = <T,>({ children, variant, onChange, value }: IconButtonGroupProps<T>) => {
+export const IconButtonGroup = <T,>({ children, variant, onChange, value, isBorder = true }: IconButtonGroupProps<T>) => {
   // 1. children 으로 들어온 IconButton 컴포넌트(JSX) props 내의 value 만 추출
   const buttonValue = React.Children.map(children, (child) => child.props.value);
 
@@ -77,7 +78,7 @@ export const IconButtonGroup = <T,>({ children, variant, onChange, value }: Icon
   };
 
   return (
-    <ButtonGroupContainer>
+    <ButtonGroupContainer $isBorder={isBorder}>
       {React.Children.map(children, (child, index) =>
         React.cloneElement(child, {
           _isFocus_: focusButtonStatus[index].focus,
@@ -100,11 +101,11 @@ const ButtonContainer = styled.div<{ $isFocus: boolean }>`
   }
 `;
 
-const ButtonGroupContainer = styled.div`
+const ButtonGroupContainer = styled.div<{ $isBorder?: boolean }>`
   display: inline-flex;
   align-self: flex-start;
   padding: 4px;
   gap: 4px;
   border-radius: 8px;
-  border: 1px solid ${colorToken['outlined']};
+  ${({ $isBorder }) => $isBorder && `border: 1px solid ${colorToken['outlined']}`}
 `;
