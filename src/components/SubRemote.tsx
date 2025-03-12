@@ -111,8 +111,7 @@ const TriggerContainer = styled.div<{ $isFocus?: boolean }>`
   display: flex;
   padding: 6px;
   border-radius: 8px;
-
-  background: ${({ $isFocus }) => ($isFocus ? colorToken['primaryColor'] : '')};
+  background: ${({ $isFocus }) => ($isFocus ? colorToken['primaryColor'] : 'none')};
 `;
 
 const SubRemoteContainer = styled.div<{ $height?: number }>`
@@ -125,4 +124,5 @@ const SubRemoteContainer = styled.div<{ $height?: number }>`
   border-radius: 12px;
   border: 1px solid ${colorToken['outlined']};
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: ${colorToken['white']};
 `;

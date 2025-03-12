@@ -4,7 +4,7 @@ import React, { ReactElement, ReactNode, useEffect, useMemo, useState } from 're
 
 interface IconButtonProps<Value> {
   _isFocus_?: boolean;
-  value: Value;
+  value?: Value;
   onClick?: () => void;
   children: ReactNode;
 }
