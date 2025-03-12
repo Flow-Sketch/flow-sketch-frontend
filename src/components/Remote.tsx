@@ -1,60 +1,62 @@
 import { css } from '@emotion/react';
-import { useCanvasRemoteStore } from '@/store';
+import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle } from 'react-icons/tb';
+import { ShapeType, useCanvasRemoteStore } from '@/store';
+import { IconButton, IconButtonGroup } from '@/components/IconButton.tsx';
 
 export const Remote = () => {
   const { mode, shapeType, ...action } = useCanvasRemoteStore();
 
+  function clickCreateElement(input: ShapeType[]) {
+    action.setShapeType(input);
+    action.setMode(['edit']);
+  }
+
   return (
     <div
       css={css`
+        display: flex;
         position: fixed;
-        left: 30px;
-        top: 30vh;
+        left: 40vw;
+        bottom: 50px;
+        gap: 10px;
       `}
     >
-      <div
-        css={css`
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        `}
-      >
-        {mode === 'view' && <p onClick={() => action.setMode('edit')}>보기</p>}
-        {mode === 'edit' && (
-          <p
-            onClick={() => {
-              action.setMode('view');
-              action.setShapeType(null);
-            }}
-          >
-            편집
-          </p>
-        )}
-      </div>
-      <div>
-        <p
-          css={css`
-            font-weight: ${shapeType === 'rect' ? 700 : 500};
-          `}
-          onClick={() => {
-            action.setMode('edit');
-            action.setShapeType('rect');
-          }}
-        >
-          네모네모
-        </p>
-        <p
-          css={css`
-            font-weight: ${shapeType === 'ellipse' ? 700 : 500};
-          `}
-          onClick={() => {
-            action.setMode('edit');
-            action.setShapeType('ellipse');
-          }}
-        >
-          둥글둥글
-        </p>
-      </div>
+      <IconButtonGroup variant={'singleCheck'} value={mode} onChange={action.setMode}>
+        <IconButton value={'view'}>
+          <TbHandStop
+            size={18}
+            css={css`
+              padding: 6px;
+            `}
+          />
+        </IconButton>
+        <IconButton value={'edit'}>
+          <TbPointerFilled
+            size={18}
+            css={css`
+              padding: 6px;
+            `}
+          />
+        </IconButton>
+      </IconButtonGroup>
+      <IconButtonGroup variant={'singleCheck'} value={shapeType} onChange={clickCreateElement}>
+        <IconButton value={'rect'}>
+          <TbRectangle
+            size={18}
+            css={css`
+              padding: 6px;
+            `}
+          />
+        </IconButton>
+        <IconButton value={'ellipse'}>
+          <TbCircle
+            size={18}
+            css={css`
+              padding: 6px;
+            `}
+          />
+        </IconButton>
+      </IconButtonGroup>
     </div>
   );
 };

@@ -9,8 +9,8 @@ interface RemoteState {
 }
 
 interface RemoteActions {
-  setMode: (mode: RemoteMode) => void;
-  setShapeType: (shapeType: ShapeType) => void;
+  setMode: (mode: RemoteMode[]) => void;
+  setShapeType: (shapeType: ShapeType[]) => void;
 }
 
 /**
@@ -77,6 +77,6 @@ interface RemoteActions {
 export const useCanvasRemoteStore = create<RemoteState & RemoteActions>((set) => ({
   mode: 'view',
   shapeType: null,
-  setMode: (mode) => set({ mode }),
-  setShapeType: (shapeType) => set({ shapeType }),
+  setMode: (mode) => set({ mode: mode[0] }),
+  setShapeType: (shapeType) => set({ shapeType: shapeType[0] }),
 }));
