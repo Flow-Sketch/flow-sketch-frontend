@@ -48,7 +48,6 @@ export const ColorPicker = ({ value, onChange, isActiveAlpha = false }: ColorPic
       <ButtonContainer ref={pickerButtonRef}>
         <SelectButton onClick={() => setOpenPicker((prev) => !prev)}>
           <MultiColorBadge colors={colorKey} />
-          <p>{colorKey[0]}</p>
         </SelectButton>
       </ButtonContainer>
       {isActiveAlpha && <AlphaPicker color={colorKey[0]} onChange={changeColor} width={'200px'} height={'4px'} />}
@@ -90,8 +89,8 @@ const SelectButton = styled.div`
 `;
 
 const MultiColorBadge = styled.div<{ colors: string[] }>`
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border-radius: 24px;
   position: relative;
   background: ${({ colors }) => {

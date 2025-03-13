@@ -1,9 +1,13 @@
+import { TbTrash } from 'react-icons/tb';
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { colorToken } from '@/style/color';
 import { useElementRegistryStore } from '@/store';
 import { MoveManagerState } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
 import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
-import { ColorPicker } from '@/components/ColorPicker.tsx';
 import { useElementOptionColorManager } from '@/hooks/elementOption';
+import { IconButton } from '@/components/IconButton.tsx';
+import { ColorPicker } from '@/components/ColorPicker.tsx';
 
 interface SelectionMenuProps {
   moveState: MoveManagerState;
@@ -18,25 +22,30 @@ export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) =
 
   return (
     isActivate && (
-      <div
-        css={css`
-          display: flex;
-          position: fixed;
-          background: white;
-          left: ${boundingBox.cx}px;
-          top: ${boundingBox.cy - boundingBox.height / 2 + 20}px;
-        `}
-      >
-        <div
-          css={css`
-            display: flex;
-            gap: 12px;
-          `}
-        >
-          <p onClick={deleteAction.handleOnClick}>삭제</p>
-          <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
-        </div>
-      </div>
+      <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
+        <IconButton onClick={deleteAction.handleOnClick}>
+          <TbTrash
+            size={22}
+            css={css`
+              padding: 6px;
+            `}
+          />
+        </IconButton>
+        <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
+      </Container>
     )
   );
 };
+
+const Container = styled.div<{ left: number; top: number }>`
+  display: flex;
+  position: fixed;
+  padding: 8px;
+  border-radius: 12px;
+  align-items: center;
+  top: ${({ top }) => top}px;
+  left: ${({ left }) => left}px;
+  background: ${colorToken['white']};
+  border: 1px solid ${colorToken['outlined']};
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+`;

@@ -68,7 +68,7 @@ export function useCanvasCreateElementManger(elementRegistryAction: ElementRegis
       y: convertOffsetY + convertHeight / 2,
     });
 
-    setShapeType(null);
+    setShapeType([null]);
     setIsDrawing(false);
     setStartPosition(null);
     setEndPosition(null);
