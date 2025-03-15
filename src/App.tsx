@@ -1,6 +1,7 @@
+import './App.css';
 import { css } from '@emotion/react';
 import { Canvas } from '@/components/Canvas.tsx';
-import './App.css';
+import { Remote } from '@/components/Remote.tsx';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         `}
       >
         <Canvas />
+        <Remote />
       </div>
     </>
   );
