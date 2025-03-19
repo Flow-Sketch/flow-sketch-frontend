@@ -3,8 +3,7 @@ import { useEffect } from 'react';
 import { isOBBColliding } from '@/utils/collidingDetection';
 import { BaseSelectBox } from '@/models/selectionBox';
 import { getBoundingBox } from '@/utils/boundingBox';
-import { useElementRegistryStore } from '@/store/useElementRegistryStore.ts';
-import { useCanvasViewStore } from '@/store';
+import { useElementRegistryStore, useCanvasViewStore } from '@/store';
 
 export type SelectManagerState = {
   dragBox: {

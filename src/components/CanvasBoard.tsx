@@ -11,17 +11,19 @@ import {
   useCanvasMoveElementManager,
   useCanvasResizeElementManager,
 } from '@/hooks/canvas';
+import { useRemoteManager } from '@/hooks/remote';
 import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
 export const CanvasBoard = () => {
   const { canvasRef } = useCanvas();
+  const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCanvasViewManager();
   const { selectState, selectAction } = useCanvasSelectElementManager();
   const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
-  const { createState, createAction } = useCanvasCreateElementManger(elementRegistryAction);
+  const { createState, createAction } = useCanvasCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useCanvasMoveElementManager(elementRegistryAction);
+  const { deleteAction } = useCanvasDeleteElementManager(selectAction, elementRegistryAction);
   const { resizeAction } = useCanvasResizeElementManager(elementRegistryAction);
-  const { deleteAction } = useCanvasDeleteElementManager(selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
 
   const handler = useCanvasActionHandler({
     viewAction,
