@@ -9,19 +9,20 @@ import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/constants';
 import { isPointInOBB } from '@/utils/collidingDetection';
 import { ResizeManagerAction } from '@/hooks/canvas/useCanvasResizeElementManager.ts';
 
-export function useCanvasActionHandler(
-  viewAction: ViewManagerAction,
-  selectAction: SelectManagerAction,
-  createAction: CreateElementMangerAction,
-  deleteAction: DeleteManagerAction,
-  moveAction: MoveManagerAction,
-  resizeAction: ResizeManagerAction,
-) {
+export function useCanvasActionHandler(action: {
+  viewAction: ViewManagerAction;
+  selectAction: SelectManagerAction;
+  createAction: CreateElementMangerAction;
+  deleteAction: DeleteManagerAction;
+  moveAction: MoveManagerAction;
+  resizeAction: ResizeManagerAction;
+}) {
   const userId = 'testUser';
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const remoteMode = useCanvasRemoteStore((store) => store.mode);
   const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
   const [editMode, setEditMode] = useState<'select' | 'resize' | 'move'>('select');
+  const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction } = action;
 
   const handleWheel = (() => {
     if (remoteMode === 'view') return viewAction.handleWheel;
