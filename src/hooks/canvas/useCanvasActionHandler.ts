@@ -1,27 +1,30 @@
 import { useState } from 'react';
-import { ViewManagerAction } from '@/hooks/canvas/useCanvasViewManager.ts';
-import { SelectManagerAction } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
-import { CreateElementMangerAction } from '@/hooks/canvas/useCanvasCreateElementManger.ts';
-import { useCanvasRemoteStore, useElementRegistryStore } from '@/store';
-import { DeleteManagerAction } from '@/hooks/canvas/useCanvasDeleteElementManager.ts';
-import { MoveManagerAction } from '@/hooks/canvas/useCanvasMoveElementManager.ts';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/constants';
 import { isPointInOBB } from '@/utils/collidingDetection';
-import { ResizeManagerAction } from '@/hooks/canvas/useCanvasResizeElementManager.ts';
+import { useRemoteManager } from '@/hooks/remote';
+import {
+  CreateElementMangerAction,
+  DeleteManagerAction,
+  MoveManagerAction,
+  ResizeManagerAction,
+  SelectManagerAction,
+  ViewManagerAction,
+  useCanvasSelectElementManager,
+} from '@/hooks/canvas';
 
-export function useCanvasActionHandler(
-  viewAction: ViewManagerAction,
-  selectAction: SelectManagerAction,
-  createAction: CreateElementMangerAction,
-  deleteAction: DeleteManagerAction,
-  moveAction: MoveManagerAction,
-  resizeAction: ResizeManagerAction,
-) {
-  const userId = 'testUser';
-  const shapeType = useCanvasRemoteStore((store) => store.shapeType);
-  const remoteMode = useCanvasRemoteStore((store) => store.mode);
-  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+export function useCanvasActionHandler(action: {
+  viewAction: ViewManagerAction;
+  selectAction: SelectManagerAction;
+  createAction: CreateElementMangerAction;
+  deleteAction: DeleteManagerAction;
+  moveAction: MoveManagerAction;
+  resizeAction: ResizeManagerAction;
+}) {
+  const { remoteState } = useRemoteManager();
+  const { shapeType, remoteMode } = remoteState;
+  const { selectState } = useCanvasSelectElementManager();
   const [editMode, setEditMode] = useState<'select' | 'resize' | 'move'>('select');
+  const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction } = action;
 
   const handleWheel = (() => {
     if (remoteMode === 'view') return viewAction.handleWheel;

@@ -2,21 +2,26 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { colorToken } from '@/style/color';
 import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle, TbArrowGuideFilled, TbTriangleSquareCircle, TbTextSize } from 'react-icons/tb';
-import { ShapeType, useCanvasRemoteStore } from '@/store';
+import { RemoteMode, ShapeType } from '@/store';
 import { IconButton, IconButtonGroup } from '@/components/IconButton.tsx';
 import { SubRemote, SubRemoteGroup } from '@/components/SubRemote.tsx';
+import { useRemoteManager } from '@/hooks/remote';
 
 export const Remote = () => {
-  const { mode, shapeType, ...action } = useCanvasRemoteStore();
+  const { remoteState, remoteAction } = useRemoteManager();
 
-  function clickCreateElement(input: ShapeType[]) {
-    action.setShapeType(input);
-    action.setMode(['edit']);
-  }
+  const handleElementCreate = (input: ShapeType[]) => {
+    remoteAction.handleShapeTypeChange(input);
+    remoteAction.handleRemoteModeChange(['edit']);
+  };
+
+  const handleModeChange = (input: RemoteMode[]) => {
+    remoteAction.handleRemoteModeChange(input);
+  };
 
   return (
     <Container>
-      <IconButtonGroup variant={'singleCheck'} value={mode} onChange={action.setMode}>
+      <IconButtonGroup variant={'singleCheck'} value={remoteState.remoteMode} onChange={handleModeChange}>
         <IconButton value={'view'}>
           <TbHandStop
             size={18}
@@ -36,7 +41,7 @@ export const Remote = () => {
       </IconButtonGroup>
       <SubRemoteGroup>
         <SubRemote remoteName={'shape'} triggerComponent={<TbTriangleSquareCircle size={24} />}>
-          <IconButtonGroup isBorder={false} variant={'singleCheck'} value={shapeType} onChange={clickCreateElement}>
+          <IconButtonGroup isBorder={false} variant={'singleCheck'} value={remoteState.shapeType} onChange={handleElementCreate}>
             <IconButton value={'rect'}>
               <TbRectangle
                 size={20}

@@ -1,10 +1,26 @@
 export { useCanvas } from './useCanvas.ts';
-export { useCanvasElementManager } from './useCanvasElementManager.ts';
-export { useCanvasViewManager } from './useCanvasViewManager.ts';
+export { useCanvasActionHandler } from './useCanvasActionHandler';
 export { usePaintingCanvas } from './usePaintingCanvas.ts';
-export { useCanvasSelectElementManager } from './useCanvasSelectElementManager.ts';
-export { useCanvasCreateElementManger } from './useCanvasCreateElementManger.ts';
-export { useCanvasDeleteElementManager } from './useCanvasDeleteElementManager.ts';
-export { useCanvasMoveElementManager } from './useCanvasMoveElementManager.ts';
-export { useCanvasResizeElementManager } from './useCanvasResizeElementManager.ts';
-export { useCanvasActionHandler } from './useCanvasActionHandler.ts';
+
+/* Canvas Manager Hook 들의 export */
+
+export { useCanvasElementManager } from './useCanvasElementManager';
+export type { ElementRegistry, ElementRegistryAction } from './useCanvasElementManager';
+
+export { useCanvasViewManager } from './useCanvasViewManager';
+export type { ViewManagerState, ViewManagerAction } from './useCanvasViewManager';
+
+export { useCanvasSelectElementManager } from './useCanvasSelectElementManager';
+export type { SelectManagerState, SelectManagerAction } from './useCanvasSelectElementManager';
+
+export { useCanvasCreateElementManger } from './useCanvasCreateElementManger';
+export type { CreateElementManagerState, CreateElementMangerAction } from './useCanvasCreateElementManger';
+
+export { useCanvasDeleteElementManager } from './useCanvasDeleteElementManager';
+export type { DeleteManagerState, DeleteManagerAction } from './useCanvasDeleteElementManager';
+
+export { useCanvasMoveElementManager } from './useCanvasMoveElementManager';
+export type { MoveManagerState, MoveManagerAction } from './useCanvasMoveElementManager';
+
+export { useCanvasResizeElementManager } from './useCanvasResizeElementManager';
+export type { ResizeManagerAction, ResizeHandlePosition } from './useCanvasResizeElementManager';

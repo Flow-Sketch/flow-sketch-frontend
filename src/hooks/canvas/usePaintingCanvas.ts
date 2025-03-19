@@ -1,10 +1,7 @@
 import * as React from 'react';
-import { ElementRegistry } from '@/hooks/canvas/useCanvasElementManager.ts';
-import { ViewManagerState } from '@/hooks/canvas/useCanvasViewManager.ts';
 import { useEffect } from 'react';
-import { SelectManagerState } from '@/hooks/canvas/useCanvasSelectElementManager.ts';
 import { colorToken } from '@/style/color';
-import { CreateElementManagerState } from '@/hooks/canvas/useCanvasCreateElementManger.ts';
+import { ElementRegistry, SelectManagerState, ViewManagerState, CreateElementManagerState } from '@/hooks/canvas';
 
 /**
  * ### usePaintingCanvas()
@@ -14,20 +11,24 @@ import { CreateElementManagerState } from '@/hooks/canvas/useCanvasCreateElement
  * - `select` 상태를 기반으로 캔버스 내의 선택된 요소 및 dragBox 표시
  *
  * @param canvasRef - HTMLCanvasElement에 대한 참조 객체
- * @param registry - 캔버스에 그릴 요소들의 레지스트리
- * @param viewState - 캔버스의 뷰 상태 (배율 및 오프셋)
- * @param selectState - 선택 상태 (드래그 박스의 시작 및 끝 지점)
- * @param createState - 객체 생성 상태 (가이드 박스의 시작 및 끝 지점, 생성객체타입)
+ * @param state - 캔버스 렌더링에 필요한 모든 상태를 포함하는 객체
+ *   - `elementRegistry`: 캔버스에 그릴 요소들의 레지스트리 (요소 목록 및 레이어 순서)
+ *   - `viewState`: 캔버스의 뷰 상태 (배율 및 오프셋)
+ *   - `selectState`: 선택 상태 (드래그 박스의 시작 및 끝 지점, 선택된 요소들)
+ *   - `createState`: 객체 생성 상태 (가이드 박스의 시작 및 끝 지점, 생성 객체 타입)
  */
 export function usePaintingCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
-  registry: ElementRegistry,
-  viewState: ViewManagerState,
-  selectState: SelectManagerState,
-  createState: CreateElementManagerState,
+  state: {
+    elementRegistry: ElementRegistry;
+    viewState: ViewManagerState;
+    selectState: SelectManagerState;
+    createState: CreateElementManagerState;
+  },
 ) {
+  const { elementRegistry, viewState, selectState, createState } = state;
   useEffect(() => {
-    const { elements, layerOrder } = registry;
+    const { elements, layerOrder } = elementRegistry;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -135,5 +136,5 @@ export function usePaintingCanvas(
       ctx.fill();
       ctx.stroke();
     }
-  }, [registry, viewState, selectState]);
+  }, [elementRegistry, viewState, selectState]);
 }

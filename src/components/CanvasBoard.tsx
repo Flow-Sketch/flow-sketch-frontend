@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import {
   useCanvas,
   usePaintingCanvas,
@@ -11,39 +11,40 @@ import {
   useCanvasMoveElementManager,
   useCanvasResizeElementManager,
 } from '@/hooks/canvas';
+import { useRemoteManager } from '@/hooks/remote';
 import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 
-export const Canvas = () => {
+export const CanvasBoard = () => {
   const { canvasRef } = useCanvas();
+  const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCanvasViewManager();
   const { selectState, selectAction } = useCanvasSelectElementManager();
   const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
-  const { createState, createAction } = useCanvasCreateElementManger(elementRegistryAction);
+  const { createState, createAction } = useCanvasCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useCanvasMoveElementManager(elementRegistryAction);
+  const { deleteAction } = useCanvasDeleteElementManager(selectAction, elementRegistryAction);
   const { resizeAction } = useCanvasResizeElementManager(elementRegistryAction);
-  const { deleteAction } = useCanvasDeleteElementManager(selectAction, elementRegistryAction); // 이 Hook 꼭 리펙토링이 필요!
 
-  const handler = useCanvasActionHandler(viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction);
-  usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
+  const handler = useCanvasActionHandler({
+    viewAction,
+    selectAction,
+    createAction,
+    deleteAction,
+    moveAction,
+    resizeAction,
+  });
+
+  usePaintingCanvas(canvasRef, {
+    elementRegistry,
+    viewState,
+    selectState,
+    createState,
+  });
 
   return (
-    <div
-      css={css`
-        display: flex;
-        position: fixed;
-        left: 0;
-        top: 0;
-      `}
-    >
+    <Container>
       <SelectionMenu moveState={moveState} deleteAction={deleteAction} />
-      <canvas
-        css={css`
-          outline: none;
-          &:focus {
-            outline: none;
-            box-shadow: none;
-          }
-        `}
+      <Canvas
         tabIndex={1}
         ref={canvasRef}
         onWheel={handler.handleWheel}
@@ -52,6 +53,21 @@ export const Canvas = () => {
         onMouseMove={handler.handleMouseMove}
         onKeyDown={handler.handleKeyDown}
       />
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  position: fixed;
+  left: 0;
+  top: 0;
+`;
+
+const Canvas = styled.canvas`
+  outline: none;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+`;

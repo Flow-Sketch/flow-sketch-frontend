@@ -1,6 +1,6 @@
 import './App.css';
 import { css } from '@emotion/react';
-import { Canvas } from '@/components/Canvas.tsx';
+import { CanvasBoard } from '@/components/CanvasBoard.tsx';
 import { Remote } from '@/components/Remote.tsx';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
           flex-direction: row;
         `}
       >
-        <Canvas />
+        <CanvasBoard />
         <Remote />
       </div>
     </>

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { MouseEvent, useState } from 'react';
-import { isPointInOBB } from '@/utils/collidingDetection';
+import { ElementRegistryAction } from '@/hooks/canvas';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { ElementRegistryAction } from '@/hooks/canvas/useCanvasElementManager.ts';
 import { useCanvasViewStore, useElementRegistryStore } from '@/store';
+import { isPointInOBB } from '@/utils/collidingDetection';
 
 export type MoveManagerState = {
   isMoving: boolean;
