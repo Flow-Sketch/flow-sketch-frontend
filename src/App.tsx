@@ -1,7 +1,7 @@
 import './App.css';
 import { css } from '@emotion/react';
-import { CanvasBoard } from '@/components/CanvasBoard.tsx';
-import { Remote } from '@/components/Remote.tsx';
+import { router } from '@/routes';
+import { RouterProvider } from 'react-router-dom';
 
 function App() {
   return (
@@ -12,8 +12,7 @@ function App() {
           flex-direction: row;
         `}
       >
-        <CanvasBoard />
-        <Remote />
+        <RouterProvider router={router} />
       </div>
     </>
   );
