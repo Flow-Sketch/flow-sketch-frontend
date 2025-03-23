@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { SelectManagerState, ElementRegistryAction } from '@/hooks/canvas';
+import { SelectManagerState, ElementRegistryAction } from 'src/hooks/canvasElement';
 import { useCanvasViewStore, useElementRegistryStore } from '@/store';
 import { isPointInOBB } from '@/utils/collidingDetection';
 

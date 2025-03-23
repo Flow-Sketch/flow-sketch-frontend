@@ -10,7 +10,7 @@ import {
   useCanvasDeleteElementManager,
   useCanvasMoveElementManager,
   useCanvasResizeElementManager,
-} from '@/hooks/canvas';
+} from 'src/hooks/canvasElement';
 import { useRemoteManager } from '@/hooks/remote';
 import { SelectionMenu } from '@/components/SelectionMenu.tsx';
 

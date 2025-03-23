@@ -10,7 +10,7 @@ import {
   SelectManagerAction,
   ViewManagerAction,
   useCanvasSelectElementManager,
-} from '@/hooks/canvas';
+} from 'src/hooks/canvasElement';
 
 export function useCanvasActionHandler(action: {
   viewAction: ViewManagerAction;

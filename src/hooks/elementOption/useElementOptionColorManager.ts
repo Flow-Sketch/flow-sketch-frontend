@@ -1,5 +1,5 @@
 import { useElementRegistryStore } from '@/store';
-import { useCanvasElementManager } from '@/hooks/canvas';
+import { useCanvasElementManager } from 'src/hooks/canvasElement';
 
 export function useElementOptionColorManager() {
   const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
