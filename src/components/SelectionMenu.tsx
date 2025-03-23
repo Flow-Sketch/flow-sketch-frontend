@@ -1,8 +1,8 @@
 import { TbTrash } from 'react-icons/tb';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { colorToken } from '@/style/color';
-import { useElementRegistryStore } from '@/store';
+import { colorToken } from '@/styles/color';
+import { useElementRegistryStore } from 'src/stores';
 import { MoveManagerState } from '@/hooks/canvasElement/useCanvasMoveElementManager.ts';
 import { DeleteManagerAction } from '@/hooks/canvasElement/useCanvasDeleteElementManager.ts';
 import { useElementOptionColorManager } from '@/hooks/elementOption';

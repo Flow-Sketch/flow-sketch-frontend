@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useElementRegistryStore } from '@/store';
+import { useElementRegistryStore } from 'src/stores';
 import { ElementRegistryAction, SelectManagerAction } from 'src/hooks/canvasElement';
 
 export type DeleteManagerState = {

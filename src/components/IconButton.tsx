@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colorToken } from '@/style/color';
+import { colorToken } from '@/styles/color';
 import React, { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 
 interface IconButtonProps<Value> {

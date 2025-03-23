@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { colorToken } from '@/style/color';
+import { colorToken } from '@/styles/color';
 import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle, TbArrowGuideFilled, TbTriangleSquareCircle, TbTextSize } from 'react-icons/tb';
-import { RemoteMode, ShapeType } from '@/store';
+import { RemoteMode, ShapeType } from 'src/stores';
 import { IconButton, IconButtonGroup } from '@/components/IconButton.tsx';
 import { SubRemote, SubRemoteGroup } from '@/components/SubRemote.tsx';
 import { useRemoteManager } from '@/hooks/remote';

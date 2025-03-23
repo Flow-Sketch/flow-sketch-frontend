@@ -1,4 +1,4 @@
-import { useElementRegistryStore } from '@/store';
+import { useElementRegistryStore } from 'src/stores';
 import { useCanvasElementManager } from 'src/hooks/canvasElement';
 
 export function useElementOptionColorManager() {

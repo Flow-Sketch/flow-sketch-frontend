@@ -1,4 +1,4 @@
-import { RemoteMode, ShapeType, useCanvasRemoteStore } from '@/store';
+import { RemoteMode, ShapeType, useCanvasRemoteStore } from 'src/stores';
 
 export type RemoteManagerState = {
   shapeType: ShapeType;

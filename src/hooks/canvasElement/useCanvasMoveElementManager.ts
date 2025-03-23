@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { ElementRegistryAction } from 'src/hooks/canvasElement';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/constants';
-import { useCanvasViewStore, useElementRegistryStore } from '@/store';
+import { useCanvasViewStore, useElementRegistryStore } from 'src/stores';
 import { isPointInOBB } from '@/utils/collidingDetection';
 
 export type MoveManagerState = {

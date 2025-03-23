@@ -1,4 +1,4 @@
-import { FlowCanvasStyle } from '@/types/canvas';
+import { FlowCanvasStyle } from './type';
 
 export type BaseSketchElementType = 'text' | 'rect' | 'ellipse';
 

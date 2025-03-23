@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from '@/store';
+import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from 'src/stores';
 import { ElementRegistryAction } from '@/hooks/canvasElement/useCanvasElementManager.ts';
 import { RemoteManagerAction } from '@/hooks/remote';
 

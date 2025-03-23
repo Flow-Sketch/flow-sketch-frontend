@@ -1,8 +1,8 @@
 import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models/sketchElement';
 import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
-import { FlowCanvasStyle } from '@/types/canvas.ts';
-import { useElementRegistryStore } from '@/store';
+import { FlowCanvasStyle } from '@/models/sketchElement';
+import { useElementRegistryStore } from 'src/stores';
 import { getBoundingBox } from '@/utils/boundingBox';
 
 interface ResizeParams {

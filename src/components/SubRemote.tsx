@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
-import { colorToken } from '@/style/color';
+import { colorToken } from '@/styles/color';
 
 interface SubRemoteProps {
   __isFocus__?: boolean;
