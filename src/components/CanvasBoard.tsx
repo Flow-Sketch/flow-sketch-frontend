@@ -5,7 +5,7 @@ import {
   useCanvasViewManager,
   useCanvasSelectElementManager,
   useCanvasActionHandler,
-  useCanvasElementManager,
+  useCanvasElementRegistry,
   useCanvasCreateElementManger,
   useCanvasDeleteElementManager,
   useCanvasMoveElementManager,
@@ -19,7 +19,7 @@ export const CanvasBoard = () => {
   const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCanvasViewManager();
   const { selectState, selectAction } = useCanvasSelectElementManager();
-  const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
+  const { elementRegistry, elementRegistryAction } = useCanvasElementRegistry();
   const { createState, createAction } = useCanvasCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useCanvasMoveElementManager(elementRegistryAction);
   const { deleteAction } = useCanvasDeleteElementManager(selectAction, elementRegistryAction);

@@ -34,7 +34,7 @@ export interface ElementRegistryAction {
 // 임시로 element 를 useState 로 상태지정
 // 추후에 전역상태로 변경할 예정
 // 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
-export function useCanvasElementManager(): {
+export function useCanvasElementRegistry(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 } {

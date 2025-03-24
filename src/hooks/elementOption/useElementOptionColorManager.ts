@@ -1,9 +1,9 @@
 import { useElementRegistryStore } from 'src/stores';
-import { useCanvasElementManager } from 'src/hooks/canvasElement';
+import { useCanvasElementRegistry } from 'src/hooks/canvasElement';
 
 export function useElementOptionColorManager() {
   const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
-  const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
+  const { elementRegistry, elementRegistryAction } = useCanvasElementRegistry();
   const selectElementStore = useElementRegistryStore((store) => store.selectElement[userId]);
   const selectElementKeys = Object.keys(selectElementStore.elements);
 

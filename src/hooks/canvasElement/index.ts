@@ -4,8 +4,8 @@ export { usePaintingCanvas } from './usePaintingCanvas.ts';
 
 /* Canvas Manager Hook 들의 export */
 
-export { useCanvasElementManager } from './useCanvasElementManager';
-export type { ElementRegistry, ElementRegistryAction } from './useCanvasElementManager';
+export { useCanvasElementRegistry } from './useCanvasElementRegistry.ts';
+export type { ElementRegistry, ElementRegistryAction } from './useCanvasElementRegistry.ts';
 
 export { useCanvasViewManager } from './useCanvasViewManager';
 export type { ViewManagerState, ViewManagerAction } from './useCanvasViewManager';
