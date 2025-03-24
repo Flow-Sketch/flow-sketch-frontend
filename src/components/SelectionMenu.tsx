@@ -1,6 +1,5 @@
-import { TbTrash } from 'react-icons/tb';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { TbTrash } from 'react-icons/tb';
 import { colorToken } from '@/styles/color';
 import { useElementRegistryStore } from 'src/stores';
 import { MoveManagerState } from '@/hooks/canvasElement/useCanvasMoveElementManager.ts';
@@ -23,13 +22,8 @@ export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) =
   return (
     isActivate && (
       <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
-        <IconButton onClick={deleteAction.handleOnClick}>
-          <TbTrash
-            size={22}
-            css={css`
-              padding: 6px;
-            `}
-          />
+        <IconButton onClick={deleteAction.handleClick}>
+          <TbTrash size={22} />
         </IconButton>
         <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
       </Container>

@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
 import { colorToken } from '@/styles/color';
 import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle, TbArrowGuideFilled, TbTriangleSquareCircle, TbTextSize } from 'react-icons/tb';
 import { RemoteMode, ShapeType } from 'src/stores';
@@ -23,40 +22,20 @@ export const Remote = () => {
     <Container>
       <IconButtonGroup variant={'singleCheck'} value={remoteState.remoteMode} onChange={handleModeChange}>
         <IconButton value={'view'}>
-          <TbHandStop
-            size={18}
-            css={css`
-              padding: 6px;
-            `}
-          />
+          <TbHandStop size={18} />
         </IconButton>
         <IconButton value={'edit'}>
-          <TbPointerFilled
-            size={18}
-            css={css`
-              padding: 6px;
-            `}
-          />
+          <TbPointerFilled size={18} />
         </IconButton>
       </IconButtonGroup>
       <SubRemoteGroup>
         <SubRemote remoteName={'shape'} triggerComponent={<TbTriangleSquareCircle size={24} />}>
           <IconButtonGroup isBorder={false} variant={'singleCheck'} value={remoteState.shapeType} onChange={handleElementCreate}>
             <IconButton value={'rect'}>
-              <TbRectangle
-                size={20}
-                css={css`
-                  padding: 8px;
-                `}
-              />
+              <TbRectangle size={20} />
             </IconButton>
             <IconButton value={'ellipse'}>
-              <TbCircle
-                size={20}
-                css={css`
-                  padding: 8px;
-                `}
-              />
+              <TbCircle size={20} />
             </IconButton>
           </IconButtonGroup>
         </SubRemote>
