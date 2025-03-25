@@ -1,8 +1,12 @@
 import { Separator } from '@/components/ui/separator.tsx';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card.tsx';
 import FlowSketchGray from '@/assets/FlowSketch-gray.svg';
+import { CanvasMetadata } from '@/models/canvasRegistry';
+interface CanvasItemCardProps {
+  canvasMeta: CanvasMetadata;
+}
 
-export const CanvasItemCard = () => {
+export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
   return (
     <Card>
       <CardContent>
@@ -12,8 +16,8 @@ export const CanvasItemCard = () => {
       </CardContent>
       <Separator />
       <CardContent>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+        <CardTitle>{canvasMeta.name}</CardTitle>
+        <CardDescription>{canvasMeta.description}</CardDescription>
       </CardContent>
     </Card>
   );

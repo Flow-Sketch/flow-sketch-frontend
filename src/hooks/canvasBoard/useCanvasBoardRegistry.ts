@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { CanvasMetadata, createCanvasRegistry } from '@/models/canvasRegistry';
+import { CanvasMetadata, CanvasRegistryState, createCanvasRegistry } from '@/models/canvasRegistry';
+
+const CANVAS_STORAGE = 'canvasStorage';
 
 interface CanvasBoardState {
   canvasList: CanvasMetadata[];
@@ -20,14 +22,19 @@ export function useCanvasBoardRegistry(): {
   // state 와 localStorage 의 싱크를 맞춤
   useEffect(() => {
     const result: CanvasMetadata[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key !== null) {
-        const metaData = localStorage.getItem(key);
-        if (metaData !== null) {
-          result.push(JSON.parse(metaData));
-        }
-      }
+    const canvasListStr = localStorage.getItem(CANVAS_STORAGE);
+
+    // 아무것도 없으면 초기값 적용 및 return
+    if (!canvasListStr) {
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify({}));
+      setMetaData([]);
+      return;
+    }
+
+    const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
+    for (const canvasKey of Object.keys(canvasStorage)) {
+      const metaData = canvasStorage[canvasKey].metaData;
+      result.push(metaData);
     }
 
     // 시간 내림차순으로 재정렬
@@ -41,16 +48,24 @@ export function useCanvasBoardRegistry(): {
   }, []);
 
   const deleteBoard = (canvasId: string) => {
-    const getCanvasBoard = localStorage.getItem(canvasId);
+    const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
+
     if (getCanvasBoard !== null) {
-      localStorage.removeItem(canvasId);
+      const allCanvasList = JSON.parse(getCanvasBoard);
+      const updateCanvasList = allCanvasList.filter((item: CanvasRegistryState) => item.metaData.id !== canvasId);
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(updateCanvasList));
       setMetaData((prev) => prev.filter((meta) => meta.id !== canvasId));
     }
   };
 
   const createBoard = (canvasId: string) => {
-    const newCanvasRegistry = createCanvasRegistry({ userId });
-    localStorage.setItem(canvasId, JSON.stringify(newCanvasRegistry));
+    const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
+
+    if (getCanvasBoard !== null) {
+      const allCanvasStorage = JSON.parse(getCanvasBoard);
+      allCanvasStorage[canvasId] = createCanvasRegistry({ userId });
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasStorage));
+    }
   };
 
   return {

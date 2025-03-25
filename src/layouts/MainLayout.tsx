@@ -3,7 +3,7 @@ import FlowSketchLogo from '@/assets/FlowSketch-light.svg';
 
 export const MainLayout = () => {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen w-screen">
       <header className="flex border-b">
         <div className="flex items-center px-4 p-2">
           <div className="flex items-center gap-2">
