@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { CanvasMetadata, CanvasRegistryState, createCanvasRegistry } from '@/models/canvasRegistry';
-
-const CANVAS_STORAGE = 'canvasStorage';
+import { useCanvasBoardRegistryStore } from '@/stores';
+import { CANVAS_STORAGE } from '@/constants';
 
 interface CanvasBoardState {
   canvasList: CanvasMetadata[];
-  canvasStorage: Record<string, CanvasRegistryState>;
 }
 
 interface CanvasBoardAction {
@@ -18,8 +17,8 @@ export function useCanvasBoardRegistry(): {
   boardAction: CanvasBoardAction;
 } {
   const userId = 'testUser'; // 임시로 userId 처리
-  const [allMetaData, setMetaData] = useState<CanvasMetadata[]>([]);
-  const [canvasStorage, setCanvasStorage] = useState<Record<string, CanvasRegistryState>>({});
+  const allMetaData = useCanvasBoardRegistryStore((store) => store.canvasList);
+  const setMetaData = useCanvasBoardRegistryStore.setState;
 
   // state 와 localStorage 의 싱크를 맞춤
   useEffect(() => {
@@ -29,7 +28,7 @@ export function useCanvasBoardRegistry(): {
     // 아무것도 없으면 초기값 적용 및 return
     if (!canvasListStr) {
       localStorage.setItem(CANVAS_STORAGE, JSON.stringify({}));
-      setMetaData([]);
+      setMetaData({ canvasList: [] });
       return;
     }
 
@@ -40,26 +39,25 @@ export function useCanvasBoardRegistry(): {
     }
 
     // 시간 내림차순으로 재정렬
-    setMetaData(
-      result.sort((a, b) => {
+    setMetaData(() => ({
+      canvasList: result.sort((a, b) => {
         const aTime = new Date(a.updatedAt).getTime();
         const bTime = new Date(b.updatedAt).getTime();
         return bTime - aTime;
       }),
-    );
-
-    // 전체 데이터 호출
-    setCanvasStorage(() => canvasStorage);
+    }));
   }, []);
 
   const deleteBoard = (canvasId: string) => {
     const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
 
     if (getCanvasBoard !== null) {
-      const allCanvasList = JSON.parse(getCanvasBoard);
-      const updateCanvasList = allCanvasList.filter((item: CanvasRegistryState) => item.metaData.id !== canvasId);
-      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(updateCanvasList));
-      setMetaData((prev) => prev.filter((meta) => meta.id !== canvasId));
+      const allCanvasBoard = JSON.parse(getCanvasBoard);
+      delete allCanvasBoard[canvasId];
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasBoard));
+      setMetaData((prev) => ({
+        canvasList: prev.canvasList.filter((meta) => meta.id !== canvasId),
+      }));
     }
   };
 
@@ -76,7 +74,6 @@ export function useCanvasBoardRegistry(): {
   return {
     boardRegistry: {
       canvasList: allMetaData,
-      canvasStorage: canvasStorage,
     },
     boardAction: {
       deleteBoard,

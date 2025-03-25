@@ -7,6 +7,8 @@ import { getBoundingBox } from '@/utils/boundingBox';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCanvasBoardRegistry } from '@/hooks/canvasBoard';
+import { CANVAS_STORAGE } from '@/constants';
+import { CanvasRegistryState } from '@/models/canvasRegistry';
 
 interface ResizeParams {
   resizeX: number;
@@ -51,12 +53,26 @@ export function useCanvasElementRegistry(): {
   // 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당
   useEffect(() => {
     // 여기에 id 가 유효한지를 확인해야 함
-    if (!canvasId || !boardRegistry.canvasStorage[canvasId]) {
+    if (!canvasId) {
       return;
     }
-    const selectCanvasRegistry = boardRegistry.canvasStorage[canvasId];
+
+    const existingCanvas = boardRegistry.canvasList.find((item) => item.id === canvasId);
+    if (!existingCanvas) {
+      return;
+    }
+
+    const canvasListStr = localStorage.getItem(CANVAS_STORAGE);
+    if (!canvasListStr) {
+      return;
+    }
+
+    const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
+    const selectCanvasRegistry = canvasStorage[canvasId];
+
+    // 최종 ElementStore 에 업데이트
     setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
-  }, [canvasId, boardRegistry.canvasStorage]);
+  }, [canvasId, boardRegistry.canvasList]);
 
   function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
     setElementRegistry((prev) => ({
