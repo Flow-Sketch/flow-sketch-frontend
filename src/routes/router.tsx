@@ -5,7 +5,7 @@ import { PrivateRoute } from './PrivateRoute';
 import { NotFoundPage } from '@/pages/error';
 import { LoginPage, SignupPage } from '@/pages/auth';
 import { CanvasPage } from '@/pages/canvas';
-import { Home } from '@/pages/home';
+import { HomePage } from '@/pages/home';
 
 export const router = createBrowserRouter([
   {
@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: ROUTE_PATH.HOME.MAIN,
-            element: <Home />,
+            element: <HomePage />,
           },
         ],
       },

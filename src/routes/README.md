@@ -2,7 +2,7 @@
 
 ## Overview
 프로젝트의 URL 구조는 크게 세 가지 도메인으로 구분됩니다:
-- Home 도메인 (`/home`)
+- HomePage 도메인 (`/home`)
 - Canvas 도메인 (`/canvas`)
 - Auth 도메인 (`/auth`)
 
@@ -25,7 +25,7 @@
 ## URL 패턴
 
 ### 도메인 이름
-#### `Home`
+#### `HomePage`
 - `/home`: 홈 루트 경로
 - `/home/:userId`: 특정 사용자의 홈 페이지
     - `:userId` - 사용자 식별자
@@ -42,11 +42,11 @@
 ### Domin 구조  표
 ```mermaid
 graph TD
-    Root --> Home["/home"]
+    Root --> HomePage["/home"]
     Root --> Canvas["/canvas"]
     Root --> Auth["/auth"]
     
-    Home --> HomeUser["/home/:userId"]
+    HomePage --> HomeUser["/home/:userId"]
     
     Canvas --> CanvasId["/canvas/:id"]
     
@@ -54,7 +54,7 @@ graph TD
     Auth --> Signup["/auth/signup"]
     
     style Root fill:#f9f,stroke:#333,stroke-width:2px
-    style Home fill:#bbf,stroke:#333,stroke-width:2px
+    style HomePage fill:#bbf,stroke:#333,stroke-width:2px
     style Canvas fill:#bbf,stroke:#333,stroke-width:2px
     style Auth fill:#bbf,stroke:#333,stroke-width:2px
 ```

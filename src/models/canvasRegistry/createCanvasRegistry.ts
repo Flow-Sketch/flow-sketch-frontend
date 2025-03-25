@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import { CanvasRegistryState, CanvasMetadata } from './type';
 
 interface CreateRegistryParams {
   userId: string;
+  canvasId: string;
   name?: string;
   description?: string;
   isPublic?: boolean;
@@ -10,6 +10,7 @@ interface CreateRegistryParams {
 
 export function createCanvasRegistry({
   userId,
+  canvasId,
   name = '새 캔버스',
   description = '',
   isPublic = false,
@@ -17,7 +18,7 @@ export function createCanvasRegistry({
   const now = new Date().toISOString();
 
   const metaData: CanvasMetadata = {
-    id: uuidv4(),
+    id: canvasId,
     name,
     description,
     createdAt: now,
