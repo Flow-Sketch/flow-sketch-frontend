@@ -1,8 +1,8 @@
 import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models/sketchElement';
 import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
 import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
-import { FlowCanvasStyle } from '@/types/canvas.ts';
-import { useElementRegistryStore } from '@/store';
+import { FlowCanvasStyle } from '@/models/sketchElement';
+import { useElementRegistryStore } from 'src/stores';
 import { getBoundingBox } from '@/utils/boundingBox';
 
 interface ResizeParams {
@@ -34,7 +34,7 @@ export interface ElementRegistryAction {
 // 임시로 element 를 useState 로 상태지정
 // 추후에 전역상태로 변경할 예정
 // 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
-export function useCanvasElementManager(): {
+export function useCanvasElementRegistry(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 } {

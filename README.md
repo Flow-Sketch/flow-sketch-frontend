@@ -73,7 +73,7 @@ graph TD
 
 예를들면 아래와 같이 설명할 수 있다.
 
-- **useCanvasElementManager**: 요소들의 생성, 수정, 삭제와 관련된 store 상태를 관리
+- **useCanvasElementRegistry**: 요소들의 생성, 수정, 삭제와 관련된 store 상태를 관리
 - **useCanvasSelectManager**: 요소 선택 상태와 관련된 store 부분을 관리
 - **useCanvasMoveElementManager**: 요소 이동과 관련된 상태를 store에서 관리
 
@@ -89,7 +89,7 @@ graph TD
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
   const { viewState, viewAction } = useCanvasViewManager();
-  const { elementRegistry, elementRegistryAction } = useCanvasElementManager();
+  const { elementRegistry, elementRegistryAction } = useCanvasElementRegistry();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
   const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
   const { deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction);
@@ -105,7 +105,7 @@ export const Canvas = () => {
 
 ## **✅ 주요 훅(Hook)과 기능**
 
-### **useCanvasElementManager**
+### **useCanvasElementRegistry**
 
 > `ElementRegistry` 의 역할에 대한 자세한 글은 여기를 확인
 >
@@ -119,7 +119,7 @@ export const Canvas = () => {
 - 이 훅은 요소 생성, 이동, 크기 조절, 삭제 등의 액션을 제공.
 
 ```tsx
-  export function useCanvasElementManager(): {
+  export function useCanvasElementRegistry(): {
     elementRegistry: ElementRegistry;
     elementRegistryAction: ElementRegistryAction;
   } {

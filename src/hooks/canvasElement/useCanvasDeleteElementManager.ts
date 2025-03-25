@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useElementRegistryStore } from '@/store';
-import { ElementRegistryAction, SelectManagerAction } from '@/hooks/canvas';
+import { useElementRegistryStore } from 'src/stores';
+import { ElementRegistryAction, SelectManagerAction } from 'src/hooks/canvasElement';
 
 export type DeleteManagerState = {
   isActivate: boolean;
@@ -11,7 +11,7 @@ export type DeleteManagerState = {
 };
 
 export type DeleteManagerAction = {
-  handleOnClick: () => void;
+  handleClick: () => void;
   handleKeyDown: (event: React.KeyboardEvent<HTMLCanvasElement>) => void;
 };
 
@@ -43,7 +43,7 @@ export function useCanvasDeleteElementManager(
     selectAction.resetElement();
   };
 
-  const handleOnClick = () => {
+  const handleClick = () => {
     deleteElement();
   };
 
@@ -60,7 +60,7 @@ export function useCanvasDeleteElementManager(
       menuPosition,
     },
     deleteAction: {
-      handleOnClick,
+      handleClick,
       handleKeyDown,
     },
   };
