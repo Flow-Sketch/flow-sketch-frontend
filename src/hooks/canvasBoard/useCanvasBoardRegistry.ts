@@ -5,6 +5,7 @@ const CANVAS_STORAGE = 'canvasStorage';
 
 interface CanvasBoardState {
   canvasList: CanvasMetadata[];
+  canvasStorage: Record<string, CanvasRegistryState>;
 }
 
 interface CanvasBoardAction {
@@ -18,6 +19,7 @@ export function useCanvasBoardRegistry(): {
 } {
   const userId = 'testUser'; // 임시로 userId 처리
   const [allMetaData, setMetaData] = useState<CanvasMetadata[]>([]);
+  const [canvasStorage, setCanvasStorage] = useState<Record<string, CanvasRegistryState>>({});
 
   // state 와 localStorage 의 싱크를 맞춤
   useEffect(() => {
@@ -45,6 +47,9 @@ export function useCanvasBoardRegistry(): {
         return bTime - aTime;
       }),
     );
+
+    // 전체 데이터 호출
+    setCanvasStorage(() => canvasStorage);
   }, []);
 
   const deleteBoard = (canvasId: string) => {
@@ -63,7 +68,7 @@ export function useCanvasBoardRegistry(): {
 
     if (getCanvasBoard !== null) {
       const allCanvasStorage = JSON.parse(getCanvasBoard);
-      allCanvasStorage[canvasId] = createCanvasRegistry({ userId });
+      allCanvasStorage[canvasId] = createCanvasRegistry({ userId, canvasId });
       localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasStorage));
     }
   };
@@ -71,6 +76,7 @@ export function useCanvasBoardRegistry(): {
   return {
     boardRegistry: {
       canvasList: allMetaData,
+      canvasStorage: canvasStorage,
     },
     boardAction: {
       deleteBoard,

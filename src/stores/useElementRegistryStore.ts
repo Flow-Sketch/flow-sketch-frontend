@@ -3,6 +3,7 @@ import { CanvasRegistryState, createCanvasRegistry } from '@/models/canvasRegist
 
 const initCanvasRegistry = createCanvasRegistry({
   userId: 'testUser',
+  canvasId: 'empty',
 });
 
 // 캔버스 요소 레지스트리를 관리하는 전역 상태 스토어

@@ -4,6 +4,9 @@ import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.
 import { FlowCanvasStyle } from '@/models/sketchElement';
 import { useElementRegistryStore } from 'src/stores';
 import { getBoundingBox } from '@/utils/boundingBox';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useCanvasBoardRegistry } from '@/hooks/canvasBoard';
 
 interface ResizeParams {
   resizeX: number;
@@ -39,9 +42,21 @@ export function useCanvasElementRegistry(): {
   elementRegistryAction: ElementRegistryAction;
 } {
   const userId = 'testUser';
+  const { id: canvasId } = useParams();
+  const { boardRegistry } = useCanvasBoardRegistry();
   const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
   const selectElementRegistry = useElementRegistryStore((store) => store.selectElement[userId].elements);
   const setElementRegistry = useElementRegistryStore.setState;
+
+  // 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당
+  useEffect(() => {
+    // 여기에 id 가 유효한지를 확인해야 함
+    if (!canvasId || !boardRegistry.canvasStorage[canvasId]) {
+      return;
+    }
+    const selectCanvasRegistry = boardRegistry.canvasStorage[canvasId];
+    setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
+  }, [canvasId, boardRegistry.canvasStorage]);
 
   function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
     setElementRegistry((prev) => ({
