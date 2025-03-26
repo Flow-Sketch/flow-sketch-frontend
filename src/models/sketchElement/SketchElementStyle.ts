@@ -1,4 +1,4 @@
-export type FlowCanvasStyle = {
+export type SketchElementStyle = {
   borderWidth?: number;
   borderColor?: string;
   background?: string;

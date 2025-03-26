@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { CanvasMetadata, CanvasRegistryState, createCanvasRegistry } from '@/models/canvasRegistry';
+import {
+  CanvasMetadata,
+  CanvasRegistryState,
+  createCanvasRegistry,
+  isValidElementRegistry,
+  isValidMetadata,
+} from '@/models/canvasRegistry';
 import { useCanvasBoardRegistryStore } from '@/stores';
 import { CANVAS_STORAGE } from '@/constants';
 
@@ -10,6 +16,8 @@ interface CanvasBoardState {
 interface CanvasBoardAction {
   deleteBoard: (id: string) => void;
   createBoard: (id: string) => void;
+  editMetaBoard: (id: string, registry: unknown) => void;
+  editElementBoard: (id: string, registry: unknown) => void;
 }
 
 export function useCanvasBoardRegistry(): {
@@ -71,6 +79,29 @@ export function useCanvasBoardRegistry(): {
     }
   };
 
+  const editElementBoard = (canvasId: string, elementRegistry: unknown) => {
+    const isValidRegistry = isValidElementRegistry(elementRegistry);
+    const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
+    console.log('함수 동작함');
+
+    if (isValidRegistry && getCanvasBoard !== null) {
+      const allCanvasStorage: Record<string, CanvasRegistryState> = JSON.parse(getCanvasBoard);
+      allCanvasStorage[canvasId]['elementRegistry'] = elementRegistry;
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasStorage));
+    }
+  };
+
+  const editMetaBoard = (canvasId: string, updateMeta: unknown) => {
+    const isValidMeta = isValidMetadata(updateMeta);
+    const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
+
+    if (isValidMeta && getCanvasBoard !== null) {
+      const allCanvasStorage: Record<string, CanvasRegistryState> = JSON.parse(getCanvasBoard);
+      allCanvasStorage[canvasId]['metaData'] = updateMeta;
+      localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasStorage));
+    }
+  };
+
   return {
     boardRegistry: {
       canvasList: allMetaData,
@@ -78,6 +109,8 @@ export function useCanvasBoardRegistry(): {
     boardAction: {
       deleteBoard,
       createBoard,
+      editElementBoard,
+      editMetaBoard,
     },
   };
 }
