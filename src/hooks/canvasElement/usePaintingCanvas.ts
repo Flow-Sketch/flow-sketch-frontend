@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { colorToken } from '@/styles/color';
-import { ElementRegistry, SelectManagerState, ViewManagerState, CreateElementManagerState } from 'src/hooks/canvasElement';
+import { SelectManagerState, ViewManagerState, CreateElementManagerState } from 'src/hooks/canvasElement';
+import { ElementRegistry } from '@/models/canvasRegistry';
 
 /**
  * ### usePaintingCanvas()

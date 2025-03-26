@@ -1,12 +1,12 @@
-import { EllipseSketchElement, RectSketchElement, SketchElement } from '@/models/sketchElement';
-import { SketchElementParams } from '@/models/sketchElement/SketchElement.ts';
-import { BaseSketchElementType } from '@/models/sketchElement/BaseSketchElement.ts';
-import { FlowCanvasStyle } from '@/models/sketchElement';
-import { useElementRegistryStore } from 'src/stores';
-import { getBoundingBox } from '@/utils/boundingBox';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { CANVAS_STORAGE } from '@/constants';
+import { useElementRegistryStore } from '@/stores';
+import { getBoundingBox } from '@/utils/boundingBox';
 import { useCanvasBoardRegistry } from '@/hooks/canvasBoard';
+import { CanvasRegistryState, createCanvasRegistry, ElementRegistry } from '@/models/canvasRegistry';
+import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/models/sketchElement';
+import { useThrottle } from '@/hooks/common';
 
 interface ResizeParams {
   resizeX: number;
@@ -19,23 +19,14 @@ interface MoveParams {
   moveY: number;
 }
 
-export interface ElementRegistry {
-  elements: {
-    [id: string]: EllipseSketchElement | RectSketchElement;
-  };
-  layerOrder: string[];
-}
-
 export interface ElementRegistryAction {
   createElement: <T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) => void;
   deleteElement: (id: string) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
-  updateStyleElement: (id: string, transformParam: FlowCanvasStyle) => void;
+  updateStyleElement: (id: string, transformParam: SketchElementStyle) => void;
 }
 
-// 임시로 element 를 useState 로 상태지정
-// 추후에 전역상태로 변경할 예정
 // 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
 export function useCanvasElementRegistry(): {
   elementRegistry: ElementRegistry;
@@ -43,7 +34,8 @@ export function useCanvasElementRegistry(): {
 } {
   const userId = 'testUser';
   const { id: canvasId } = useParams();
-  const { boardRegistry } = useCanvasBoardRegistry();
+  const { boardRegistry, boardAction } = useCanvasBoardRegistry();
+  const throttleEditElementBoard = useThrottle(boardAction.editElementBoard, 300);
   const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
   const selectElementRegistry = useElementRegistryStore((store) => store.selectElement[userId].elements);
   const setElementRegistry = useElementRegistryStore.setState;
@@ -51,12 +43,56 @@ export function useCanvasElementRegistry(): {
   // 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당
   useEffect(() => {
     // 여기에 id 가 유효한지를 확인해야 함
-    if (!canvasId || !boardRegistry.canvasStorage[canvasId]) {
+    if (!canvasId) {
       return;
     }
-    const selectCanvasRegistry = boardRegistry.canvasStorage[canvasId];
+
+    const existingCanvas = boardRegistry.canvasList.find((item) => item.id === canvasId);
+    if (!existingCanvas) {
+      return;
+    }
+
+    const canvasListStr = localStorage.getItem(CANVAS_STORAGE);
+    if (!canvasListStr) {
+      return;
+    }
+
+    const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
+    const selectCanvasRegistry = canvasStorage[canvasId];
+    selectCanvasRegistry.elementRegistry['elements'] = selectCanvasRegistry.elementRegistry.layerOrder.reduce(
+      (acc, elementId) => {
+        acc[elementId] = SketchElement.convertElement(selectCanvasRegistry.elementRegistry['elements'][elementId]);
+        return acc;
+      },
+      {} as ElementRegistry['elements'],
+    );
+
+    // 최종 ElementStore 에 업데이트
     setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
-  }, [canvasId, boardRegistry.canvasStorage]);
+
+    return () => {
+      setElementRegistry(() =>
+        createCanvasRegistry({
+          userId,
+          canvasId: 'empty',
+        }),
+      );
+    };
+  }, [canvasId, boardRegistry.canvasList]);
+
+  useEffect(() => {
+    // 여기에 id 가 유효한지를 확인해야 함
+    if (!canvasId) {
+      return;
+    }
+
+    // store가 초기 상태일 때는 저장하지 않음
+    if (elementRegistry.elements && Object.keys(elementRegistry.elements).length === 0 && elementRegistry.layerOrder.length === 0) {
+      return;
+    }
+
+    throttleEditElementBoard(canvasId, elementRegistry);
+  }, [canvasId, elementRegistry]);
 
   function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
     setElementRegistry((prev) => ({
@@ -127,7 +163,7 @@ export function useCanvasElementRegistry(): {
     }));
   }
 
-  function updateStyleElement(id: string, param: FlowCanvasStyle) {
+  function updateStyleElement(id: string, param: SketchElementStyle) {
     const updateElement = elementRegistry.elements[id];
     const updateElements = { ...elementRegistry.elements };
     if (updateElement) {
