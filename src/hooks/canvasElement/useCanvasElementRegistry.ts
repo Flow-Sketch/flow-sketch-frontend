@@ -59,6 +59,13 @@ export function useCanvasElementRegistry(): {
 
     const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
     const selectCanvasRegistry = canvasStorage[canvasId];
+    selectCanvasRegistry.elementRegistry['elements'] = selectCanvasRegistry.elementRegistry.layerOrder.reduce(
+      (acc, elementId) => {
+        acc[elementId] = SketchElement.convertElement(selectCanvasRegistry.elementRegistry['elements'][elementId]);
+        return acc;
+      },
+      {} as ElementRegistry['elements'],
+    );
 
     // 최종 ElementStore 에 업데이트
     setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));

@@ -128,8 +128,6 @@ export function useCanvasSelectElementManager(): {
         },
       },
     }));
-
-    console.log(newSelectElement);
   }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
 
   // offset 을 변경하거나 scale 을 변경했을 때, 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함

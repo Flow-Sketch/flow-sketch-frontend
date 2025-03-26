@@ -82,7 +82,6 @@ export function useCanvasBoardRegistry(): {
   const editElementBoard = (canvasId: string, elementRegistry: unknown) => {
     const isValidRegistry = isValidElementRegistry(elementRegistry);
     const getCanvasBoard = localStorage.getItem(CANVAS_STORAGE);
-    console.log('함수 동작함');
 
     if (isValidRegistry && getCanvasBoard !== null) {
       const allCanvasStorage: Record<string, CanvasRegistryState> = JSON.parse(getCanvasBoard);
