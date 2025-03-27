@@ -10,7 +10,6 @@ export function useEditCanvasBoardManager(): {
   editAction: EditCanvasBoardManagerAction;
 } {
   const { boardAction } = useCanvasBoardRegistry();
-  const throttleEditMetaBoard = useThrottle(boardAction.editElementBoard, 300);
   const throttleEditElementBoard = useThrottle(boardAction.editElementBoard, 300);
 
   const editElementBoard = (canvasId: string, elementRegistry: unknown) => {
@@ -18,7 +17,7 @@ export function useEditCanvasBoardManager(): {
   };
 
   const editMetaBoard = (canvasId: string, meta: unknown) => {
-    throttleEditMetaBoard(canvasId, meta);
+    boardAction.editMetaBoard(canvasId, meta);
   };
 
   return {

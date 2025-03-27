@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from 'react';
 import { Separator } from '@/components/ui/separator.tsx';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card.tsx';
 import FlowSketchGray from '@/assets/FlowSketch-gray.svg';
@@ -10,7 +11,7 @@ import { useDeleteCanvasBoardManager } from '@/hooks/canvasBoard/useDeleteCanvas
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { useState } from 'react';
+import { useEditCanvasBoardManager } from '@/hooks/canvasBoard';
 
 interface CanvasItemCardProps {
   canvasMeta: CanvasMetadata;
@@ -19,7 +20,6 @@ interface CanvasItemCardProps {
 export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
   const navigate = useNavigate();
   const { deleteCanvas } = useDeleteCanvasBoardManager();
-
   const [isEditNameOpen, setIsEditNameOpen] = useState(false);
   const [isMemoOpen, setIsMemoOpen] = useState(false);
 
@@ -68,11 +68,11 @@ export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
           </DropdownMenu>
 
           <Dialog open={isEditNameOpen} onOpenChange={setIsEditNameOpen}>
-            <EditNameDialog canvasMeta={canvasMeta} />
+            <EditNameDialog canvasMeta={canvasMeta} onClose={() => setIsEditNameOpen(false)} />
           </Dialog>
 
           <Dialog open={isMemoOpen} onOpenChange={setIsMemoOpen}>
-            <MemoDialog canvasMeta={canvasMeta} />
+            <MemoDialog canvasMeta={canvasMeta} onClose={() => setIsMemoOpen(false)} />
           </Dialog>
         </div>
       </CardContent>
@@ -80,36 +80,72 @@ export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
   );
 };
 
-const EditNameDialog = ({ canvasMeta }: { canvasMeta: CanvasMetadata }) => (
-  <DialogContent className="sm:max-w-[425px]">
-    <DialogHeader>
-      <DialogTitle>캔버스 이름 변경</DialogTitle>
-      <DialogDescription>변경할 캔버스의 이름을 입력해주세요.</DialogDescription>
-    </DialogHeader>
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Input id="name" defaultValue={canvasMeta.name} className="col-span-3" />
-      </div>
-    </div>
-    <DialogFooter>
-      <Button type="submit">저장</Button>
-    </DialogFooter>
-  </DialogContent>
-);
+const EditNameDialog = ({ canvasMeta, onClose }: { canvasMeta: CanvasMetadata; onClose: () => void }) => {
+  const { editAction } = useEditCanvasBoardManager();
+  const [editName, setEditName] = useState<string>(canvasMeta.name);
 
-const MemoDialog = ({ canvasMeta }: { canvasMeta: CanvasMetadata }) => (
-  <DialogContent className="sm:max-w-[425px]">
-    <DialogHeader>
-      <DialogTitle>캔버스 메모</DialogTitle>
-      <DialogDescription>캔버스에 대한 메모를 입력해주세요.</DialogDescription>
-    </DialogHeader>
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Input id="memo" defaultValue={canvasMeta.description} className="col-span-3" />
+  const handleChangeName = (event: ChangeEvent<HTMLInputElement>) => {
+    setEditName(event.target.value);
+  };
+
+  const handleSaveName = () => {
+    const updateCanvasMeta = { ...canvasMeta };
+    updateCanvasMeta.name = editName;
+    editAction.editMetaBoard(updateCanvasMeta.id, updateCanvasMeta);
+    onClose();
+  };
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>캔버스 이름 변경</DialogTitle>
+        <DialogDescription>변경할 캔버스의 이름을 입력해주세요.</DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Input id="name" defaultValue={editName} onChange={handleChangeName} className="col-span-3" />
+        </div>
       </div>
-    </div>
-    <DialogFooter>
-      <Button type="submit">저장</Button>
-    </DialogFooter>
-  </DialogContent>
-);
+      <DialogFooter>
+        <Button type="submit" onClick={handleSaveName}>
+          저장
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
+
+const MemoDialog = ({ canvasMeta, onClose }: { canvasMeta: CanvasMetadata; onClose: () => void }) => {
+  const { editAction } = useEditCanvasBoardManager();
+  const [editMemo, setEditMemo] = useState<string>(canvasMeta.name);
+
+  const handleChangeMemo = (event: ChangeEvent<HTMLInputElement>) => {
+    setEditMemo(event.target.value);
+  };
+
+  const handleSaveMemo = () => {
+    const updateCanvasMeta = { ...canvasMeta };
+    updateCanvasMeta.description = editMemo;
+    editAction.editMetaBoard(updateCanvasMeta.id, updateCanvasMeta);
+    onClose();
+  };
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>캔버스 메모</DialogTitle>
+        <DialogDescription>캔버스에 대한 메모를 입력해주세요.</DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Input id="memo" defaultValue={canvasMeta.description} onChange={handleChangeMemo} className="col-span-3" />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button onClick={handleSaveMemo} type="submit">
+          저장
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+};

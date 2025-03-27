@@ -98,6 +98,11 @@ export function useCanvasBoardRegistry(): {
       const allCanvasStorage: Record<string, CanvasRegistryState> = JSON.parse(getCanvasBoard);
       allCanvasStorage[canvasId]['metaData'] = updateMeta;
       localStorage.setItem(CANVAS_STORAGE, JSON.stringify(allCanvasStorage));
+      setMetaData((prev) => ({
+        canvasList: prev.canvasList.reduce((acc, val) => {
+          return [...acc, val.id === canvasId ? updateMeta : val];
+        }, [] as CanvasMetadata[]),
+      }));
     }
   };
 
