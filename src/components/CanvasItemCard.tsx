@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button.tsx';
 import { MoreVertical, Trash2, Pencil, StickyNote } from 'lucide-react';
 import { useDeleteCanvasBoardManager } from '@/hooks/canvasBoard/useDeleteCanvasBoardManager.ts';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { useState } from 'react';
 
 interface CanvasItemCardProps {
   canvasMeta: CanvasMetadata;
@@ -16,6 +19,9 @@ interface CanvasItemCardProps {
 export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
   const navigate = useNavigate();
   const { deleteCanvas } = useDeleteCanvasBoardManager();
+
+  const [isEditNameOpen, setIsEditNameOpen] = useState(false);
+  const [isMemoOpen, setIsMemoOpen] = useState(false);
 
   const handleClick = () => {
     navigate(`${ROUTE_PATH.CANVAS.ROOT}/${canvasMeta.id}`);
@@ -46,11 +52,11 @@ export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsEditNameOpen(true)}>
                 <Pencil />
                 <p>이름 변경</p>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsMemoOpen(true)}>
                 <StickyNote />
                 <p>메모</p>
               </DropdownMenuItem>
@@ -60,8 +66,50 @@ export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Dialog open={isEditNameOpen} onOpenChange={setIsEditNameOpen}>
+            <EditNameDialog canvasMeta={canvasMeta} />
+          </Dialog>
+
+          <Dialog open={isMemoOpen} onOpenChange={setIsMemoOpen}>
+            <MemoDialog canvasMeta={canvasMeta} />
+          </Dialog>
         </div>
       </CardContent>
     </Card>
   );
 };
+
+const EditNameDialog = ({ canvasMeta }: { canvasMeta: CanvasMetadata }) => (
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>캔버스 이름 변경</DialogTitle>
+      <DialogDescription>변경할 캔버스의 이름을 입력해주세요.</DialogDescription>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Input id="name" defaultValue={canvasMeta.name} className="col-span-3" />
+      </div>
+    </div>
+    <DialogFooter>
+      <Button type="submit">저장</Button>
+    </DialogFooter>
+  </DialogContent>
+);
+
+const MemoDialog = ({ canvasMeta }: { canvasMeta: CanvasMetadata }) => (
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>캔버스 메모</DialogTitle>
+      <DialogDescription>캔버스에 대한 메모를 입력해주세요.</DialogDescription>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Input id="memo" defaultValue={canvasMeta.description} className="col-span-3" />
+      </div>
+    </div>
+    <DialogFooter>
+      <Button type="submit">저장</Button>
+    </DialogFooter>
+  </DialogContent>
+);
