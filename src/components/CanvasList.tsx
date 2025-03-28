@@ -16,7 +16,7 @@ export const CanvasList = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-32">
       {boardRegistry.canvasList.map((metaData) => (
-        <CanvasItemCard canvasMeta={metaData} />
+        <CanvasItemCard key={metaData.id} canvasMeta={metaData} />
       ))}
     </div>
   );

@@ -1,7 +1,8 @@
 export const ROUTE_PATH = {
-  HOME: {
-    ROOT: '/home',
-    MAIN: '/home/:userId',
+  ROOT: '/',
+  USER: {
+    ROOT: '/user',
+    HOME: '/user/:username/home',
   },
   CANVAS: {
     ROOT: '/canvas',
