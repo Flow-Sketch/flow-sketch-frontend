@@ -9,21 +9,22 @@ import { HomePage } from '@/pages/home';
 
 export const router = createBrowserRouter([
   {
-    element: <MainLayout />,
+    path: ROUTE_PATH.ROOT,
+    element: <PrivateRoute isAuthenticated={true} />, // 임시로 모두 허용
     children: [
       {
-        path: ROUTE_PATH.HOME.ROOT,
-        element: <PrivateRoute isAuthenticated={true} />, // 임시로 모두 허용
+        path: ROUTE_PATH.USER.ROOT,
+        element: <MainLayout />,
         children: [
           {
-            path: ROUTE_PATH.HOME.MAIN,
+            path: ROUTE_PATH.USER.HOME,
             element: <HomePage />,
           },
         ],
       },
       {
         path: ROUTE_PATH.CANVAS.ROOT,
-        element: <PrivateRoute isAuthenticated={true} />, // 임시로 모두 허용
+        element: <CanvasPage />,
         children: [
           {
             path: ROUTE_PATH.CANVAS.MAIN,
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    path: ROUTE_PATH.ROOT,
     element: <AuthLayout />,
     children: [
       {
