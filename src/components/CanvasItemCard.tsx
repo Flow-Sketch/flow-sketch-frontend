@@ -41,7 +41,7 @@ export const CanvasItemCard = ({ canvasMeta }: CanvasItemCardProps) => {
       <Separator />
       <CardContent>
         <div className="flex self-stretch justify-between">
-          <div onClick={handleClick} className="flex self-stretch justify-between hover: cursor-pointer">
+          <div onClick={handleClick} className="flex flex-col self-stretch justify-between hover: cursor-pointer gap-2">
             <CardTitle>{canvasMeta.name}</CardTitle>
             <CardDescription>{canvasMeta.description}</CardDescription>
           </div>
@@ -103,7 +103,7 @@ const EditNameDialog = ({ canvasMeta, onClose }: { canvasMeta: CanvasMetadata; o
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Input id="name" defaultValue={editName} onChange={handleChangeName} className="col-span-3" />
+          <Input id="name" defaultValue={editName} onChange={handleChangeName} className="col-span-4" />
         </div>
       </div>
       <DialogFooter>
@@ -138,7 +138,7 @@ const MemoDialog = ({ canvasMeta, onClose }: { canvasMeta: CanvasMetadata; onClo
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Input id="memo" defaultValue={canvasMeta.description} onChange={handleChangeMemo} className="col-span-3" />
+          <Input id="memo" defaultValue={canvasMeta.description} onChange={handleChangeMemo} className="col-span-4" />
         </div>
       </div>
       <DialogFooter>

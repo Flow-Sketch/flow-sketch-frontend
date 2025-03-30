@@ -5,8 +5,14 @@ import { RemoteMode, ShapeType } from 'src/stores';
 import { IconButton, IconButtonGroup } from '@/components/IconButton.tsx';
 import { SubRemote, SubRemoteGroup } from '@/components/SubRemote.tsx';
 import { useRemoteManager } from '@/hooks/remote';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { MoreVertical, Undo2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/routes';
 
 export const Remote = () => {
+  const navigate = useNavigate();
   const { remoteState, remoteAction } = useRemoteManager();
 
   const handleElementCreate = (input: ShapeType[]) => {
@@ -16,6 +22,10 @@ export const Remote = () => {
 
   const handleModeChange = (input: RemoteMode[]) => {
     remoteAction.handleRemoteModeChange(input);
+  };
+
+  const handleBackToHome = () => {
+    navigate(ROUTE_PATH.ROOT);
   };
 
   return (
@@ -46,6 +56,19 @@ export const Remote = () => {
           <span>추후 추가예정</span>
         </SubRemote>
       </SubRemoteGroup>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" alignOffset={20} sideOffset={22}>
+          <DropdownMenuItem onClick={handleBackToHome}>
+            <Undo2 />
+            <p>나가기</p>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </Container>
   );
 };
