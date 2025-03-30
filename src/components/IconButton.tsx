@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colorToken } from '@/style/color';
+import { colorToken } from '@/styles/color';
 import React, { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 
 interface IconButtonProps<Value> {
@@ -92,10 +92,10 @@ export const IconButtonGroup = <T,>({ children, variant, onChange, value, isBord
 const ButtonContainer = styled.div<{ $isFocus: boolean }>`
   display: flex;
   border-radius: 4px;
-  padding: 2px;
+  padding: 8px;
   ${({ $isFocus }) => ($isFocus ? `background : ${colorToken['surface']}` : '')};
 
-  & :hover {
+  &:hover {
     background: ${colorToken['surface']};
     border-radius: 4px;
   }

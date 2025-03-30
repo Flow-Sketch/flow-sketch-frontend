@@ -1,4 +1,4 @@
-import { FlowCanvasStyle } from '@/types/canvas';
+import { SketchElementStyle } from './SketchElementStyle.ts';
 
 export type BaseSketchElementType = 'text' | 'rect' | 'ellipse';
 
@@ -9,7 +9,7 @@ interface BaseSketchElementParams {
   height: number;
   x: number;
   y: number;
-  elementStyle: FlowCanvasStyle;
+  elementStyle: SketchElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   points?: { x: number; y: number }[];
 }
@@ -21,7 +21,7 @@ export abstract class BaseSketchElement {
   height: number;
   x: number;
   y: number;
-  elementStyle: FlowCanvasStyle;
+  elementStyle: SketchElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   isEditable: boolean; //
   points?: { x: number; y: number }[];

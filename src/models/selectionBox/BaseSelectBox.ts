@@ -1,4 +1,4 @@
-import { colorToken } from '@/style/color';
+import { colorToken } from '@/styles/color';
 
 interface BaseSelectBoxParams {
   id: string;

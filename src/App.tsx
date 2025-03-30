@@ -1,20 +1,10 @@
-import './App.css';
-import { css } from '@emotion/react';
-import { Canvas } from '@/components/Canvas.tsx';
-import { Remote } from '@/components/Remote.tsx';
+import { router } from '@/routes';
+import { RouterProvider } from 'react-router-dom';
 
 function App() {
   return (
     <>
-      <div
-        css={css`
-          display: flex;
-          flex-direction: row;
-        `}
-      >
-        <Canvas />
-        <Remote />
-      </div>
+      <RouterProvider router={router} />
     </>
   );
 }
