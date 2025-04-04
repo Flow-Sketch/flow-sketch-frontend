@@ -5,7 +5,7 @@
 Figma나 Draw.io와 같은 디자인/다이어그램 도구와 유사한 기능을 구현하며, 다중 접속으로 동시 편집이 가능한 기능 제공을 목표로 프로젝트를 시작했습니다.
 
 > ##### 서비스 링크
-> [https://flow-sketch-brown.vercel.app](https://flow-sketch-brown.vercel.app/)
+> [http://www.flowsketch.kr](http://www.flowsketch.kr)
 
 # **2️⃣ 주요기능**
 
@@ -23,6 +23,7 @@ Figma나 Draw.io와 같은 디자인/다이어그램 도구와 유사한 기능�
 
 ### 동시편집
 
+> ##### 🚀 추후 개발 예정
 > 여러 사용자가 동시에 같은 캔버스를 편집할 수 있는 실시간 협업 기능을 제공합니다.  
 > 각 사용자의 편집 내용이 즉시 다른 사용자에게 반영됩니다.
 
