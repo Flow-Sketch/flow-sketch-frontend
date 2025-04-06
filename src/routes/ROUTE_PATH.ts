@@ -5,8 +5,8 @@ export const ROUTE_PATH = {
     HOME: '/user/:username/home',
   },
   CANVAS: {
-    ROOT: '/canvas',
-    MAIN: '/canvas/:id',
+    ROOT: '/sketch',
+    MAIN: '/sketch/:id',
   },
   AUTH: {
     LOGIN: '/auth/login',

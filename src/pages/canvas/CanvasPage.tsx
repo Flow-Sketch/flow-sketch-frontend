@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
-import { CanvasBoard } from '@/components/CanvasBoard.tsx';
-import { Remote } from '@/components/Remote.tsx';
+import { SketchBoard, SketchToolbar } from 'src/features/sketch';
 
 export const CanvasPage = () => {
   return (
@@ -10,8 +9,8 @@ export const CanvasPage = () => {
         flex-direction: row;
       `}
     >
-      <CanvasBoard />
-      <Remote />
+      <SketchBoard />
+      <SketchToolbar />
     </div>
   );
 };

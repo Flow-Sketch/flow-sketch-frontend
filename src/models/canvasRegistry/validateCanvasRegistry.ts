@@ -84,7 +84,7 @@ export function isValidSelectElementRegistry(data: unknown): data is SelectEleme
  * ```typescript
  * const validData = {
  *   metaData: {
- *     id: 'test-canvas-1',
+ *     id: 'test-sketch-1',
  *     name: 'Test Canvas',
  *     createdAt: '2024-03-20T09:00:00.000Z',
  *     updatedAt: '2024-03-20T09:30:00.000Z',

@@ -77,9 +77,9 @@ graph TD
 
 예를들면 아래와 같이 설명할 수 있다.
 
-- **useCanvasElementRegistry**: 요소들의 생성, 수정, 삭제와 관련된 store 상태를 관리
+- **useElementRegistry**: 요소들의 생성, 수정, 삭제와 관련된 store 상태를 관리
 - **useCanvasSelectManager**: 요소 선택 상태와 관련된 store 부분을 관리
-- **useCanvasMoveElementManager**: 요소 이동과 관련된 상태를 store에서 관리
+- **useMoveElementManager**: 요소 이동과 관련된 상태를 store에서 관리
 
 ## **✅ 핵심 컴포넌트**
 
@@ -87,21 +87,21 @@ graph TD
 
 > Canvas 컴포넌트는 모든 드로잉 기능이 구현되는 메인 컴포넌트입니다.  
 > 다양한 훅을 통합하여 사용자 인터랙션을 이 곳에서 처리합니다.
-> `useCanvasActionHandler` 를 통해 다양한 액션 핸들러를 통합하고, `usePaintingCanvas` 를 통해 캔버스에 요소를 렌더링합니다.
+> `useCanvasActionHandler` 를 통해 다양한 액션 핸들러를 통합하고, `usePaintingSketchBoard` 를 통해 캔버스에 요소를 렌더링합니다.
 
 ```tsx
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
-  const { viewState, viewAction } = useCanvasViewManager();
-  const { elementRegistry, elementRegistryAction } = useCanvasElementRegistry();
+  const { viewState, viewAction } = useCameraViewManager();
+  const { elementRegistry, elementRegistryAction } = useElementRegistry();
   const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
-  const { createState, createAction } = useCanvasCreateElementManger(viewState, elementRegistryAction);
-  const { deleteAction } = useCanvasDeleteElementManager(selectState, selectAction, elementRegistryAction);
-  const { moveAction } = useCanvasMoveElementManager(viewState, selectState, elementRegistryAction);
-  const { resizeAction } = useCanvasResizeElementManager(viewState, selectState, elementRegistryAction);
+  const { createState, createAction } = useCreateElementManger(viewState, elementRegistryAction);
+  const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
+  const { moveAction } = useMoveElementManager(viewState, selectState, elementRegistryAction);
+  const { resizeAction } = useResizeElementManager(viewState, selectState, elementRegistryAction);
 
   const handler = useCanvasActionHandler(selectState, viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction);
-  usePaintingCanvas(canvasRef, elementRegistry, viewState, selectState, createState);
+  usePaintingSketchBoard(canvasRef, elementRegistry, viewState, selectState, createState);
 
   // 렌더링 로직...
 };
@@ -142,9 +142,9 @@ export abstract class BaseSketchElement {
 }
 ```
 
-### 2. `CanvasBoard`
+### 2. `SketchBoard`
 
-> `CanvasBoard`는 캔버스의 메타데이터와 상태를 관리하는 모듈입니다:
+> `SketchBoard`는 캔버스의 메타데이터와 상태를 관리하는 모듈입니다:
 
 ```typescript
 interface CanvasBoardState {
