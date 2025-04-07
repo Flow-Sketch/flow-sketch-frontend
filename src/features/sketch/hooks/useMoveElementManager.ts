@@ -2,8 +2,8 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { ElementRegistryAction } from '@/features/sketch/hooks/index.ts';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/features/sketch/constants';
-import { useCanvasViewStore, useElementRegistryStore } from '@/stores';
-import { isPointInOBB } from '@/utils/collidingDetection';
+import { useCanvasViewStore, useElementRegistryStore } from 'src/core/stores';
+import { isPointInOBB } from '@/shared/utils/collidingDetection';
 
 export type MoveManagerState = {
   isMoving: boolean;

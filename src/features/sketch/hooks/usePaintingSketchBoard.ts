@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { colorToken } from '@/styles/color';
+import { colorToken } from '@/shared/styles/color';
 import { SelectManagerState, ViewManagerState, CreateElementManagerState } from '@/features/sketch/hooks/index.ts';
-import { ElementRegistry } from '@/models/canvasRegistry';
+import { ElementRegistry } from '@/core/models/sketchFile';
 
 /**
  * ### usePaintingSketchBoard()

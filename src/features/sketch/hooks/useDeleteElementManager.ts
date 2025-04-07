@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useElementRegistryStore } from '@/stores';
+import { useElementRegistryStore } from 'src/core/stores';
 import { ElementRegistryAction, SelectManagerAction } from '@/features/sketch/hooks/index.ts';
 
 export type DeleteManagerState = {

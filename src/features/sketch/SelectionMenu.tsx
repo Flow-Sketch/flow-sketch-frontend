@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { TbTrash } from 'react-icons/tb';
-import { colorToken } from '@/styles/color';
-import { useElementRegistryStore } from '@/stores';
-import { IconButton } from '@/components/IconButton.tsx';
-import { ColorPicker } from '@/components/ColorPicker.tsx';
+import { colorToken } from '@/shared/styles/color';
+import { useElementRegistryStore } from 'src/core/stores';
+import { IconButton } from '@/shared/components/IconButton.tsx';
+import { ColorPicker } from '@/shared/components/ColorPicker.tsx';
 import { useChangeColorElementManager, MoveManagerState, DeleteManagerAction } from './hooks';
 
 interface SelectionMenuProps {

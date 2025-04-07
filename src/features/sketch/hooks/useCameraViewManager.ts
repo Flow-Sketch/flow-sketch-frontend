@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCanvasViewStore } from '@/stores';
+import { useCanvasViewStore } from 'src/core/stores';
 
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
 const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기

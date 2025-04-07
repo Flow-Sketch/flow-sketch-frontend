@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
-import { colorToken } from '@/styles/color';
+import { colorToken } from '@/shared/styles/color';
 import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle, TbArrowGuideFilled, TbTriangleSquareCircle, TbTextSize } from 'react-icons/tb';
-import { RemoteMode, ShapeType } from '@/stores';
-import { IconButton, IconButtonGroup } from '@/components/IconButton.tsx';
-import { SubRemote, SubRemoteGroup } from '@/components/SubRemote.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
-import { Button } from '@/components/ui/button.tsx';
+import { RemoteMode, ShapeType } from 'src/core/stores';
+import { IconButton, IconButtonGroup } from '@/shared/components/IconButton.tsx';
+import { SubRemote, SubRemoteGroup } from '@/shared/components/SubRemote.tsx';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/components/ui/dropdown-menu.tsx';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { MoreVertical, Undo2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/routes';
 import { useRemoteManager } from './hooks/useRemoteManager';
+import { ROUTE_PATH } from '@/app/route';
 
 export const SketchToolbar = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '../constants/transformControls.ts';
-import { isPointInOBB } from '@/utils/collidingDetection';
+import { isPointInOBB } from '@/shared/utils/collidingDetection';
 import {
   CreateElementMangerAction,
   DeleteManagerAction,

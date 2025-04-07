@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { CANVAS_STORAGE } from '@/features/sketchFile/constants';
-import { useElementRegistryStore } from '@/stores';
-import { getBoundingBox } from '@/utils/boundingBox';
-import { useSketchFilesRegistry } from '@/features/sketchFile/hooks';
-import { CanvasRegistryState, createCanvasRegistry, ElementRegistry } from '@/models/canvasRegistry';
-import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/models/sketchElement';
-import { useThrottle } from '@/hooks';
+import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
+import { useElementRegistryStore } from 'src/core/stores';
+import { getBoundingBox } from '@/shared/utils/boundingBox';
+import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
+import { CanvasRegistryState, createSketchFile, ElementRegistry } from '@/core/models/sketchFile';
+import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/core/models/sketchElement';
+import { useThrottle } from 'src/shared/hooks';
 
 interface ResizeParams {
   resizeX: number;
@@ -72,7 +72,7 @@ export function useElementRegistry(): {
 
     return () => {
       setElementRegistry(() =>
-        createCanvasRegistry({
+        createSketchFile({
           userId,
           canvasId: 'empty',
         }),

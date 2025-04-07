@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { isOBBColliding } from '@/utils/collidingDetection';
-import { BaseSelectBox } from '@/models/selectionBox';
-import { getBoundingBox } from '@/utils/boundingBox';
-import { useElementRegistryStore, useCanvasViewStore } from '@/stores';
+import { isOBBColliding } from '@/shared/utils/collidingDetection';
+import { BaseSelectBox } from '@/core/models/selectionBox';
+import { getBoundingBox } from '@/shared/utils/boundingBox';
+import { useElementRegistryStore, useCanvasViewStore } from 'src/core/stores';
 
 export type SelectManagerState = {
   dragBox: {

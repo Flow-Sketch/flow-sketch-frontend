@@ -2,8 +2,8 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '../constants';
 import { SelectManagerState, ElementRegistryAction } from '@/features/sketch/hooks/index.ts';
-import { useCanvasViewStore, useElementRegistryStore } from '@/stores';
-import { isPointInOBB } from '@/utils/collidingDetection';
+import { useCanvasViewStore, useElementRegistryStore } from 'src/core/stores';
+import { isPointInOBB } from '@/shared/utils/collidingDetection';
 
 // 리사이즈 핸들 위치 타입 정의
 export type ResizeHandlePosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'right' | 'bottom' | 'left' | null;

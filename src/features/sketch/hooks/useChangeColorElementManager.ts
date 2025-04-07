@@ -1,4 +1,4 @@
-import { useElementRegistryStore } from '@/stores';
+import { useElementRegistryStore } from 'src/core/stores';
 import { useElementRegistry } from '@/features/sketch/hooks/index.ts';
 
 export function useChangeColorElementManager() {

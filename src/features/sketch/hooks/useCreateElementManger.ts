@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from '@/stores';
+import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from 'src/core/stores';
 import { ElementRegistryAction } from '@/features/sketch/hooks/useElementRegistry.ts';
 import { RemoteManagerAction } from '@/features/sketch/hooks/useRemoteManager.ts';
 
