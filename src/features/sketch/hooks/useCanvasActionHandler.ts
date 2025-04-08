@@ -8,6 +8,7 @@ import {
   ResizeManagerAction,
   SelectManagerAction,
   ViewManagerAction,
+  ClipboardManagerAction,
   useSelectElementManager,
   useRemoteManager,
 } from '@/features/sketch/hooks/index.ts';
@@ -19,12 +20,13 @@ export function useCanvasActionHandler(action: {
   deleteAction: DeleteManagerAction;
   moveAction: MoveManagerAction;
   resizeAction: ResizeManagerAction;
+  clipboardAction: ClipboardManagerAction;
 }) {
   const { remoteState } = useRemoteManager();
   const { shapeType, remoteMode } = remoteState;
   const { selectState } = useSelectElementManager();
   const [editMode, setEditMode] = useState<'select' | 'resize' | 'move'>('select');
-  const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction } = action;
+  const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction, clipboardAction } = action;
 
   const handleWheel = (() => {
     if (remoteMode === 'view') return viewAction.handleWheel;
@@ -95,8 +97,22 @@ export function useCanvasActionHandler(action: {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (!event) return;
     if (remoteMode === 'edit') {
-      return deleteAction.handleKeyDown(event);
+      if (event.key === 'Delete' || event.key === 'Backspace') return deleteAction.handleDeleteElement();
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case 'c':
+            clipboardAction.handleCopyElement();
+            break;
+          case 'v':
+            clipboardAction.handlePasteElement();
+            break;
+          case 'x':
+            clipboardAction.handleCutElement();
+            break;
+        }
+      }
     }
   };
 

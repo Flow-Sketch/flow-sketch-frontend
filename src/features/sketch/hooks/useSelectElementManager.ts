@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { isOBBColliding } from '@/shared/utils/collidingDetection';
 import { BaseSelectBox } from '@/core/models/selectionBox';
 import { getBoundingBox } from '@/shared/utils/boundingBox';
@@ -26,6 +26,7 @@ export type SelectManagerAction = {
   handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseUp: () => void;
   resetElement: () => void;
+  handleUpdateSelectId: (selectKeys: string[]) => void;
 };
 
 /**
@@ -60,13 +61,16 @@ export function useSelectElementManager(): {
   const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
   const userSelectState = store.selectElement[userId];
 
+  // 선택된 요소들의 id 를 저장
+  const [selectElementIds, setSelectElementIds] = useState<null | string[]>(null);
+
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
     const { startPoint, endPoint } = userSelectState.dragBox;
     if (!startPoint || !endPoint) return;
 
     const { offset, scale } = viewState;
-    const newSelectElement: { [id: string]: BaseSelectBox } = {};
+    const newSelectElementKeys: string[] = [];
     const dragRectWidth = Math.abs(endPoint.x - startPoint.x) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
@@ -92,19 +96,41 @@ export function useSelectElementManager(): {
 
       if (isObb) {
         element.enableEditing();
-        newSelectElement[element.id] = new BaseSelectBox({
-          id: element.id,
-          x: element.x,
-          y: element.y,
-          width: element.width,
-          height: element.height,
+        newSelectElementKeys.push(elementId);
+      }
+    }
+
+    // 선택된 id 가 없으면 모두 reset
+    if (newSelectElementKeys.length === 0) {
+      resetElement();
+      setSelectElementIds(null);
+      return;
+    }
+
+    // 선택된 id 가 있으면 값을 업데이트
+    setSelectElementIds(newSelectElementKeys);
+  }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
+
+  // offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
+  useEffect(() => {
+    if (!selectElementIds) return;
+
+    const newSelectElement: { [id: string]: BaseSelectBox } = {};
+    for (const elementId of selectElementIds) {
+      const originalElement = store.elementRegistry.elements[elementId];
+      if (originalElement) {
+        // 요소가 존재하는지 확인
+        newSelectElement[elementId] = new BaseSelectBox({
+          id: originalElement.id,
+          x: originalElement.x,
+          y: originalElement.y,
+          width: originalElement.width,
+          height: originalElement.height,
           offsetX: viewState.offset.x,
           offsetY: viewState.offset.y,
-          rotation: element.rotation,
+          rotation: originalElement.rotation,
           scale: viewState.scale,
         });
-      } else {
-        element.disableEditing();
       }
     }
 
@@ -128,53 +154,27 @@ export function useSelectElementManager(): {
         },
       },
     }));
-  }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
+  }, [selectElementIds, viewState.offset, viewState.scale, store.elementRegistry.elements]);
 
-  // offset 을 변경하거나 scale 을 변경했을 때, 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
-  useEffect(() => {
-    const selectElementIdArr = Object.keys(userSelectState.elements);
-    if (selectElementIdArr.length) {
-      const newSelectElement: { [id: string]: BaseSelectBox } = {};
-      for (const elementId of selectElementIdArr) {
-        const originalElement = store.elementRegistry.elements[elementId];
-        if (originalElement) {
-          // 요소가 존재하는지 확인
-          newSelectElement[elementId] = new BaseSelectBox({
-            id: originalElement.id,
-            x: originalElement.x,
-            y: originalElement.y,
-            width: originalElement.width,
-            height: originalElement.height,
-            offsetX: viewState.offset.x,
-            offsetY: viewState.offset.y,
-            rotation: originalElement.rotation,
-            scale: viewState.scale,
-          });
-        }
-      }
-
-      // 스토어 업데이트
-      setState((state) => ({
-        ...state,
-        selectElement: {
-          ...state.selectElement,
-          [userId]: {
-            ...state.selectElement[userId],
-            elements: newSelectElement,
-            boundingBox: getBoundingBox(
-              Object.values(newSelectElement).map((item) => ({
-                cx: item.viewX,
-                cy: item.viewY,
-                width: item.width,
-                height: item.height,
-                rotation: item.rotation,
-              })),
-            ),
-          },
+  /** 선택 요소 초기화 */
+  const resetElement = () => {
+    // 스토어 업데이트
+    setState((state) => ({
+      ...state,
+      selectElement: {
+        ...state.selectElement,
+        [userId]: {
+          ...state.selectElement[userId],
+          elements: {},
         },
-      }));
-    }
-  }, [viewState.offset, viewState.scale, store.elementRegistry.elements]);
+      },
+    }));
+  };
+
+  const handleUpdateSelectId = (selectIds: string[]) => {
+    if (selectIds.length === 0) return;
+    setSelectElementIds(() => selectIds);
+  };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
@@ -239,27 +239,13 @@ export function useSelectElementManager(): {
     }));
   };
 
-  /** 선택 요소 초기화 */
-  const resetElement = () => {
-    // 스토어 업데이트
-    setState((state) => ({
-      ...state,
-      selectElement: {
-        ...state.selectElement,
-        [userId]: {
-          ...state.selectElement[userId],
-          elements: {},
-        },
-      },
-    }));
-  };
-
   return {
     selectAction: {
       handleMouseMove,
       handleMouseDown,
       handleMouseUp,
       resetElement,
+      handleUpdateSelectId,
     },
     selectState: {
       dragBox: userSelectState.dragBox,

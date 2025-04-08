@@ -27,3 +27,6 @@ export type { ResizeManagerAction, ResizeHandlePosition } from './useResizeEleme
 
 export { useChangeColorElementManager } from './useChangeColorElementManager.ts';
 export { useRemoteManager } from './useRemoteManager.ts';
+
+export { useClipboardElementManager } from './useClipboardElementManager.ts';
+export type { ClipboardManagerAction } from './useClipboardElementManager.ts';

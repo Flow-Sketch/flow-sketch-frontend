@@ -13,6 +13,7 @@ import {
   useRemoteManager,
 } from './hooks';
 import { SelectionMenu } from './SelectionMenu';
+import { useClipboardElementManager } from '@/features/sketch/hooks/useClipboardElementManager.ts';
 
 export const SketchBoard = () => {
   const { canvasRef } = useCanvas();
@@ -22,8 +23,9 @@ export const SketchBoard = () => {
   const { elementRegistry, elementRegistryAction } = useElementRegistry();
   const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useMoveElementManager(elementRegistryAction);
-  const { deleteAction } = useDeleteElementManager(selectAction, elementRegistryAction);
   const { resizeAction } = useResizeElementManager(elementRegistryAction);
+  const { deleteAction } = useDeleteElementManager(selectAction, elementRegistryAction);
+  const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
 
   const handler = useCanvasActionHandler({
     viewAction,
@@ -32,6 +34,7 @@ export const SketchBoard = () => {
     deleteAction,
     moveAction,
     resizeAction,
+    clipboardAction,
   });
 
   usePaintingSketchBoard(canvasRef, {

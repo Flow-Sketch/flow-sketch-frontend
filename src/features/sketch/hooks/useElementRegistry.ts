@@ -21,7 +21,7 @@ interface MoveParams {
 
 export interface ElementRegistryAction {
   createElement: <T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) => void;
-  deleteElement: (id: string) => void;
+  deleteElement: (ids: string[]) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
   updateStyleElement: (id: string, transformParam: SketchElementStyle) => void;
@@ -104,21 +104,22 @@ export function useElementRegistry(): {
     }));
   }
 
-  function deleteElement(id: string) {
-    if (!elementRegistry.elements[id]) {
-      return;
-    }
+  function deleteElement(ids: string[]) {
+    if (ids.length === 0) return;
+
     const updateElement = { ...elementRegistry.elements };
     const updateSelectElement = { ...selectElementRegistry };
 
-    delete updateElement[id];
-    delete updateSelectElement[id];
+    for (const id of ids) {
+      delete updateElement[id];
+      delete updateSelectElement[id];
+    }
 
     setElementRegistry((prev) => ({
       ...prev,
       elementRegistry: {
         elements: updateElement,
-        layerOrder: prev.elementRegistry.layerOrder.filter((key) => key !== id),
+        layerOrder: prev.elementRegistry.layerOrder.filter((key) => !ids.includes(key)),
       },
       selectElement: {
         ...prev.selectElement,
