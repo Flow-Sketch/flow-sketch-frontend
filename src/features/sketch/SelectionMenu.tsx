@@ -20,7 +20,7 @@ export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) =
   return (
     isActivate && (
       <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
-        <IconButton onClick={deleteAction.handleClick}>
+        <IconButton onClick={deleteAction.handleDeleteElement}>
           <TbTrash size={22} />
         </IconButton>
         <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
