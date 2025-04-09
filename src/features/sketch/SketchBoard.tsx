@@ -14,6 +14,7 @@ import {
 } from './hooks';
 import { SelectionMenu } from './SelectionMenu';
 import { useClipboardElementManager } from '@/features/sketch/hooks/useClipboardElementManager.ts';
+import { SketchContextMenu } from '@/features/sketch/SketchContextMenu.tsx';
 
 export const SketchBoard = () => {
   const { canvasRef } = useCanvas();
@@ -21,6 +22,8 @@ export const SketchBoard = () => {
   const { viewState, viewAction } = useCameraViewManager();
   const { selectState, selectAction } = useSelectElementManager();
   const { elementRegistry, elementRegistryAction } = useElementRegistry();
+
+  // Element 를 직접적으로 관리
   const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
   const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
@@ -47,15 +50,17 @@ export const SketchBoard = () => {
   return (
     <Container>
       <SelectionMenu moveState={moveState} selectState={selectState} deleteAction={deleteAction} />
-      <Canvas
-        tabIndex={1}
-        ref={canvasRef}
-        onWheel={handler.handleWheel}
-        onMouseDown={handler.handleMouseDown}
-        onMouseUp={handler.handleMouseUp}
-        onMouseMove={handler.handleMouseMove}
-        onKeyDown={handler.handleKeyDown}
-      />
+      <SketchContextMenu>
+        <Canvas
+          tabIndex={1}
+          ref={canvasRef}
+          onWheel={handler.handleWheel}
+          onMouseDown={handler.handleMouseDown}
+          onMouseUp={handler.handleMouseUp}
+          onMouseMove={handler.handleMouseMove}
+          onKeyDown={handler.handleKeyDown}
+        />
+      </SketchContextMenu>
     </Container>
   );
 };
