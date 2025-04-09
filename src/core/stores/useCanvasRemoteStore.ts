@@ -1,7 +1,9 @@
 import { create } from 'zustand/react';
+import { RectType } from '@/core/models/sketchElement/RectSketchElement.ts';
+import { EllipseType } from '@/core/models/sketchElement/EllipseSketchElement.ts';
 
 export type RemoteMode = 'view' | 'edit';
-export type ShapeType = null | 'rect' | 'ellipse';
+export type ShapeType = null | RectType | EllipseType;
 
 interface RemoteState {
   remoteMode: RemoteMode;

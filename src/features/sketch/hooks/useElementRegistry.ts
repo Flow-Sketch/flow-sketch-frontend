@@ -2,9 +2,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
 import { useElementRegistryStore } from 'src/core/stores';
-import { getBoundingBox } from '@/shared/utils/boundingBox';
 import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
-import { CanvasRegistryState, createSketchFile, ElementRegistry } from '@/core/models/sketchFile';
+import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
 import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/core/models/sketchElement';
 import { useThrottle } from 'src/shared/hooks';
 
@@ -20,8 +19,9 @@ interface MoveParams {
 }
 
 export interface ElementRegistryAction {
-  createElement: <T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) => void;
-  deleteElement: (ids: string[]) => void;
+  createElements: <T extends BaseSketchElementType>(params: SketchElementParams<T>[]) => void;
+  createSingleElement: <T extends BaseSketchElementType>(params: SketchElementParams<T>) => void;
+  deleteElements: (ids: string[]) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
   updateStyleElement: (id: string, transformParam: SketchElementStyle) => void;
@@ -36,11 +36,12 @@ export function useElementRegistry(): {
   const { id: canvasId } = useParams();
   const { boardRegistry, boardAction } = useSketchFilesRegistry();
   const throttleEditElementBoard = useThrottle(boardAction.editElementBoard, 300);
+
+  const isInitializedSketch = useElementRegistryStore((store) => store.isInitialized);
   const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
-  const selectElementRegistry = useElementRegistryStore((store) => store.selectElement[userId].elements);
   const setElementRegistry = useElementRegistryStore.setState;
 
-  // 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당
+  /** A. 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당 **/
   useEffect(() => {
     // 여기에 id 가 유효한지를 확인해야 함
     if (!canvasId) {
@@ -59,6 +60,8 @@ export function useElementRegistry(): {
 
     const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
     const selectCanvasRegistry = canvasStorage[canvasId];
+
+    // json -> element 인스턴스로 변환
     selectCanvasRegistry.elementRegistry['elements'] = selectCanvasRegistry.elementRegistry.layerOrder.reduce(
       (acc, elementId) => {
         acc[elementId] = SketchElement.convertElement(selectCanvasRegistry.elementRegistry['elements'][elementId]);
@@ -66,53 +69,58 @@ export function useElementRegistry(): {
       },
       {} as ElementRegistry['elements'],
     );
+    // 초기화 완료
+    selectCanvasRegistry.isInitialized = true;
 
     // 최종 ElementStore 에 업데이트
     setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
 
+    // 페이지를 나가면, store 를 초기화
     return () => {
-      setElementRegistry(() =>
-        createSketchFile({
-          userId,
-          canvasId: 'empty',
-        }),
-      );
+      setElementRegistry(() => resetSketchFile({ userId }));
     };
   }, [canvasId, boardRegistry.canvasList]);
 
+  /** B. store 값이 업데이트 될 때마다 localstorage 값을 업데이트  **/
   useEffect(() => {
     // 여기에 id 가 유효한지를 확인해야 함
-    if (!canvasId) {
+    if (!canvasId || !isInitializedSketch) {
       return;
     }
-
-    // store가 초기 상태일 때는 저장하지 않음
-    if (elementRegistry.elements && Object.keys(elementRegistry.elements).length === 0 && elementRegistry.layerOrder.length === 0) {
-      return;
-    }
-
     throttleEditElementBoard(canvasId, elementRegistry);
   }, [canvasId, elementRegistry]);
 
-  function createElement<T extends BaseSketchElementType>(type: T, params: SketchElementParams<T>) {
+  function createElements<T extends BaseSketchElementType>(params: SketchElementParams<T>[]) {
+    const newElements = params.reduce((cur, param) => {
+      return { ...cur, [param.id]: SketchElement.createElement(param) };
+    }, {});
+    const newIds = params.map((param) => param.id);
     setElementRegistry((prev) => ({
       ...prev,
       elementRegistry: {
-        elements: { ...prev.elementRegistry.elements, [params.id]: SketchElement.createElement(type, params) },
+        elements: { ...prev.elementRegistry.elements, ...newElements },
+        layerOrder: [...prev.elementRegistry.layerOrder, ...newIds],
+      },
+    }));
+  }
+
+  function createSingleElement<T extends BaseSketchElementType>(params: SketchElementParams<T>) {
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: { ...prev.elementRegistry.elements, [params.id]: SketchElement.createElement(params) },
         layerOrder: [...prev.elementRegistry.layerOrder, params.id],
       },
     }));
   }
 
-  function deleteElement(ids: string[]) {
+  function deleteElements(ids: string[]) {
     if (ids.length === 0) return;
 
     const updateElement = { ...elementRegistry.elements };
-    const updateSelectElement = { ...selectElementRegistry };
 
     for (const id of ids) {
       delete updateElement[id];
-      delete updateSelectElement[id];
     }
 
     setElementRegistry((prev) => ({
@@ -121,12 +129,11 @@ export function useElementRegistry(): {
         elements: updateElement,
         layerOrder: prev.elementRegistry.layerOrder.filter((key) => !ids.includes(key)),
       },
-      selectElement: {
-        ...prev.selectElement,
+      selectElements: {
+        ...prev.selectElements,
         [userId]: {
-          ...prev.selectElement[userId],
-          elements: updateSelectElement,
-          boundingBox: getBoundingBox([]),
+          ...prev.selectElements[userId],
+          selectElementIds: [],
         },
       },
     }));
@@ -183,8 +190,9 @@ export function useElementRegistry(): {
   return {
     elementRegistry,
     elementRegistryAction: {
-      createElement,
-      deleteElement,
+      createSingleElement,
+      createElements,
+      deleteElements,
       moveElement,
       resizeElement,
       updateStyleElement,

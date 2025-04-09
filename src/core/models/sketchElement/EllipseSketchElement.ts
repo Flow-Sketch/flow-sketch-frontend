@@ -1,7 +1,10 @@
 import { BaseSketchElement } from '@/core/models/sketchElement/BaseSketchElement.ts';
 
+export type EllipseType = 'ellipse';
+
 export interface EllipseSketchElementParams {
   id: string;
+  type: EllipseType;
   width: number;
   height: number;
   x: number;

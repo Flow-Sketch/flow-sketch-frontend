@@ -27,7 +27,7 @@ const CANVAS_STORAGE = 'canvasStorage'
       elements: { [elementId: string]: SketchElement },
       layerOrder: string[]
     },
-    selectElement: {
+    selectElements: {
       [userId: string]: {
         elements: { [elementId: string]: boolean },
         boundingBox: BoundingBox
@@ -56,7 +56,7 @@ const CANVAS_STORAGE = 'canvasStorage'
       },
       "layerOrder": ["element-1", "element-2"]
     },
-    "selectElement": {
+    "selectElements": {
       "testUser": {
         "elements": {
           "element-1": true

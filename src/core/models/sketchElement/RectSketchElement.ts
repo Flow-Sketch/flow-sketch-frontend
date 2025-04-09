@@ -1,6 +1,9 @@
 import { BaseSketchElement } from '@/core/models/sketchElement/BaseSketchElement.ts';
 
+export type RectType = 'rect';
+
 export interface RectSketchElementParams {
+  type: RectType;
   id: string;
   width: number;
   height: number;
@@ -14,7 +17,7 @@ export class RectSketchElement extends BaseSketchElement {
   constructor(params: RectSketchElementParams) {
     super({
       id: params.id,
-      type: 'rect',
+      type: params.type,
       width: params.width,
       height: params.height,
       x: params.x,

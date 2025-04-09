@@ -1,6 +1,8 @@
 import { SketchElementStyle } from './SketchElementStyle.ts';
+import { EllipseType } from '@/core/models/sketchElement/EllipseSketchElement.ts';
+import { RectType } from '@/core/models/sketchElement/RectSketchElement.ts';
 
-export type BaseSketchElementType = 'text' | 'rect' | 'ellipse';
+export type BaseSketchElementType = RectType | EllipseType;
 
 interface BaseSketchElementParams {
   id: string;

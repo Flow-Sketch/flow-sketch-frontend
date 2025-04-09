@@ -1,11 +1,12 @@
 import { expect, describe, it } from '@jest/globals';
 import { isValidCanvasRegistryState } from '../validateSketchFile.ts';
 import { RectSketchElement } from '@/core/models/sketchElement';
-import { BaseSelectBox } from '@/core/models/selectionBox';
+import { CanvasRegistryState } from '@/core/models/sketchFile';
 
 describe('validateAndParseCanvasRegistry', () => {
   // 유효한 캔버스 레지스트리 데이터 모킹
-  const validCanvasRegistry = {
+  const validCanvasRegistry: CanvasRegistryState = {
+    isInitialized: false,
     metaData: {
       id: 'test-sketch-1',
       name: 'Test Canvas',
@@ -20,23 +21,13 @@ describe('validateAndParseCanvasRegistry', () => {
       elements: {},
       layerOrder: [],
     },
-    selectElement: {
+    selectElements: {
       testUser: {
         dragBox: {
           startPoint: null,
           endPoint: null,
         },
-        boundingBox: {
-          minX: 0,
-          maxX: 0,
-          minY: 0,
-          maxY: 0,
-          cx: 0,
-          cy: 0,
-          width: 0,
-          height: 0,
-        },
-        elements: {},
+        selectElementIds: [],
       },
     },
   };
@@ -68,12 +59,13 @@ describe('validateAndParseCanvasRegistry', () => {
 
   describe('엘리먼트 레지스트리 검증', () => {
     it('유효한 스케치 엘리먼트를 포함하는 경우 성공해야 함', () => {
-      const validElements = {
+      const validElements: CanvasRegistryState = {
         ...validCanvasRegistry,
         elementRegistry: {
           elements: {
             'element-1': new RectSketchElement({
               id: 'element-1',
+              type: 'rect',
               x: 0,
               y: 0,
               width: 100,
@@ -102,37 +94,15 @@ describe('validateAndParseCanvasRegistry', () => {
 
   describe('선택 엘리먼트 검증', () => {
     it('유효한 선택 상태를 포함하는 경우 성공해야 함', () => {
-      const validSelection = {
+      const validSelection: CanvasRegistryState = {
         ...validCanvasRegistry,
-        selectElement: {
+        selectElements: {
           testUser: {
             dragBox: {
               startPoint: { x: 0, y: 0 },
               endPoint: { x: 100, y: 100 },
             },
-            boundingBox: {
-              minX: 0,
-              maxX: 100,
-              minY: 0,
-              maxY: 100,
-              cx: 50,
-              cy: 50,
-              width: 100,
-              height: 100,
-            },
-            elements: {
-              'element-1': new BaseSelectBox({
-                id: 'element-1',
-                x: 0,
-                y: 0,
-                width: 100,
-                height: 100,
-                offsetX: 0,
-                offsetY: 0,
-                rotation: 0,
-                scale: 1,
-              }),
-            },
+            selectElementIds: ['element-1'],
           },
         },
       };
@@ -140,16 +110,13 @@ describe('validateAndParseCanvasRegistry', () => {
       expect(result).toBe(true);
     });
 
-    it('잘못된 바운딩 박스 값이 있으면 실패해야 함', () => {
+    it('잘못된 속성 값이 있으면 실패해야 함', () => {
       const invalidBoundingBox = {
         ...validCanvasRegistry,
-        selectElement: {
+        selectElements: {
           testUser: {
-            ...validCanvasRegistry.selectElement.testUser,
-            boundingBox: {
-              ...validCanvasRegistry.selectElement.testUser.boundingBox,
-              width: '100', // number 대신 string
-            },
+            ...validCanvasRegistry.selectElements.testUser,
+            selectElementIds: null,
           },
         },
       };

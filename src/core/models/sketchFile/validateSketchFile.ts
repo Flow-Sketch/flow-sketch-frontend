@@ -1,6 +1,5 @@
 import { CanvasRegistryState, CanvasMetadata, ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile/type.ts';
 import { EllipseSketchElement, RectSketchElement } from '@/core/models/sketchElement';
-import { BaseSelectBox } from '@/core/models/selectionBox';
 
 export function isValidMetadata(data: unknown): data is CanvasMetadata {
   if (!data || typeof data !== 'object') return false;
@@ -53,22 +52,10 @@ export function isValidSelectElementRegistry(data: unknown): data is SelectEleme
     (registry.dragBox.endPoint === null ||
       (typeof registry.dragBox.endPoint?.x === 'number' && typeof registry.dragBox.endPoint?.y === 'number'));
 
-  // boundingBox 검증
-  const isBoundingBoxValid =
-    registry.boundingBox &&
-    typeof registry.boundingBox.minX === 'number' &&
-    typeof registry.boundingBox.maxX === 'number' &&
-    typeof registry.boundingBox.minY === 'number' &&
-    typeof registry.boundingBox.maxY === 'number' &&
-    typeof registry.boundingBox.cx === 'number' &&
-    typeof registry.boundingBox.cy === 'number' &&
-    typeof registry.boundingBox.width === 'number' &&
-    typeof registry.boundingBox.height === 'number';
-
   // elements 검증
-  const areElementsValid = registry.elements && Object.values(registry.elements).every((element) => element instanceof BaseSelectBox);
+  const areElementsValid = registry.selectElementIds && registry.selectElementIds.every((element) => typeof element === 'string');
 
-  return isDragBoxValid && isBoundingBoxValid && areElementsValid;
+  return isDragBoxValid && areElementsValid;
 }
 
 /** ## isValidCanvasRegistryState(obj : unknown) : boolean
@@ -78,7 +65,7 @@ export function isValidSelectElementRegistry(data: unknown): data is SelectEleme
  * ### 검증 내용
  * - metaData: 캔버스의 기본 정보 (id, name, 생성일자 등)
  * - elementRegistry: 캔버스 내 요소들의 정보
- * - selectElement: 사용자별 선택 상태 정보
+ * - selectElements: 사용자별 선택 상태 정보
  *
  * @example
  * ```typescript
@@ -97,7 +84,7 @@ export function isValidSelectElementRegistry(data: unknown): data is SelectEleme
  *     elements: {},
  *     layerOrder: []
  *   },
- *   selectElement: {
+ *   selectElements: {
  *     testUser: {
  *       dragBox: { startPoint: null, endPoint: null },
  *       boundingBox: { minX: 0, maxX: 0, minY: 0, maxY: 0, cx: 0, cy: 0, width: 0, height: 0 },
@@ -120,14 +107,14 @@ export function isValidCanvasRegistryState(data: unknown): data is CanvasRegistr
   const state = data as CanvasRegistryState;
 
   // 기본 구조 검증
-  if (!state.metaData || !state.elementRegistry || !state.selectElement) {
+  if (!state.metaData || !state.elementRegistry || !state.selectElements) {
     return false;
   }
 
   // 각 부분 검증
   const isMetadataValid = isValidMetadata(state.metaData);
   const isElementRegistryValid = isValidElementRegistry(state.elementRegistry);
-  const isSelectElementValid = Object.values(state.selectElement).every((registry) => isValidSelectElementRegistry(registry));
+  const isSelectElementValid = Object.values(state.selectElements).every((registry) => isValidSelectElementRegistry(registry));
 
   return isMetadataValid && isElementRegistryValid && isSelectElementValid;
 }

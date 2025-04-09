@@ -1,24 +1,24 @@
 import styled from '@emotion/styled';
 import { TbTrash } from 'react-icons/tb';
 import { colorToken } from '@/shared/styles/color';
-import { useElementRegistryStore } from 'src/core/stores';
 import { IconButton } from '@/shared/components/IconButton.tsx';
 import { ColorPicker } from '@/shared/components/ColorPicker.tsx';
-import { useChangeColorElementManager, MoveManagerState, DeleteManagerAction } from './hooks';
+import { useChangeColorElementManager, MoveManagerState, DeleteManagerAction, SelectManagerState } from './hooks';
 
 interface SelectionMenuProps {
   moveState: MoveManagerState;
+  selectState: SelectManagerState;
   deleteAction: DeleteManagerAction;
 }
 
-export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) => {
-  const userId = 'testUser';
-  const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElement[userId]);
-  const isActivate = !moveState.isMoving && Object.keys(elements).length > 0;
+export const SelectionMenu = ({ moveState, selectState, deleteAction }: SelectionMenuProps) => {
+  const { boundingBox, selectElements } = selectState;
+  const isActivate = !moveState.isMoving && Object.keys(selectElements).length > 0;
   const { colors, changeBackground } = useChangeColorElementManager();
 
   return (
-    isActivate && (
+    isActivate &&
+    boundingBox && (
       <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
         <IconButton onClick={deleteAction.handleDeleteElement}>
           <TbTrash size={22} />
