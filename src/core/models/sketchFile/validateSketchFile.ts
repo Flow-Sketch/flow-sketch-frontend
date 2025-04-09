@@ -1,6 +1,5 @@
 import { CanvasRegistryState, CanvasMetadata, ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile/type.ts';
 import { EllipseSketchElement, RectSketchElement } from '@/core/models/sketchElement';
-import { BaseSelectBox } from '@/core/models/selectionBox';
 
 export function isValidMetadata(data: unknown): data is CanvasMetadata {
   if (!data || typeof data !== 'object') return false;
@@ -53,22 +52,10 @@ export function isValidSelectElementRegistry(data: unknown): data is SelectEleme
     (registry.dragBox.endPoint === null ||
       (typeof registry.dragBox.endPoint?.x === 'number' && typeof registry.dragBox.endPoint?.y === 'number'));
 
-  // boundingBox 검증
-  const isBoundingBoxValid =
-    registry.boundingBox &&
-    typeof registry.boundingBox.minX === 'number' &&
-    typeof registry.boundingBox.maxX === 'number' &&
-    typeof registry.boundingBox.minY === 'number' &&
-    typeof registry.boundingBox.maxY === 'number' &&
-    typeof registry.boundingBox.cx === 'number' &&
-    typeof registry.boundingBox.cy === 'number' &&
-    typeof registry.boundingBox.width === 'number' &&
-    typeof registry.boundingBox.height === 'number';
-
   // elements 검증
-  const areElementsValid = registry.elements && Object.values(registry.elements).every((element) => element instanceof BaseSelectBox);
+  const areElementsValid = registry.selectElementIds && registry.selectElementIds.every((element) => typeof element === 'string');
 
-  return isDragBoxValid && isBoundingBoxValid && areElementsValid;
+  return isDragBoxValid && areElementsValid;
 }
 
 /** ## isValidCanvasRegistryState(obj : unknown) : boolean

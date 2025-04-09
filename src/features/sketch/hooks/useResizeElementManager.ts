@@ -2,8 +2,9 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '../constants';
 import { SelectManagerState, ElementRegistryAction } from '@/features/sketch/hooks/index.ts';
-import { useCanvasViewStore, useElementRegistryStore } from 'src/core/stores';
+import { useCanvasViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
+import { BoundingBox } from '@/shared/utils/boundingBox';
 
 // 리사이즈 핸들 위치 타입 정의
 export type ResizeHandlePosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'right' | 'bottom' | 'left' | null;
@@ -26,12 +27,13 @@ export type ResizeManagerAction = {
  * @param elementRegistryAction - 요소 레지스트리 액션
  * @returns 리사이즈 관련 액션
  */
-export function useResizeElementManager(elementRegistryAction: ElementRegistryAction): {
+export function useResizeElementManager(
+  selectState: SelectManagerState,
+  elementRegistryAction: ElementRegistryAction,
+): {
   resizeAction: ResizeManagerAction;
 } {
-  const userId = 'testUser';
   const viewState = useCanvasViewStore();
-  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [isResizing, setIsResizing] = useState<boolean>(false); // 현재 드래그 중인지 여부
@@ -48,13 +50,13 @@ export function useResizeElementManager(elementRegistryAction: ElementRegistryAc
    * 리사이즈 시작 위치와 활성 핸들을 설정
    */
   const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
-    if (!event) return;
+    if (!event || !selectState.boundingBox) return;
 
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
 
     // 선택된 요소가 없으면 리턴
-    if (Object.keys(selectState.elements).length === 0) return;
+    if (selectState.selectElements.length === 0) return;
 
     // 마우스 위치가 어떤 핸들 위에 있는지 확인
     const handlePosition = getResizeHandleAtPosition(currentX, currentY, selectState.boundingBox);
@@ -82,7 +84,7 @@ export function useResizeElementManager(elementRegistryAction: ElementRegistryAc
     const deltaY = (currentY - startPoint.y) / viewState.scale;
 
     // 선택된 모든 요소에 대해 크기 조절 적용
-    for (const selectKey of Object.keys(selectState.elements)) {
+    for (const selectKey of selectState.selectElements) {
       elementRegistryAction.resizeElement(selectKey, {
         resizeX: deltaX,
         resizeY: deltaY,
@@ -122,7 +124,7 @@ export function useResizeElementManager(elementRegistryAction: ElementRegistryAc
  * @param boundingBox - 바운딩 박스
  * @returns 리사이즈 핸들 위치 또는 null
  */
-function getResizeHandleAtPosition(mouseX: number, mouseY: number, boundingBox: SelectManagerState['boundingBox']): ResizeHandlePosition {
+function getResizeHandleAtPosition(mouseX: number, mouseY: number, boundingBox: BoundingBox): ResizeHandlePosition {
   const { cx, cy, width, height } = boundingBox;
   const halfWidth = width / 2;
   const halfHeight = height / 2;

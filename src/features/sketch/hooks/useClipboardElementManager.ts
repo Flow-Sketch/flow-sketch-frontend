@@ -20,13 +20,12 @@ export function useClipboardElementManager(
   const userId = 'testUser';
   const [clipboards, setClipboard] = useState<BaseSketchElement[] | null>(null);
   const allElements = useElementRegistryStore((store) => store.elementRegistry);
-  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
+  const selectStateIds = useElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
 
   const handleCopyElement = () => {
-    const currentSelectElementKeys = Object.keys(selectState.elements);
-    if (currentSelectElementKeys.length === 0) return;
+    if (selectStateIds.length === 0) return;
 
-    const selectElements = currentSelectElementKeys.reduce((current, elementId) => {
+    const selectElements = selectStateIds.reduce((current, elementId) => {
       const currentElement = allElements.elements[elementId];
       if (currentElement) {
         return [...current, allElements.elements[elementId]];
@@ -59,10 +58,9 @@ export function useClipboardElementManager(
   };
 
   const handleCutElement = () => {
-    const currentSelectElementKeys = Object.keys(selectState.elements);
-    if (!currentSelectElementKeys.length) return;
+    if (!selectStateIds.length) return;
 
-    const selectElements = currentSelectElementKeys.reduce((current, elementId) => {
+    const selectElements = selectStateIds.reduce((current, elementId) => {
       if (allElements.elements[elementId]) {
         return [...current, allElements.elements[elementId]];
       } else {
@@ -71,7 +69,7 @@ export function useClipboardElementManager(
     }, [] as BaseSketchElement[]);
 
     setClipboard(selectElements);
-    elementRegistryAction.deleteElements(currentSelectElementKeys);
+    elementRegistryAction.deleteElements(selectStateIds);
   };
 
   return {

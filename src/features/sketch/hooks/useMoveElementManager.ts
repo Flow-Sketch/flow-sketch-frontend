@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { MouseEvent, useState } from 'react';
-import { ElementRegistryAction } from '@/features/sketch/hooks/index.ts';
+import { ElementRegistryAction, SelectManagerState } from '@/features/sketch/hooks/index.ts';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/features/sketch/constants';
-import { useCanvasViewStore, useElementRegistryStore } from 'src/core/stores';
+import { useCanvasViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 
 export type MoveManagerState = {
@@ -15,18 +15,19 @@ export type MoveManagerAction = {
   handleMouseUp: () => void;
 };
 
-export function useMoveElementManager(elementRegistryAction: ElementRegistryAction): {
+export function useMoveElementManager(
+  selectState: SelectManagerState,
+  elementRegistryAction: ElementRegistryAction,
+): {
   moveState: MoveManagerState;
   moveAction: MoveManagerAction;
 } {
-  const userId = 'testUser';
   const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const viewState = useCanvasViewStore();
-  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
-    if (!event) return;
+    if (!event || !selectState.boundingBox) return;
 
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
@@ -56,7 +57,7 @@ export function useMoveElementManager(elementRegistryAction: ElementRegistryActi
     const deltaY = (currentY - alignmentPoint.y) / viewState.scale;
 
     // 선택된 요소를 같은 크기로 이동시킴
-    for (const selectKey of Object.keys(selectState.elements)) {
+    for (const selectKey of selectState.selectElements) {
       elementRegistryAction.moveElement(selectKey, { moveX: deltaX, moveY: deltaY });
     }
     setAlignmentPoint({ x: currentX, y: currentY });

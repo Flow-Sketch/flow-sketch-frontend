@@ -39,17 +39,7 @@ export function createSketchFile({
     selectElements: {
       [userId]: {
         dragBox: { startPoint: null, endPoint: null },
-        boundingBox: {
-          minX: 0,
-          maxX: 0,
-          minY: 0,
-          maxY: 0,
-          cx: 0,
-          cy: 0,
-          width: 0,
-          height: 0,
-        },
-        elements: {},
+        selectElementIds: [],
       },
     },
   };
@@ -81,17 +71,7 @@ export function resetSketchFile({ userId }: { userId: string }): CanvasRegistryS
     selectElements: {
       [userId]: {
         dragBox: { startPoint: null, endPoint: null },
-        boundingBox: {
-          minX: 0,
-          maxX: 0,
-          minY: 0,
-          maxY: 0,
-          cx: 0,
-          cy: 0,
-          width: 0,
-          height: 0,
-        },
-        elements: {},
+        selectElementIds: [],
       },
     },
   };

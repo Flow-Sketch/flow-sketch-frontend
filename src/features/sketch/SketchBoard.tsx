@@ -22,9 +22,9 @@ export const SketchBoard = () => {
   const { selectState, selectAction } = useSelectElementManager();
   const { elementRegistry, elementRegistryAction } = useElementRegistry();
   const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
-  const { moveState, moveAction } = useMoveElementManager(elementRegistryAction);
-  const { resizeAction } = useResizeElementManager(elementRegistryAction);
-  const { deleteAction } = useDeleteElementManager(selectAction, elementRegistryAction);
+  const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
+  const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
+  const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
   const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
 
   const handler = useCanvasActionHandler({
@@ -46,7 +46,7 @@ export const SketchBoard = () => {
 
   return (
     <Container>
-      <SelectionMenu moveState={moveState} deleteAction={deleteAction} />
+      <SelectionMenu moveState={moveState} selectState={selectState} deleteAction={deleteAction} />
       <Canvas
         tabIndex={1}
         ref={canvasRef}

@@ -1,5 +1,4 @@
 import { EllipseSketchElement, RectSketchElement } from '@/core/models/sketchElement';
-import { BaseSelectBox } from '@/core/models/selectionBox';
 
 export interface ElementRegistry {
   elements: {
@@ -13,19 +12,7 @@ export interface SelectElementRegistry {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
   };
-  boundingBox: {
-    minX: number;
-    maxX: number;
-    minY: number;
-    maxY: number;
-    cx: number;
-    cy: number;
-    width: number;
-    height: number;
-  };
-  elements: {
-    [id: string]: BaseSelectBox;
-  };
+  selectElementIds: string[];
 }
 
 export interface CanvasMetadata {

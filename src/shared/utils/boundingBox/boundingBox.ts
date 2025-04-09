@@ -11,7 +11,7 @@ interface ElementBox {
   rotation: number;
 }
 
-interface BoundingBox {
+export interface BoundingBox {
   minX: number;
   maxX: number;
   minY: number;

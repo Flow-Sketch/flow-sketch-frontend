@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { isOBBColliding } from '@/shared/utils/collidingDetection';
 import { BaseSelectBox } from '@/core/models/selectionBox';
-import { getBoundingBox } from '@/shared/utils/boundingBox';
+import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
 import { useElementRegistryStore, useCanvasViewStore } from 'src/core/stores';
 
 export type SelectManagerState = {
@@ -10,15 +10,8 @@ export type SelectManagerState = {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
   };
-  boundingBox: {
-    cx: number;
-    cy: number;
-    width: number;
-    height: number;
-  };
-  selectElements: {
-    [id: string]: BaseSelectBox;
-  };
+  boundingBox: BoundingBox;
+  selectElements: string[];
 };
 
 export type SelectManagerAction = {
@@ -54,7 +47,7 @@ export function useSelectElementManager(): {
 } {
   // Zustand 스토어에서 상태와 업데이트 함수 가져오기
   const store = useElementRegistryStore();
-  const setState = useElementRegistryStore.setState;
+  const setElementRegistry = useElementRegistryStore.setState;
   const viewState = useCanvasViewStore();
 
   // 스토어에서 현재 사용자의 선택 상태 가져오기
@@ -62,7 +55,17 @@ export function useSelectElementManager(): {
   const userSelectState = store.selectElements[userId];
 
   // 선택된 요소들의 id 를 저장
-  const [selectElementIds, setSelectElementIds] = useState<null | string[]>(null);
+  const [boundingBox, setBoundingBox] = useState<BoundingBox>({
+    minX: 0,
+    maxX: 0,
+    minY: 0,
+    maxY: 0,
+    cx: 0,
+    cy: 0,
+    width: 0,
+    height: 0,
+  });
+  // const [selectElementIds, setSelectElementIds] = useState<null | string[]>(null);
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -75,7 +78,6 @@ export function useSelectElementManager(): {
     const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetY = (Math.abs(offset.y) + Math.min(startPoint.y, endPoint.y)) / scale; // View 좌표계 -> 절대 좌표계로 변경
-
     const dragRect = {
       cx: convertOffsetX + dragRectWidth / 2,
       cy: convertOffsetY + dragRectHeight / 2,
@@ -103,17 +105,18 @@ export function useSelectElementManager(): {
     // 선택된 id 가 없으면 모두 reset
     if (newSelectElementKeys.length === 0) {
       resetElement();
-      setSelectElementIds(null);
       return;
     }
 
     // 선택된 id 가 있으면 값을 업데이트
-    setSelectElementIds(newSelectElementKeys);
+    updateSelectIds(newSelectElementKeys);
   }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
 
   // offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
   useEffect(() => {
-    if (!selectElementIds) return;
+    const selectElementIds = userSelectState.selectElementIds;
+
+    if (selectElementIds.length === 0) return;
     const newSelectElement: { [id: string]: BaseSelectBox } = {};
 
     for (const elementId of selectElementIds) {
@@ -134,38 +137,43 @@ export function useSelectElementManager(): {
       }
     }
 
-    // 스토어 업데이트
-    setState((state) => ({
+    setBoundingBox(() =>
+      getBoundingBox(
+        Object.values(newSelectElement).map((item) => ({
+          cx: item.viewX,
+          cy: item.viewY,
+          width: item.width,
+          height: item.height,
+          rotation: item.rotation,
+        })),
+      ),
+    );
+  }, [userSelectState.selectElementIds, viewState.offset, viewState.scale, store.elementRegistry.elements]);
+
+  const updateSelectIds = (ids: string[]) => {
+    console.log(ids);
+    setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
         [userId]: {
           ...state.selectElements[userId],
-          elements: newSelectElement,
-          boundingBox: getBoundingBox(
-            Object.values(newSelectElement).map((item) => ({
-              cx: item.viewX,
-              cy: item.viewY,
-              width: item.width,
-              height: item.height,
-              rotation: item.rotation,
-            })),
-          ),
+          selectElementIds: ids,
         },
       },
     }));
-  }, [selectElementIds, viewState.offset, viewState.scale, store.elementRegistry.elements]);
+  };
 
   /** 선택 요소 초기화 */
   const resetElement = () => {
     // 스토어 업데이트
-    setState((state) => ({
+    setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
         [userId]: {
           ...state.selectElements[userId],
-          elements: {},
+          selectElementIds: [],
         },
       },
     }));
@@ -173,7 +181,7 @@ export function useSelectElementManager(): {
 
   const handleUpdateSelectId = (selectIds: string[]) => {
     if (selectIds.length === 0) return;
-    setSelectElementIds(() => selectIds);
+    updateSelectIds(selectIds);
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -185,7 +193,7 @@ export function useSelectElementManager(): {
     };
 
     // 스토어 업데이트
-    setState((state) => ({
+    setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
@@ -202,7 +210,7 @@ export function useSelectElementManager(): {
 
   const handleMouseUp = () => {
     // 스토어 업데이트
-    setState((state) => ({
+    setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
@@ -221,7 +229,7 @@ export function useSelectElementManager(): {
     if (!event || !userSelectState.dragBox.startPoint) return;
 
     // 스토어 업데이트
-    setState((state) => ({
+    setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
@@ -249,8 +257,8 @@ export function useSelectElementManager(): {
     },
     selectState: {
       dragBox: userSelectState.dragBox,
-      boundingBox: userSelectState.boundingBox,
-      selectElements: userSelectState.elements,
+      selectElements: userSelectState.selectElementIds,
+      boundingBox,
     },
   };
 }
