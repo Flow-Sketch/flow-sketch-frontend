@@ -64,8 +64,9 @@ export function useCreateElementManger(
     const convertOffsetX = (Math.abs(viewState.offset.x) + Math.min(startPoint.x, endPoint.x)) / viewState.scale; // View 좌표계 -> 절대 좌표계로 변경
     const convertOffsetY = (Math.abs(viewState.offset.y) + Math.min(startPoint.y, endPoint.y)) / viewState.scale; // View 좌표계 -> 절대 좌표계로 변경
 
-    elementRegistryAction.createElement(shapeType, {
+    elementRegistryAction.createSingleElement({
       id: uuidv4(),
+      type: shapeType,
       width: convertWidth,
       height: convertHeight,
       x: convertOffsetX + convertWidth / 2,

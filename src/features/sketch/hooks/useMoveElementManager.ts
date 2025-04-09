@@ -23,7 +23,7 @@ export function useMoveElementManager(elementRegistryAction: ElementRegistryActi
   const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const viewState = useCanvasViewStore();
-  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;

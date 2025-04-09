@@ -16,7 +16,7 @@ export type SelectManagerState = {
     width: number;
     height: number;
   };
-  selectElement: {
+  selectElements: {
     [id: string]: BaseSelectBox;
   };
 };
@@ -59,7 +59,7 @@ export function useSelectElementManager(): {
 
   // 스토어에서 현재 사용자의 선택 상태 가져오기
   const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
-  const userSelectState = store.selectElement[userId];
+  const userSelectState = store.selectElements[userId];
 
   // 선택된 요소들의 id 를 저장
   const [selectElementIds, setSelectElementIds] = useState<null | string[]>(null);
@@ -114,8 +114,8 @@ export function useSelectElementManager(): {
   // offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
   useEffect(() => {
     if (!selectElementIds) return;
-
     const newSelectElement: { [id: string]: BaseSelectBox } = {};
+
     for (const elementId of selectElementIds) {
       const originalElement = store.elementRegistry.elements[elementId];
       if (originalElement) {
@@ -137,10 +137,10 @@ export function useSelectElementManager(): {
     // 스토어 업데이트
     setState((state) => ({
       ...state,
-      selectElement: {
-        ...state.selectElement,
+      selectElements: {
+        ...state.selectElements,
         [userId]: {
-          ...state.selectElement[userId],
+          ...state.selectElements[userId],
           elements: newSelectElement,
           boundingBox: getBoundingBox(
             Object.values(newSelectElement).map((item) => ({
@@ -161,10 +161,10 @@ export function useSelectElementManager(): {
     // 스토어 업데이트
     setState((state) => ({
       ...state,
-      selectElement: {
-        ...state.selectElement,
+      selectElements: {
+        ...state.selectElements,
         [userId]: {
-          ...state.selectElement[userId],
+          ...state.selectElements[userId],
           elements: {},
         },
       },
@@ -187,10 +187,10 @@ export function useSelectElementManager(): {
     // 스토어 업데이트
     setState((state) => ({
       ...state,
-      selectElement: {
-        ...state.selectElement,
+      selectElements: {
+        ...state.selectElements,
         [userId]: {
-          ...state.selectElement[userId],
+          ...state.selectElements[userId],
           dragBox: {
             startPoint: newStartPosition,
             endPoint: newStartPosition, // 사각형이 0,0에서 그려지는 문제 방지
@@ -204,10 +204,10 @@ export function useSelectElementManager(): {
     // 스토어 업데이트
     setState((state) => ({
       ...state,
-      selectElement: {
-        ...state.selectElement,
+      selectElements: {
+        ...state.selectElements,
         [userId]: {
-          ...state.selectElement[userId],
+          ...state.selectElements[userId],
           dragBox: {
             startPoint: null,
             endPoint: null,
@@ -223,12 +223,12 @@ export function useSelectElementManager(): {
     // 스토어 업데이트
     setState((state) => ({
       ...state,
-      selectElement: {
-        ...state.selectElement,
+      selectElements: {
+        ...state.selectElements,
         [userId]: {
-          ...state.selectElement[userId],
+          ...state.selectElements[userId],
           dragBox: {
-            ...state.selectElement[userId].dragBox,
+            ...state.selectElements[userId].dragBox,
             endPoint: {
               x: event.nativeEvent.offsetX,
               y: event.nativeEvent.offsetY,
@@ -250,7 +250,7 @@ export function useSelectElementManager(): {
     selectState: {
       dragBox: userSelectState.dragBox,
       boundingBox: userSelectState.boundingBox,
-      selectElement: userSelectState.elements,
+      selectElements: userSelectState.elements,
     },
   };
 }

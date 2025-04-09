@@ -22,7 +22,7 @@ export function useDeleteElementManager(
 } {
   const userId = 'testUser';
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
-  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   useEffect(() => {
     setMenuPosition({
@@ -34,7 +34,7 @@ export function useDeleteElementManager(
   const handleDeleteElement = () => {
     const { elements } = selectState;
     const elementKeys = Object.keys(elements);
-    registryAction.deleteElement(elementKeys);
+    registryAction.deleteElements(elementKeys);
     selectAction.resetElement();
   };
 

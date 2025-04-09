@@ -53,14 +53,14 @@ export function usePaintingSketchBoard(
     ctx.restore();
 
     // 1개의 선택된 요소 그리기
-    if (Object.keys(selectState.selectElement).length === 1) {
-      const objectKeys = Object.keys(selectState.selectElement);
+    if (Object.keys(selectState.selectElements).length === 1) {
+      const objectKeys = Object.keys(selectState.selectElements);
       for (const elementId of objectKeys) {
-        selectState.selectElement[elementId].draw(ctx);
+        selectState.selectElements[elementId].draw(ctx);
       }
     }
 
-    if (Object.keys(selectState.selectElement).length > 1) {
+    if (Object.keys(selectState.selectElements).length > 1) {
       const { cx, cy, width, height } = selectState.boundingBox;
 
       ctx.save();

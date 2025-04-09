@@ -13,7 +13,7 @@ interface SelectionMenuProps {
 
 export const SelectionMenu = ({ moveState, deleteAction }: SelectionMenuProps) => {
   const userId = 'testUser';
-  const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElement[userId]);
+  const { boundingBox, elements } = useElementRegistryStore((store) => store.selectElements[userId]);
   const isActivate = !moveState.isMoving && Object.keys(elements).length > 0;
   const { colors, changeBackground } = useChangeColorElementManager();
 

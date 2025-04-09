@@ -43,9 +43,10 @@ export interface CanvasMetadata {
 }
 
 export interface CanvasRegistryState {
+  isInitialized: boolean;
   metaData: CanvasMetadata;
   elementRegistry: ElementRegistry;
-  selectElement: {
+  selectElements: {
     [userId: string]: SelectElementRegistry;
   };
 }

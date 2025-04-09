@@ -20,7 +20,7 @@ describe('validateAndParseCanvasRegistry', () => {
       elements: {},
       layerOrder: [],
     },
-    selectElement: {
+    selectElements: {
       testUser: {
         dragBox: {
           startPoint: null,
@@ -74,6 +74,7 @@ describe('validateAndParseCanvasRegistry', () => {
           elements: {
             'element-1': new RectSketchElement({
               id: 'element-1',
+              type: 'rect',
               x: 0,
               y: 0,
               width: 100,
@@ -104,7 +105,7 @@ describe('validateAndParseCanvasRegistry', () => {
     it('유효한 선택 상태를 포함하는 경우 성공해야 함', () => {
       const validSelection = {
         ...validCanvasRegistry,
-        selectElement: {
+        selectElements: {
           testUser: {
             dragBox: {
               startPoint: { x: 0, y: 0 },
@@ -143,11 +144,11 @@ describe('validateAndParseCanvasRegistry', () => {
     it('잘못된 바운딩 박스 값이 있으면 실패해야 함', () => {
       const invalidBoundingBox = {
         ...validCanvasRegistry,
-        selectElement: {
+        selectElements: {
           testUser: {
-            ...validCanvasRegistry.selectElement.testUser,
+            ...validCanvasRegistry.selectElements.testUser,
             boundingBox: {
-              ...validCanvasRegistry.selectElement.testUser.boundingBox,
+              ...validCanvasRegistry.selectElements.testUser.boundingBox,
               width: '100', // number 대신 string
             },
           },

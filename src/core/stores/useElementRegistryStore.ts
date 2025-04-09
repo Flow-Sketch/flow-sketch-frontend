@@ -1,9 +1,8 @@
 import { create } from 'zustand/react';
-import { CanvasRegistryState, createSketchFile } from '@/core/models/sketchFile';
+import { CanvasRegistryState, resetSketchFile } from '@/core/models/sketchFile';
 
-const initCanvasRegistry = createSketchFile({
+const initCanvasRegistry = resetSketchFile({
   userId: 'testUser',
-  canvasId: 'empty',
 });
 
 // 캔버스 요소 레지스트리를 관리하는 전역 상태 스토어

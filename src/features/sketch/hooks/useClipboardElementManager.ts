@@ -20,7 +20,7 @@ export function useClipboardElementManager(
   const userId = 'testUser';
   const [clipboards, setClipboard] = useState<BaseSketchElement[] | null>(null);
   const allElements = useElementRegistryStore((store) => store.elementRegistry);
-  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   const handleCopyElement = () => {
     const currentSelectElementKeys = Object.keys(selectState.elements);
@@ -42,22 +42,20 @@ export function useClipboardElementManager(
     if (!clipboards) return;
 
     // 0. 새로운 id 를 생성
-    const newElementId: string[] = [];
+    const newElements = [];
+    const newElementIds: string[] = [];
+
+    for (const clip of clipboards) {
+      const newId = uuidv4();
+      newElementIds.push(newId);
+      newElements.push({ ...clip, id: newId, x: clip.x + 30, y: clip.y + 30 });
+    }
 
     // 1. 새로운 객체 생성
-    clipboards.forEach((element) => {
-      const newId = uuidv4();
-      newElementId.push(newId);
-      elementRegistryAction.createElement(element.type, {
-        ...element,
-        x: element.x + 30,
-        y: element.y + 30,
-        id: newId,
-      });
-    });
+    elementRegistryAction.createElements(newElements);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
-    selectAction.handleUpdateSelectId(newElementId);
+    selectAction.handleUpdateSelectId(newElementIds);
   };
 
   const handleCutElement = () => {
@@ -73,7 +71,7 @@ export function useClipboardElementManager(
     }, [] as BaseSketchElement[]);
 
     setClipboard(selectElements);
-    elementRegistryAction.deleteElement(currentSelectElementKeys);
+    elementRegistryAction.deleteElements(currentSelectElementKeys);
   };
 
   return {

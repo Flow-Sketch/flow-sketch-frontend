@@ -31,7 +31,7 @@ export function useResizeElementManager(elementRegistryAction: ElementRegistryAc
 } {
   const userId = 'testUser';
   const viewState = useCanvasViewStore();
-  const selectState = useElementRegistryStore((store) => store.selectElement[userId]);
+  const selectState = useElementRegistryStore((store) => store.selectElements[userId]);
 
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [isResizing, setIsResizing] = useState<boolean>(false); // 현재 드래그 중인지 여부
