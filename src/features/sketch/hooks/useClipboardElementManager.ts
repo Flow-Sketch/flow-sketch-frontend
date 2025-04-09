@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ElementRegistryAction } from '@/features/sketch/hooks/useElementRegistry.ts';
 import { useElementRegistryStore } from '@/core/stores';
 import { SelectManagerAction } from '@/features/sketch/hooks/useSelectElementManager.ts';
 import { BaseSketchElement } from '@/core/models/sketchElement';
+import { OnlyClassProperties } from '@/shared/utils/common';
 
 export type ClipboardManagerAction = {
   handleCopyElement: () => void;
@@ -18,9 +19,11 @@ export function useClipboardElementManager(
   clipboardAction: ClipboardManagerAction;
 } {
   const userId = 'testUser';
-  const [clipboards, setClipboard] = useState<BaseSketchElement[] | null>(null);
+  const [clipboards, setClipboard] = useState<OnlyClassProperties<BaseSketchElement>[] | null>(null);
   const allElements = useElementRegistryStore((store) => store.elementRegistry);
   const selectStateIds = useElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
+
+  useEffect(() => {}, []);
 
   const handleCopyElement = () => {
     if (selectStateIds.length === 0) return;
@@ -41,8 +44,8 @@ export function useClipboardElementManager(
     if (!clipboards) return;
 
     // 0. 새로운 id 를 생성
-    const newElements = [];
     const newElementIds: string[] = [];
+    const newElements: OnlyClassProperties<BaseSketchElement>[] = [];
 
     for (const clip of clipboards) {
       const newId = uuidv4();
@@ -55,6 +58,9 @@ export function useClipboardElementManager(
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
     selectAction.handleUpdateSelectId(newElementIds);
+
+    // 3. clipBoard 에 새롭게 객체 업데이트
+    setClipboard(newElements);
   };
 
   const handleCutElement = () => {

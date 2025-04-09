@@ -65,7 +65,6 @@ export function useSelectElementManager(): {
     width: 0,
     height: 0,
   });
-  // const [selectElementIds, setSelectElementIds] = useState<null | string[]>(null);
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -151,7 +150,6 @@ export function useSelectElementManager(): {
   }, [userSelectState.selectElementIds, viewState.offset, viewState.scale, store.elementRegistry.elements]);
 
   const updateSelectIds = (ids: string[]) => {
-    console.log(ids);
     setElementRegistry((state) => ({
       ...state,
       selectElements: {
