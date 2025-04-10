@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { isOBBColliding } from '@/shared/utils/collidingDetection';
-import { BaseSelectBox } from '@/core/models/selectionBox';
+import { isOBBColliding, Point, vectorLength } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
 import { useElementRegistryStore, useCanvasViewStore } from 'src/core/stores';
+import { convertSelectBoxList } from '@/features/sketch/utils';
+import { BaseSketchElement } from '@/core/models/sketchElement';
 
 export type SelectManagerState = {
   dragBox: {
@@ -65,8 +66,8 @@ export function useSelectElementManager(): {
   const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
   const userSelectState = store.selectElements[userId];
 
-  // 선택된 요소들의 id 를 저장
-  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX);
+  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX); // 선택된 elements 들의 bounding box 를 그리기
+  const [tempStartPoint, setTempStartPoint] = useState<null | Point>(null); // 마우스 down 시 잘못클릭한 것인지 파악하기 위한 용도
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -121,29 +122,18 @@ export function useSelectElementManager(): {
       setBoundingBox(() => INIT_BOUNDINGBOX);
       return;
     }
-    const newSelectElement: { [id: string]: BaseSelectBox } = {};
 
-    for (const elementId of selectElementIds) {
+    const elementList = selectElementIds.reduce((cur, elementId) => {
       const originalElement = store.elementRegistry.elements[elementId];
-      if (originalElement) {
-        // 요소가 존재하는지 확인
-        newSelectElement[elementId] = new BaseSelectBox({
-          id: originalElement.id,
-          x: originalElement.x,
-          y: originalElement.y,
-          width: originalElement.width,
-          height: originalElement.height,
-          offsetX: viewState.offset.x,
-          offsetY: viewState.offset.y,
-          rotation: originalElement.rotation,
-          scale: viewState.scale,
-        });
-      }
-    }
+      if (originalElement) return [...cur, originalElement];
+      return [...cur];
+    }, [] as BaseSketchElement[]);
+
+    const selectBoxList = convertSelectBoxList(elementList, viewState);
 
     setBoundingBox(() =>
       getBoundingBox(
-        Object.values(newSelectElement).map((item) => ({
+        selectBoxList.map((item) => ({
           cx: item.viewX,
           cy: item.viewY,
           width: item.width,
@@ -188,48 +178,27 @@ export function useSelectElementManager(): {
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event) return;
+    // 마우스 좌클릭에만 해당
+    if (!event || event.button !== 0) return;
 
     const newStartPosition = {
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
     };
-
-    // 스토어 업데이트
-    setElementRegistry((state) => ({
-      ...state,
-      selectElements: {
-        ...state.selectElements,
-        [userId]: {
-          ...state.selectElements[userId],
-          dragBox: {
-            startPoint: newStartPosition,
-            endPoint: newStartPosition, // 사각형이 0,0에서 그려지는 문제 방지
-          },
-        },
-      },
-    }));
-  };
-
-  const handleMouseUp = () => {
-    // 스토어 업데이트
-    setElementRegistry((state) => ({
-      ...state,
-      selectElements: {
-        ...state.selectElements,
-        [userId]: {
-          ...state.selectElements[userId],
-          dragBox: {
-            startPoint: null,
-            endPoint: null,
-          },
-        },
-      },
-    }));
+    setTempStartPoint(newStartPosition);
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !userSelectState.dragBox.startPoint) return;
+    if (!event || !tempStartPoint) return;
+
+    const deltaVector = {
+      x: event.nativeEvent.offsetX - tempStartPoint.x,
+      y: event.nativeEvent.offsetY - tempStartPoint.y,
+    };
+    const distanceToTempPoint = vectorLength(deltaVector);
+
+    // 두 사이의 거리가 10px 을 넘지 않으면 값을 업데이트 하지 않음
+    if (distanceToTempPoint < 10) return;
 
     // 스토어 업데이트
     setElementRegistry((state) => ({
@@ -240,10 +209,32 @@ export function useSelectElementManager(): {
           ...state.selectElements[userId],
           dragBox: {
             ...state.selectElements[userId].dragBox,
+            startPoint: {
+              x: tempStartPoint.x,
+              y: tempStartPoint.y,
+            },
             endPoint: {
               x: event.nativeEvent.offsetX,
               y: event.nativeEvent.offsetY,
             },
+          },
+        },
+      },
+    }));
+  };
+
+  const handleMouseUp = () => {
+    setTempStartPoint(null);
+    // 스토어 업데이트
+    setElementRegistry((state) => ({
+      ...state,
+      selectElements: {
+        ...state.selectElements,
+        [userId]: {
+          ...state.selectElements[userId],
+          dragBox: {
+            startPoint: null,
+            endPoint: null,
           },
         },
       },

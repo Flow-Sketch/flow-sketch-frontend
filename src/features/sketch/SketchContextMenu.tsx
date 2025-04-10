@@ -33,6 +33,12 @@ export const SketchContextMenu = ({ children, selectState, clipboardAction, dele
     [selectState.boundingBox],
   );
 
+  const handlePasteAtPosition = (event: any) => {
+    const cx = event.clientX;
+    const cy = event.clientY;
+    clipboardAction.handlePasteElementAtPosition({ cx, cy });
+  };
+
   return (
     <ContextMenu>
       <ContextMenuTrigger onContextMenu={handleChangeMenu}>{children}</ContextMenuTrigger>
@@ -42,7 +48,7 @@ export const SketchContextMenu = ({ children, selectState, clipboardAction, dele
             Copy
             <ContextMenuShortcut>⌘c</ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem>
+          <ContextMenuItem onClick={clipboardAction.handlePasteElement}>
             Paste
             <ContextMenuShortcut>⌘v</ContextMenuShortcut>
           </ContextMenuItem>
@@ -64,7 +70,7 @@ export const SketchContextMenu = ({ children, selectState, clipboardAction, dele
       )}
       {menuMode === 'default' && (
         <ContextMenuContent className="w-54">
-          <ContextMenuItem>
+          <ContextMenuItem onClick={handlePasteAtPosition}>
             Paste
             <ContextMenuShortcut>⌘v</ContextMenuShortcut>
           </ContextMenuItem>
