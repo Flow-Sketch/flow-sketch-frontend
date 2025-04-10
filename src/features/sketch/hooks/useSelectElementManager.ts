@@ -22,6 +22,17 @@ export type SelectManagerAction = {
   handleUpdateSelectId: (selectKeys: string[]) => void;
 };
 
+const INIT_BOUNDINGBOX = {
+  minX: 0,
+  maxX: 0,
+  minY: 0,
+  maxY: 0,
+  cx: 0,
+  cy: 0,
+  width: 0,
+  height: 0,
+};
+
 /**
  * ### useSelectElementManager()
  * #### 설명
@@ -55,16 +66,7 @@ export function useSelectElementManager(): {
   const userSelectState = store.selectElements[userId];
 
   // 선택된 요소들의 id 를 저장
-  const [boundingBox, setBoundingBox] = useState<BoundingBox>({
-    minX: 0,
-    maxX: 0,
-    minY: 0,
-    maxY: 0,
-    cx: 0,
-    cy: 0,
-    width: 0,
-    height: 0,
-  });
+  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX);
 
   // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
   useEffect(() => {
@@ -115,7 +117,10 @@ export function useSelectElementManager(): {
   useEffect(() => {
     const selectElementIds = userSelectState.selectElementIds;
 
-    if (selectElementIds.length === 0) return;
+    if (selectElementIds.length === 0) {
+      setBoundingBox(() => INIT_BOUNDINGBOX);
+      return;
+    }
     const newSelectElement: { [id: string]: BaseSelectBox } = {};
 
     for (const elementId of selectElementIds) {

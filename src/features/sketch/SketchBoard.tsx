@@ -50,7 +50,7 @@ export const SketchBoard = () => {
   return (
     <Container>
       <SelectionMenu moveState={moveState} selectState={selectState} deleteAction={deleteAction} />
-      <SketchContextMenu>
+      <SketchContextMenu selectState={selectState} clipboardAction={clipboardAction} deleteAction={deleteAction}>
         <Canvas
           tabIndex={1}
           ref={canvasRef}

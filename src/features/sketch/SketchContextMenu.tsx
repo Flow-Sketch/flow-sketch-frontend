@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -7,39 +7,69 @@ import {
   ContextMenuShortcut,
   ContextMenuSeparator,
 } from '@/shared/components/ui/context-menu.tsx';
+import { ClipboardManagerAction, DeleteManagerAction, SelectManagerState } from '@/features/sketch/hooks';
+import { isPointInAABB } from '@/shared/utils/collidingDetection';
 
 interface SketchContextMenu {
   children: ReactNode;
+  selectState: SelectManagerState;
+  clipboardAction: ClipboardManagerAction;
+  deleteAction: DeleteManagerAction;
 }
 
-export const SketchContextMenu = ({ children }: SketchContextMenu) => {
+export const SketchContextMenu = ({ children, selectState, clipboardAction, deleteAction }: SketchContextMenu) => {
+  const [menuMode, setMenuMode] = useState<'selection' | 'default'>('default');
+
+  const handleChangeMenu = useCallback(
+    (event: any) => {
+      const clientX = event.clientX;
+      const clientY = event.clientY;
+      if (isPointInAABB(selectState.boundingBox, { x: clientX, y: clientY })) {
+        setMenuMode('selection');
+      } else {
+        setMenuMode('default');
+      }
+    },
+    [selectState.boundingBox],
+  );
+
   return (
     <ContextMenu>
-      <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-54">
-        <ContextMenuItem>
-          Copy
-          <ContextMenuShortcut>⌘c</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem>
-          Paste
-          <ContextMenuShortcut>⌘v</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem>
-          Delete
-          <ContextMenuShortcut>⌫</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem>
-          Bring to Front
-          <ContextMenuShortcut>⌘]</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem>
-          Send to Back
-          <ContextMenuShortcut>⌘[</ContextMenuShortcut>
-        </ContextMenuItem>
-      </ContextMenuContent>
+      <ContextMenuTrigger onContextMenu={handleChangeMenu}>{children}</ContextMenuTrigger>
+      {menuMode === 'selection' && (
+        <ContextMenuContent className="w-54">
+          <ContextMenuItem onClick={clipboardAction.handleCopyElement}>
+            Copy
+            <ContextMenuShortcut>⌘c</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem>
+            Paste
+            <ContextMenuShortcut>⌘v</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={deleteAction.handleDeleteElement}>
+            Delete
+            <ContextMenuShortcut>⌫</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem disabled>
+            Bring to Front
+            <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem disabled>
+            Send to Back
+            <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      )}
+      {menuMode === 'default' && (
+        <ContextMenuContent className="w-54">
+          <ContextMenuItem>
+            Paste
+            <ContextMenuShortcut>⌘v</ContextMenuShortcut>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      )}
     </ContextMenu>
   );
 };
