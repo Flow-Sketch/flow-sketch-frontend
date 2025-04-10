@@ -1,8 +1,8 @@
 import { create } from 'zustand/react';
 
 export interface ViewState {
-  offset: { x: number; y: number };
-  alignmentPoint: { x: number; y: number };
+  offset: { x: number; y: number }; // 캔버스 view 의 원점(좌측상단) 기준 절대좌표의 원점(좌측상단) 과의 차이(== 절대 좌표계)
+  alignmentPoint: { x: number; y: number }; // 캔버스 시점변경 시, 가장 마지막으로 기록된 마우스좌표(== view 좌표계)
   scale: number;
   isDrawing: boolean;
 }

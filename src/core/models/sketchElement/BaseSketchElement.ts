@@ -4,15 +4,21 @@ import { RectType } from '@/core/models/sketchElement/RectSketchElement.ts';
 
 export type BaseSketchElementType = RectType | EllipseType;
 
-interface BaseSketchElementParams {
+interface DefaultElementStyle extends SketchElementStyle {
+  borderWidth: number;
+  borderColor: string;
+  background: string;
+}
+
+export interface BaseSketchElementParams {
   id: string;
   type: BaseSketchElementType;
   width: number;
   height: number;
   x: number;
   y: number;
-  elementStyle: SketchElementStyle;
-  rotation: number; // 단위 : 라디안(360도 === 2 * PI)
+  elementStyle?: SketchElementStyle;
+  rotation?: number; // 단위 : 라디안(360도 === 2 * PI)
   points?: { x: number; y: number }[];
 }
 
@@ -23,7 +29,7 @@ export abstract class BaseSketchElement {
   height: number;
   x: number;
   y: number;
-  elementStyle: SketchElementStyle;
+  elementStyle: DefaultElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   isEditable: boolean; //
   points?: { x: number; y: number }[];
@@ -34,9 +40,14 @@ export abstract class BaseSketchElement {
     this.height = params.height;
     this.x = params.x;
     this.y = params.y;
-    this.elementStyle = params.elementStyle;
+    this.elementStyle = {
+      borderWidth: params.elementStyle?.borderWidth ? params.elementStyle.borderWidth : 2,
+      borderColor: params.elementStyle?.borderColor ? params.elementStyle.borderColor : '#000',
+      background: params.elementStyle?.background ? params.elementStyle.background : 'transparent',
+      ...params.elementStyle,
+    };
     this.points = params.points;
-    this.rotation = params.rotation;
+    this.rotation = params.rotation ? params.rotation : 0;
     this.isEditable = false;
   }
 
