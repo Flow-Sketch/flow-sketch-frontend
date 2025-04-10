@@ -1,8 +1,8 @@
-import { BaseSketchElement } from '@/core/models/sketchElement/BaseSketchElement.ts';
+import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketchElement/BaseSketchElement.ts';
 
 export type RectType = 'rect';
 
-export interface RectSketchElementParams {
+export interface RectSketchElementParams extends BaseSketchElementParams {
   type: RectType;
   id: string;
   width: number;
@@ -10,7 +10,6 @@ export interface RectSketchElementParams {
   x: number;
   y: number;
   rotation?: number;
-  background?: string;
 }
 
 export class RectSketchElement extends BaseSketchElement {
@@ -23,11 +22,7 @@ export class RectSketchElement extends BaseSketchElement {
       x: params.x,
       y: params.y,
       rotation: params.rotation ? params.rotation : 0, // 최초 생성 시, rotation 은 0 으로 시작
-      elementStyle: {
-        borderWidth: 2,
-        background: params.background ? params.background : '#dfdfdf',
-        borderColor: '#000000',
-      },
+      elementStyle: params.elementStyle,
     });
   }
   draw(ctx: CanvasRenderingContext2D) {

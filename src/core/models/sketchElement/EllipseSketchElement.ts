@@ -1,8 +1,8 @@
-import { BaseSketchElement } from '@/core/models/sketchElement/BaseSketchElement.ts';
+import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketchElement/BaseSketchElement.ts';
 
 export type EllipseType = 'ellipse';
 
-export interface EllipseSketchElementParams {
+export interface EllipseSketchElementParams extends BaseSketchElementParams {
   id: string;
   type: EllipseType;
   width: number;
@@ -22,20 +22,16 @@ export class EllipseSketchElement extends BaseSketchElement {
       x: params.x,
       y: params.y,
       rotation: params.rotation ? params.rotation : 0, // 최초 생성 시, rotation 은 0 으로 시작
-      elementStyle: {
-        borderWidth: 2,
-        background: '#dfdfdf',
-        borderColor: '#000000',
-      },
+      elementStyle: params.elementStyle,
     });
   }
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
     // 스타일 적용
-    ctx.lineWidth = this.elementStyle.borderWidth ?? 2;
-    ctx.strokeStyle = this.elementStyle.borderColor ?? '#000';
-    ctx.fillStyle = this.elementStyle.background ?? 'transparent';
+    ctx.lineWidth = this.elementStyle.borderWidth;
+    ctx.strokeStyle = this.elementStyle.borderColor;
+    ctx.fillStyle = this.elementStyle.background;
 
     //  원 회전
     ctx.translate(this.x, this.y); // 회전하고자 하는 평면의 중점을 x, y  로 이동
