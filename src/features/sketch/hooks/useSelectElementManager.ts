@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { isOBBColliding, isPointInOBB, Point, vectorLength } from '@/shared/utils/collidingDetection';
+import { isOBBColliding, isPointInOBB, Point } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
 import { useElementRegistryStore, useCanvasViewStore, ViewState } from 'src/core/stores';
 import { convertSelectBoxList } from '@/features/sketch/utils';
@@ -65,8 +65,8 @@ export function useSelectElementManager(): {
   const setElementRegistry = useElementRegistryStore.setState;
   const userSelectState = store.selectElements[userId];
 
-  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX); // 선택된 elements 들의 bounding box 를 그리기
-  const [tempStartPoint, setTempStartPoint] = useState<null | Point>(null); // 마우스 down 시 잘못클릭한 것인지 파악하기 위한 용도
+  // 선택된 elements 들의 bounding box 를 그리기
+  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX);
 
   /** offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함 */
   useEffect(() => {
@@ -139,23 +139,31 @@ export function useSelectElementManager(): {
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
     };
-    setTempStartPoint(newStartPosition);
+
+    // 스토어 업데이트
+    setElementRegistry((state) => ({
+      ...state,
+      selectElements: {
+        ...state.selectElements,
+        [userId]: {
+          ...state.selectElements[userId],
+          dragBox: {
+            startPoint: newStartPosition,
+            endPoint: newStartPosition,
+          },
+        },
+      },
+    }));
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !tempStartPoint) return;
-    const deltaVector = {
-      x: event.nativeEvent.offsetX - tempStartPoint.x,
-      y: event.nativeEvent.offsetY - tempStartPoint.y,
-    };
-    const distanceToTempPoint = vectorLength(deltaVector);
+    const dragStartPoint = userSelectState.dragBox.startPoint;
 
-    // 두 사이의 거리가 10px 을 넘지 않으면 값을 업데이트 하지 않음
-    if (distanceToTempPoint < 0) return;
+    if (!event || !dragStartPoint) return;
     const newDragBox = {
       startPoint: {
-        x: tempStartPoint.x,
-        y: tempStartPoint.y,
+        x: dragStartPoint.x,
+        y: dragStartPoint.y,
       },
       endPoint: {
         x: event.nativeEvent.offsetX,
@@ -179,7 +187,6 @@ export function useSelectElementManager(): {
   };
 
   const handleMouseUp = () => {
-    setTempStartPoint(null);
     // 스토어 업데이트
     setElementRegistry((state) => ({
       ...state,
@@ -204,14 +211,13 @@ export function useSelectElementManager(): {
     };
     const selectId = getSingleElementId(selectViewPoint, viewState, store.elementRegistry);
 
-    if (!selectId) return; // 스토어 업데이트
     setElementRegistry((state) => ({
       ...state,
       selectElements: {
         ...state.selectElements,
         [userId]: {
           ...state.selectElements[userId],
-          selectElementIds: [selectId],
+          selectElementIds: selectId ? [selectId] : [],
         },
       },
     }));
