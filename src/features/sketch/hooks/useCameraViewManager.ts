@@ -82,7 +82,6 @@ export function useCameraViewManager(): {
     const minWidthScale = VIEW_WIDTH / CANVAS_WIDTH;
     const minHeightScale = VIEW_HEIGHT / CANVAS_HEIGHT;
 
-    event.preventDefault();
     const MAX_SCALE = 3;
     const MIN_SCALE = Math.max(minWidthScale, minHeightScale);
     const scaleAmount = event.deltaY > 0 ? 0.9 : 1.1;
