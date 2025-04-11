@@ -93,6 +93,7 @@ const MultiColorBadge = styled.div<{ colors: string[] }>`
   height: 24px;
   border-radius: 24px;
   position: relative;
+  border: 1px solid #dfdfdf;
   background: ${({ colors }) => {
     if (colors.length <= 1) return colors[0] || '#000000';
     return `linear-gradient(to right, ${colors[0]} 0%, ${colors[0]} 50%, ${colors[1]} 50%, ${colors[1]} 100%)`;

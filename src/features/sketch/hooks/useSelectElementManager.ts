@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { isOBBColliding, Point, vectorLength } from '@/shared/utils/collidingDetection';
+import { isOBBColliding, isPointInOBB, Point, vectorLength } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
-import { useElementRegistryStore, useCanvasViewStore } from 'src/core/stores';
+import { useElementRegistryStore, useCanvasViewStore, ViewState } from 'src/core/stores';
 import { convertSelectBoxList } from '@/features/sketch/utils';
 import { BaseSketchElement } from '@/core/models/sketchElement';
+import { ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile';
 
 export type SelectManagerState = {
   dragBox: {
@@ -19,6 +20,7 @@ export type SelectManagerAction = {
   handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleMouseUp: () => void;
+  handleSingleSelect: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   resetElement: () => void;
   handleUpdateSelectId: (selectKeys: string[]) => void;
 };
@@ -57,64 +59,16 @@ export function useSelectElementManager(): {
   selectState: SelectManagerState;
   selectAction: SelectManagerAction;
 } {
-  // Zustand 스토어에서 상태와 업데이트 함수 가져오기
+  const userId = 'testUser';
+  const viewState = useCanvasViewStore();
   const store = useElementRegistryStore();
   const setElementRegistry = useElementRegistryStore.setState;
-  const viewState = useCanvasViewStore();
-
-  // 스토어에서 현재 사용자의 선택 상태 가져오기
-  const userId = 'testUser'; // 현재 사용자 ID (실제로는 인증 시스템에서 가져와야 함)
   const userSelectState = store.selectElements[userId];
 
   const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX); // 선택된 elements 들의 bounding box 를 그리기
   const [tempStartPoint, setTempStartPoint] = useState<null | Point>(null); // 마우스 down 시 잘못클릭한 것인지 파악하기 위한 용도
 
-  // 마우스 드래그 시, 드래그박스 안에 도형이 포함되어있느지를 탐지하는 로직
-  useEffect(() => {
-    const { startPoint, endPoint } = userSelectState.dragBox;
-    if (!startPoint || !endPoint) return;
-
-    const { offset, scale } = viewState;
-    const newSelectElementKeys: string[] = [];
-    const dragRectWidth = Math.abs(endPoint.x - startPoint.x) / scale; // View 좌표계 -> 절대 좌표계로 변경
-    const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
-    const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
-    const convertOffsetY = (Math.abs(offset.y) + Math.min(startPoint.y, endPoint.y)) / scale; // View 좌표계 -> 절대 좌표계로 변경
-    const dragRect = {
-      cx: convertOffsetX + dragRectWidth / 2,
-      cy: convertOffsetY + dragRectHeight / 2,
-      width: dragRectWidth,
-      height: dragRectHeight,
-      angle: 0,
-    };
-
-    for (const elementId of store.elementRegistry.layerOrder) {
-      const element = store.elementRegistry.elements[elementId];
-      const isObb = isOBBColliding(dragRect, {
-        cx: element.x,
-        cy: element.y,
-        width: element.width,
-        height: element.height,
-        angle: element.rotation,
-      });
-
-      if (isObb) {
-        element.enableEditing();
-        newSelectElementKeys.push(elementId);
-      }
-    }
-
-    // 선택된 id 가 없으면 모두 reset
-    if (newSelectElementKeys.length === 0) {
-      resetElement();
-      return;
-    }
-
-    // 선택된 id 가 있으면 값을 업데이트
-    updateSelectIds(newSelectElementKeys);
-  }, [userSelectState.dragBox.startPoint, userSelectState.dragBox.endPoint]);
-
-  // offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함
+  /** offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함 */
   useEffect(() => {
     const selectElementIds = userSelectState.selectElementIds;
 
@@ -190,7 +144,6 @@ export function useSelectElementManager(): {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event || !tempStartPoint) return;
-
     const deltaVector = {
       x: event.nativeEvent.offsetX - tempStartPoint.x,
       y: event.nativeEvent.offsetY - tempStartPoint.y,
@@ -198,7 +151,18 @@ export function useSelectElementManager(): {
     const distanceToTempPoint = vectorLength(deltaVector);
 
     // 두 사이의 거리가 10px 을 넘지 않으면 값을 업데이트 하지 않음
-    if (distanceToTempPoint < 10) return;
+    if (distanceToTempPoint < 0) return;
+    const newDragBox = {
+      startPoint: {
+        x: tempStartPoint.x,
+        y: tempStartPoint.y,
+      },
+      endPoint: {
+        x: event.nativeEvent.offsetX,
+        y: event.nativeEvent.offsetY,
+      },
+    };
+    const selectIds = getSelectElementIds(newDragBox, viewState, store.elementRegistry);
 
     // 스토어 업데이트
     setElementRegistry((state) => ({
@@ -207,17 +171,8 @@ export function useSelectElementManager(): {
         ...state.selectElements,
         [userId]: {
           ...state.selectElements[userId],
-          dragBox: {
-            ...state.selectElements[userId].dragBox,
-            startPoint: {
-              x: tempStartPoint.x,
-              y: tempStartPoint.y,
-            },
-            endPoint: {
-              x: event.nativeEvent.offsetX,
-              y: event.nativeEvent.offsetY,
-            },
-          },
+          selectElementIds: selectIds,
+          dragBox: newDragBox,
         },
       },
     }));
@@ -241,11 +196,33 @@ export function useSelectElementManager(): {
     }));
   };
 
+  const handleSingleSelect = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!event) return;
+    const selectViewPoint = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
+    const selectId = getSingleElementId(selectViewPoint, viewState, store.elementRegistry);
+
+    if (!selectId) return; // 스토어 업데이트
+    setElementRegistry((state) => ({
+      ...state,
+      selectElements: {
+        ...state.selectElements,
+        [userId]: {
+          ...state.selectElements[userId],
+          selectElementIds: [selectId],
+        },
+      },
+    }));
+  };
+
   return {
     selectAction: {
       handleMouseMove,
       handleMouseDown,
       handleMouseUp,
+      handleSingleSelect,
       resetElement,
       handleUpdateSelectId,
     },
@@ -255,4 +232,75 @@ export function useSelectElementManager(): {
       boundingBox,
     },
   };
+}
+
+/** ### getSelectElementIds()
+ * > dragBox 를 활용해 선택된 Element 리스트를 반환
+ */
+function getSelectElementIds(dragBox: SelectElementRegistry['dragBox'], viewState: ViewState, elementRegistry: ElementRegistry) {
+  const { startPoint, endPoint } = dragBox;
+  if (!startPoint || !endPoint) return [];
+
+  const { offset, scale } = viewState;
+  const dragRectWidth = Math.abs(endPoint.x - startPoint.x) / scale; // View 좌표계 -> 절대 좌표계로 변경
+  const dragRectHeight = Math.abs(endPoint.y - startPoint.y) / scale; // View 좌표계 -> 절대 좌표계로 변경
+  const convertOffsetX = (Math.abs(offset.x) + Math.min(startPoint.x, endPoint.x)) / scale; // View 좌표계 -> 절대 좌표계로 변경
+  const convertOffsetY = (Math.abs(offset.y) + Math.min(startPoint.y, endPoint.y)) / scale; // View 좌표계 -> 절대 좌표계로 변경
+  const dragRect = {
+    cx: convertOffsetX + dragRectWidth / 2,
+    cy: convertOffsetY + dragRectHeight / 2,
+    width: dragRectWidth,
+    height: dragRectHeight,
+    angle: 0,
+  };
+
+  const newSelectElementKeys: string[] = [];
+  for (const elementId of elementRegistry.layerOrder) {
+    const element = elementRegistry.elements[elementId];
+    const isObb = isOBBColliding(dragRect, {
+      cx: element.x,
+      cy: element.y,
+      width: element.width,
+      height: element.height,
+      angle: element.rotation,
+    });
+
+    if (isObb) {
+      element.enableEditing();
+      newSelectElementKeys.push(elementId);
+    }
+  }
+
+  return newSelectElementKeys;
+}
+
+/** ### getSingleElementId()
+ * > point 를 활용해 선택된 단일 Element 리스트를 반환
+ */
+function getSingleElementId(selectViewPoint: Point, viewState: ViewState, elementRegistry: ElementRegistry) {
+  const convertAbsolutePoint = {
+    x: (selectViewPoint.x - viewState.offset.x) / viewState.scale,
+    y: (selectViewPoint.y - viewState.offset.y) / viewState.scale,
+  };
+
+  for (const elementId of elementRegistry.layerOrder) {
+    const element = elementRegistry.elements[elementId];
+    const isObb = isPointInOBB(
+      {
+        cx: element.x,
+        cy: element.y,
+        width: element.width,
+        height: element.height,
+        rotation: element.rotation,
+      },
+      convertAbsolutePoint,
+    );
+
+    if (isObb) {
+      element.enableEditing();
+      return elementId;
+    }
+  }
+
+  return null;
 }

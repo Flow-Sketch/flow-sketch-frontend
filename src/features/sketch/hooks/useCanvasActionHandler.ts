@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TRANSFORM_CONTROL_CORNER_WIDTH } from '../constants/transformControls.ts';
+import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/features/sketch/constants';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 import {
   CreateElementMangerAction,
@@ -23,10 +23,11 @@ export function useCanvasActionHandler(action: {
   clipboardAction: ClipboardManagerAction;
 }) {
   const { remoteState } = useRemoteManager();
-  const { shapeType, remoteMode } = remoteState;
   const { selectState } = useSelectElementManager();
-  const [editMode, setEditMode] = useState<'select' | 'resize' | 'move'>('select');
+  const [editMode, setEditMode] = useState<'idle' | 'resize' | 'move' | 'moveReady' | 'selectReady' | 'multiSelect'>('idle');
+
   const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction, clipboardAction } = action;
+  const { shapeType, remoteMode } = remoteState;
 
   const handleWheel = (() => {
     if (remoteMode === 'view') return viewAction.handleWheel;
@@ -36,63 +37,70 @@ export function useCanvasActionHandler(action: {
     if (remoteMode === 'view') return viewAction.handleMouseDown(event);
     if (remoteMode === 'edit') {
       if (shapeType) return createAction.handleMouseDown(event);
-      const { cx, cy, width, height } = selectState.boundingBox;
+      const { boundingBox } = selectState;
       const point = {
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
       };
       const outerBox = {
-        cx: cx,
-        cy: cy,
-        width: width + TRANSFORM_CONTROL_CORNER_WIDTH,
-        height: height + TRANSFORM_CONTROL_CORNER_WIDTH,
+        cx: boundingBox.cx,
+        cy: boundingBox.cy,
+        width: boundingBox.width + TRANSFORM_CONTROL_CORNER_WIDTH,
+        height: boundingBox.height + TRANSFORM_CONTROL_CORNER_WIDTH,
         rotation: 0,
       };
       const innerBox = {
-        cx: cx,
-        cy: cy,
-        width: width - TRANSFORM_CONTROL_CORNER_WIDTH,
-        height: height - TRANSFORM_CONTROL_CORNER_WIDTH,
+        cx: boundingBox.cx,
+        cy: boundingBox.cy,
+        width: boundingBox.width - TRANSFORM_CONTROL_CORNER_WIDTH,
+        height: boundingBox.height - TRANSFORM_CONTROL_CORNER_WIDTH,
         rotation: 0,
       };
       if (isPointInOBB(outerBox, point)) {
         if (isPointInOBB(innerBox, point)) {
-          setEditMode('move');
+          setEditMode('moveReady');
           return moveAction.handleMouseDown(event);
         }
         setEditMode('resize');
         return resizeAction.handleMouseDown(event);
       }
+      setEditMode('selectReady');
       return selectAction.handleMouseDown(event);
     }
   };
 
-  const handleMouseUp = () => {
-    if (remoteMode === 'view') return viewAction.handleMouseUp();
-    if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleMouseUp();
-      if (editMode === 'select') selectAction.handleMouseUp();
-      if (editMode === 'resize') {
-        resizeAction.handleMouseUp();
-        setEditMode('select');
-      }
-      if (editMode === 'move') {
-        moveAction.handleMouseUp();
-        setEditMode('select');
-      }
-    }
-  };
-
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (event.buttons !== 1) return; // 마우스 우클릭하고 있는 동안에만 핸들러 실행
+    if (event.buttons !== 1) return; // 마우스 좌클릭하고 있는 동안에만 핸들러 실행
     if (remoteMode === 'view') return viewAction.handleMouseMove(event);
     if (remoteMode === 'edit') {
       if (shapeType) return createAction.handleMouseMove(event);
-      if (editMode === 'select') selectAction.handleMouseMove(event);
-      if (editMode === 'resize') resizeAction.handleMouseMove(event);
-      if (editMode === 'move') {
-        moveAction.handleMouseMove(event);
+      if (editMode === 'move') return moveAction.handleMouseMove(event);
+      if (editMode === 'resize') return resizeAction.handleMouseMove(event);
+      if (editMode === 'multiSelect') return selectAction.handleMouseMove(event);
+
+      if (editMode === 'moveReady') return setEditMode('move');
+      if (editMode === 'selectReady') return setEditMode('multiSelect');
+    }
+  };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!event) return;
+    if (remoteMode === 'view') return viewAction.handleMouseUp();
+    if (remoteMode === 'edit') {
+      if (shapeType) return createAction.handleMouseUp();
+      if (editMode === 'multiSelect') {
+        selectAction.handleMouseUp();
       }
+      if (editMode === 'resize') {
+        resizeAction.handleMouseUp();
+      }
+      if (editMode === 'move') {
+        moveAction.handleMouseUp();
+      }
+      if (editMode === 'moveReady' || editMode === 'selectReady') {
+        selectAction.handleSingleSelect(event);
+      }
+      return setEditMode('idle');
     }
   };
 
