@@ -10,9 +10,9 @@ export type MoveManagerState = {
 };
 
 export type MoveManagerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartElementMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateElementPosition: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleFinalizeElementMove: () => void;
 };
 
 export function useMoveElementManager(
@@ -26,7 +26,7 @@ export function useMoveElementManager(
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const viewState = useCanvasViewStore();
 
-  const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleStartElementMove = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !selectState.boundingBox) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -48,7 +48,7 @@ export function useMoveElementManager(
     }
   };
 
-  const handleMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateElementPosition = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isMoving || !alignmentPoint) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -63,7 +63,7 @@ export function useMoveElementManager(
     setAlignmentPoint({ x: currentX, y: currentY });
   };
 
-  const handleMouseUp = () => {
+  const handleFinalizeElementMove = () => {
     if (!isMoving || !alignmentPoint) return;
 
     setIsMoving(false);
@@ -75,9 +75,9 @@ export function useMoveElementManager(
       isMoving,
     },
     moveAction: {
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp,
+      handleStartElementMove,
+      handleUpdateElementPosition,
+      handleFinalizeElementMove,
     },
   };
 }

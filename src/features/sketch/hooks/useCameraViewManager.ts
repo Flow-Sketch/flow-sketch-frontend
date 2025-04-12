@@ -13,10 +13,10 @@ export type ViewManagerState = {
 };
 
 export type ViewManagerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleWheel: (event: React.WheelEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartViewAlignment: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateViewScale: (event: React.WheelEvent<HTMLCanvasElement>) => void;
+  handleUpdateViewOffset: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleResetViewAlignment: () => void;
 };
 
 /**
@@ -57,7 +57,7 @@ export function useCameraViewManager(): {
   /**
    * > View 시점 변경 시, 변화량 측정에 필요한 기준점을 지정하는 함수
    */
-  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleStartViewAlignment = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
 
     // 캔버스 내에서 클릭한 마우스커서의 상대위치
@@ -73,10 +73,9 @@ export function useCameraViewManager(): {
     });
   };
 
-  /** ### `changeViewScale()`
-   * > 확대/축소의 비율을 변경하기 위한 함수
+  /** > 확대/축소의 비율을 변경하기 위한 함수
    */
-  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+  const handleUpdateViewScale = (event: React.WheelEvent<HTMLCanvasElement>) => {
     if (!event) return;
 
     const minWidthScale = VIEW_WIDTH / CANVAS_WIDTH;
@@ -98,7 +97,7 @@ export function useCameraViewManager(): {
 
   /** > View 시점의 기준점을 초기화하는 함수
    */
-  const handleMouseUp = () => {
+  const handleResetViewAlignment = () => {
     setState({
       isDrawing: false,
       alignmentPoint: {
@@ -112,7 +111,7 @@ export function useCameraViewManager(): {
    * > `offset` 의 위치를 변경하며, 이 함수를 실행해 View 의 위치를 변경
    * > - `offset` : 전체 캔버스에서 특정 지점의 View 시점의 위치
    */
-  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateViewOffset = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event || !viewState.isDrawing) return;
 
     // 클릭한 시점을 기준으로, 한번의 mouseEvent 로 변경된 delta 값을 offset 에 반영한다.
@@ -142,10 +141,10 @@ export function useCameraViewManager(): {
       scale: viewState.scale,
     },
     viewAction: {
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp,
-      handleWheel,
+      handleStartViewAlignment,
+      handleResetViewAlignment,
+      handleUpdateViewOffset,
+      handleUpdateViewScale,
     },
   };
 }

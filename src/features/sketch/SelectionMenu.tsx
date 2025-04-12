@@ -14,16 +14,16 @@ interface SelectionMenuProps {
 export const SelectionMenu = ({ moveState, selectState, deleteAction }: SelectionMenuProps) => {
   const { boundingBox, selectElements } = selectState;
   const isActivate = !moveState.isMoving && Object.keys(selectElements).length > 0;
-  const { colors, changeBackground } = useChangeColorElementManager();
+  const { colors, handleChangeBackgroundColor } = useChangeColorElementManager();
 
   return (
     isActivate &&
     boundingBox && (
       <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
-        <IconButton onClick={deleteAction.handleDeleteElement}>
+        <IconButton onClick={deleteAction.handleDeleteElements}>
           <TbTrash size={22} />
         </IconButton>
-        <ColorPicker value={colors.backgroundColors} onChange={changeBackground} />
+        <ColorPicker value={colors.backgroundColors} onChange={handleChangeBackgroundColor} />
       </Container>
     )
   );

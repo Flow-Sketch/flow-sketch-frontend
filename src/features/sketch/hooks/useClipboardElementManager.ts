@@ -60,7 +60,7 @@ export function useClipboardElementManager(
     elementRegistryAction.createElements(newElements);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
-    selectAction.handleUpdateSelectId(newElementIds);
+    selectAction.handleManualSelectIds(newElementIds);
 
     // 3. clipBoard 에 새롭게 객체 업데이트
     setClipboard(newElements);
@@ -101,7 +101,7 @@ export function useClipboardElementManager(
     elementRegistryAction.createElements(newElements);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
-    selectAction.handleUpdateSelectId(newElementIds);
+    selectAction.handleManualSelectIds(newElementIds);
 
     // 3. clipBoard 에 새롭게 객체 업데이트
     setClipboard(newElements);

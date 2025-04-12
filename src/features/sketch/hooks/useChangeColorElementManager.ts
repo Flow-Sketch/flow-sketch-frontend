@@ -11,7 +11,7 @@ export function useChangeColorElementManager() {
     return background ? [...acc, background] : [...acc];
   }, [] as string[]);
 
-  function changeBackground(colorCode: string) {
+  function handleChangeBackgroundColor(colorCode: string) {
     for (const elementKey of selectElementStore) {
       elementRegistryAction.updateStyleElement(elementKey, { background: colorCode });
     }
@@ -21,6 +21,6 @@ export function useChangeColorElementManager() {
     colors: {
       backgroundColors,
     },
-    changeBackground,
+    handleChangeBackgroundColor,
   };
 }

@@ -9,7 +9,7 @@ export type DeleteManagerState = {
 };
 
 export type DeleteManagerAction = {
-  handleDeleteElement: () => void;
+  handleDeleteElements: () => void;
 };
 
 export function useDeleteElementManager(
@@ -30,10 +30,10 @@ export function useDeleteElementManager(
     });
   }, [selectState.boundingBox]);
 
-  const handleDeleteElement = () => {
+  const handleDeleteElements = () => {
     const { selectElements } = selectState;
     registryAction.deleteElements(selectElements);
-    selectAction.resetElement();
+    selectAction.handleClearSelection();
   };
 
   return {
@@ -41,7 +41,7 @@ export function useDeleteElementManager(
       menuPosition,
     },
     deleteAction: {
-      handleDeleteElement,
+      handleDeleteElements,
     },
   };
 }

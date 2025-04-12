@@ -14,9 +14,9 @@ export type CreateElementManagerState = {
 };
 
 export type CreateElementMangerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartElementCreation: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateElementSize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleFinalizeElementCreation: () => void;
 };
 
 export function useCreateElementManger(
@@ -36,7 +36,7 @@ export function useCreateElementManger(
   /**
    * > 도형을 그릴 때 처음 point(좌측 상단)
    */
-  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleStartElementCreation = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
@@ -47,7 +47,7 @@ export function useCreateElementManger(
     });
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateElementSize = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isDrawing || !startPoint) return;
 
     setEndPosition({
@@ -56,7 +56,7 @@ export function useCreateElementManger(
     });
   };
 
-  const handleMouseUp = () => {
+  const handleFinalizeElementCreation = () => {
     if (!isDrawing || !startPoint || !endPoint || !shapeType) return;
 
     const convertWidth = Math.abs(endPoint.x - startPoint.x) / viewState.scale;
@@ -88,9 +88,9 @@ export function useCreateElementManger(
       shapeType,
     },
     createAction: {
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp,
+      handleStartElementCreation,
+      handleUpdateElementSize,
+      handleFinalizeElementCreation,
     },
   };
 }

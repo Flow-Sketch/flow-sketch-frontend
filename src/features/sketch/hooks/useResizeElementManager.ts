@@ -10,9 +10,9 @@ import { BoundingBox } from '@/shared/utils/boundingBox';
 export type ResizeHandlePosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'right' | 'bottom' | 'left' | null;
 
 export type ResizeManagerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartElementResize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateElementSize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleFinalizeElementResize: () => void;
 };
 
 /**
@@ -49,7 +49,7 @@ export function useResizeElementManager(
    * 마우스 다운 이벤트 핸들러
    * 리사이즈 시작 위치와 활성 핸들을 설정
    */
-  const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleStartElementResize = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !selectState.boundingBox) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -73,7 +73,7 @@ export function useResizeElementManager(
    * 마우스 이동 이벤트 핸들러
    * 활성 핸들에 따라 요소 크기 조절
    */
-  const handleMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateElementSize = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isResizing || !startPoint || !initialBoundingBox || !activeHandle) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -99,7 +99,7 @@ export function useResizeElementManager(
    * 마우스 업 이벤트 핸들러
    * 리사이즈 상태 초기화
    */
-  const handleMouseUp = () => {
+  const handleFinalizeElementResize = () => {
     if (!isResizing) return;
 
     setIsResizing(false);
@@ -110,9 +110,9 @@ export function useResizeElementManager(
 
   return {
     resizeAction: {
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp,
+      handleStartElementResize,
+      handleUpdateElementSize,
+      handleFinalizeElementResize,
     },
   };
 }

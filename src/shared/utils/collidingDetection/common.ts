@@ -37,34 +37,34 @@ export function rectCorners(rect: RectangleInfo): Point[] {
   }));
 }
 
-/** 두 벡터의 내적을 구한다(스칼라). */
+/** 두 벡터의 내적을 반환(스칼라) */
 export function dotProduct(a: Point, b: Point): number {
   return a.x * b.x + a.y * b.y;
 }
 
-/** 두 점의 차 (벡터)를 구한다: a - b */
+/** 두 점의 차 (벡터)를 반환(a - b) */
 export function subtract(a: Point, b: Point): Point {
   return { x: a.x - b.x, y: a.y - b.y };
 }
 
-/** 벡터의 길이(크기)를 구한다. */
+/** 벡터의 길이(크기)를 반환 */
 export function vectorLength(v: Point): number {
   return Math.sqrt(v.x * v.x + v.y * v.y);
 }
 
-/** 벡터를 단위벡터로 변환한다(길이를 1로 만든다). */
+/** 벡터를 단위벡터로 변환(길이 1, 방향만 가짐) */
 export function normalizeVector(v: Point): Point {
   const len = vectorLength(v);
   return { x: v.x / len, y: v.y / len };
 }
 
-/** 벡터의 수직(법선) 벡터를 구한다. */
+/** 벡터의 수직(법선) 벡터를 반홤 */
 export function perpendicularVector(v: Point): Point {
   return { x: -v.y, y: v.x };
 }
 
 /**
- * 점들을 주어진 축(axis)에 투영하여 최소, 최대 값을 구한다.
+ * 점들을 주어진 축(axis)에 투영하여 최소, 최대 값을 계산
  */
 export function projectPointsOntoAxis(points: Point[], axis: Point): { min: number; max: number } {
   let min = dotProduct(points[0], axis);
