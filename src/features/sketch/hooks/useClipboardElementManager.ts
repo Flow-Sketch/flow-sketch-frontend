@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ElementRegistryAction } from '@/features/sketch/hooks/useElementRegistry.ts';
+import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { SelectManagerAction } from '@/features/sketch/hooks/useSelectElementManager.ts';
-import { useCanvasViewStore, useElementRegistryStore } from '@/core/stores';
+import { useSketchCameraViewStore, useSketchElementRegistryStore } from '@/core/stores';
 import { BaseSketchElement } from '@/core/models/sketchElement';
 import { OnlyClassProperties } from '@/shared/utils/common';
 import { getBoundingBox } from '@/shared/utils/boundingBox';
@@ -24,9 +24,9 @@ export function useClipboardElementManager(
   const userId = 'testUser';
   const [clipboards, setClipboard] = useState<OnlyClassProperties<BaseSketchElement>[] | null>(null);
 
-  const viewState = useCanvasViewStore();
-  const allElements = useElementRegistryStore((store) => store.elementRegistry);
-  const selectStateIds = useElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
+  const viewState = useSketchCameraViewStore();
+  const allElements = useSketchElementRegistryStore((store) => store.elementRegistry);
+  const selectStateIds = useSketchElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
 
   const handleCopyElement = () => {
     if (selectStateIds.length === 0) return;

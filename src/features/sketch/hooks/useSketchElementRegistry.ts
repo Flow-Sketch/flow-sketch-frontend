@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
-import { useElementRegistryStore } from 'src/core/stores';
+import { useSketchElementRegistryStore } from 'src/core/stores';
 import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
 import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
 import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/core/models/sketchElement';
@@ -28,7 +28,7 @@ export interface ElementRegistryAction {
 }
 
 // 여러 인원이 접속할 때 캔버스 편집 기능을 이곳에 추가
-export function useElementRegistry(): {
+export function useSketchElementRegistry(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 } {
@@ -37,9 +37,9 @@ export function useElementRegistry(): {
 
   const { boardRegistry, boardAction } = useSketchFilesRegistry();
   const throttleEditElementBoard = useThrottle(boardAction.editElementBoard, 300);
-  const isInitializedSketch = useElementRegistryStore((store) => store.isInitialized);
-  const elementRegistry = useElementRegistryStore((store) => store.elementRegistry);
-  const setElementRegistry = useElementRegistryStore.setState;
+  const isInitializedSketch = useSketchElementRegistryStore((store) => store.isInitialized);
+  const elementRegistry = useSketchElementRegistryStore((store) => store.elementRegistry);
+  const setElementRegistry = useSketchElementRegistryStore.setState;
 
   /** A. 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당 **/
   useEffect(() => {
@@ -109,7 +109,6 @@ export function useElementRegistry(): {
     if (ids.length === 0) return;
 
     const updateElement = { ...elementRegistry.elements };
-
     for (const id of ids) {
       delete updateElement[id];
     }

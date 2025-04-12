@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH, TRANSFORM_CONTROL_SIDE_WIDTH } from '../constants';
 import { SelectManagerState, ElementRegistryAction } from '@/features/sketch/hooks/index.ts';
-import { useCanvasViewStore } from 'src/core/stores';
+import { useSketchCameraViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 import { BoundingBox } from '@/shared/utils/boundingBox';
 
@@ -33,7 +33,7 @@ export function useResizeElementManager(
 ): {
   resizeAction: ResizeManagerAction;
 } {
-  const viewState = useCanvasViewStore();
+  const viewState = useSketchCameraViewStore();
 
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [isResizing, setIsResizing] = useState<boolean>(false); // 현재 드래그 중인지 여부

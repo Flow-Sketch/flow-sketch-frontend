@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AuthLayout, MainLayout } from '@/app/layouts';
-import { CanvasPage, HomePage, LoginPage, NotFoundPage, SignupPage } from '@/pages';
+import { SketchPage, HomePage, LoginPage, NotFoundPage, SignupPage } from '@/pages';
 import { PrivateRoute } from '@/app/route/PrivateRoute.tsx';
 import { ROUTE_PATH } from '@/app/route/path.ts';
 
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: ROUTE_PATH.CANVAS.MAIN,
-            element: <CanvasPage />,
+            element: <SketchPage />,
           },
         ],
       },

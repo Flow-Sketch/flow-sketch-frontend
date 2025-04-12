@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { isOBBColliding, isPointInOBB, Point } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
-import { useElementRegistryStore, useCanvasViewStore, ViewState } from 'src/core/stores';
+import { useSketchElementRegistryStore, useSketchCameraViewStore, ViewState } from 'src/core/stores';
 import { convertSelectBoxList } from '@/features/sketch/utils';
 import { BaseSketchElement } from '@/core/models/sketchElement';
 import { ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile';
@@ -60,9 +60,9 @@ export function useSelectElementManager(): {
   selectAction: SelectManagerAction;
 } {
   const userId = 'testUser';
-  const viewState = useCanvasViewStore();
-  const store = useElementRegistryStore();
-  const setElementRegistry = useElementRegistryStore.setState;
+  const viewState = useSketchCameraViewStore();
+  const store = useSketchElementRegistryStore();
+  const setElementRegistry = useSketchElementRegistryStore.setState;
   const userSelectState = store.selectElements[userId];
 
   // 선택된 elements 들의 bounding box 를 그리기

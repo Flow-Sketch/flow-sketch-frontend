@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCanvasViewStore } from 'src/core/stores';
+import { useSketchCameraViewStore } from 'src/core/stores';
 
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
 const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
@@ -51,8 +51,8 @@ export function useCameraViewManager(): {
    * - 지점은 절대좌표 기준으로 잡는다.
    */
   // Zustand 스토어에서 상태 가져오기
-  const viewState = useCanvasViewStore();
-  const setState = useCanvasViewStore.setState;
+  const viewState = useSketchCameraViewStore();
+  const setState = useSketchCameraViewStore.setState;
 
   /**
    * > View 시점 변경 시, 변화량 측정에 필요한 기준점을 지정하는 함수

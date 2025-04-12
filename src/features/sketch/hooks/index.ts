@@ -1,11 +1,11 @@
 export { useCanvas } from './useCanvas.ts';
-export { useCanvasActionHandler } from './useCanvasActionHandler.ts';
-export { usePaintingSketchBoard } from './usePaintingSketchBoard.ts';
+export { useSketchActionHandler } from './useSketchActionHandler.ts';
+export { usePaintingSketch } from './usePaintingSketch.ts';
 
 /* Canvas Manager Hook 들의 export */
 
-export { useElementRegistry } from './useElementRegistry.ts';
-export type { ElementRegistryAction } from './useElementRegistry.ts';
+export { useSketchElementRegistry } from './useSketchElementRegistry.ts';
+export type { ElementRegistryAction } from './useSketchElementRegistry.ts';
 
 export { useCameraViewManager } from './useCameraViewManager.ts';
 export type { ViewManagerState, ViewManagerAction } from './useCameraViewManager.ts';

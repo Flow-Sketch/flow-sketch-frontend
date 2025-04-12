@@ -5,6 +5,6 @@ interface CanvasBoardRegistryStore {
   canvasList: CanvasMetadata[];
 }
 
-export const useCanvasBoardRegistryStore = create<CanvasBoardRegistryStore>(() => ({
+export const useSketchFileRegistryStore = create<CanvasBoardRegistryStore>(() => ({
   canvasList: [],
 }));

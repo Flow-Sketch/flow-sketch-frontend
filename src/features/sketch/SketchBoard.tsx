@@ -3,11 +3,11 @@ import { SelectionMenu } from './SelectionMenu';
 import { SketchContextMenu } from './SketchContextMenu';
 import {
   useCanvas,
-  usePaintingSketchBoard,
+  usePaintingSketch,
   useCameraViewManager,
   useSelectElementManager,
-  useCanvasActionHandler,
-  useElementRegistry,
+  useSketchActionHandler,
+  useSketchElementRegistry,
   useCreateElementManger,
   useDeleteElementManager,
   useMoveElementManager,
@@ -18,7 +18,7 @@ import {
 
 export const SketchBoard = () => {
   const { canvasRef } = useCanvas();
-  const { elementRegistry, elementRegistryAction } = useElementRegistry();
+  const { elementRegistry, elementRegistryAction } = useSketchElementRegistry();
 
   // Element 조작기능 Hooks
   const { remoteAction } = useRemoteManager();
@@ -30,7 +30,7 @@ export const SketchBoard = () => {
   const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
   const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
 
-  const handler = useCanvasActionHandler({
+  const handler = useSketchActionHandler({
     viewAction,
     selectAction,
     createAction,
@@ -40,7 +40,7 @@ export const SketchBoard = () => {
     clipboardAction,
   });
 
-  usePaintingSketchBoard(canvasRef, {
+  usePaintingSketch(canvasRef, {
     elementRegistry,
     viewState,
     selectState,

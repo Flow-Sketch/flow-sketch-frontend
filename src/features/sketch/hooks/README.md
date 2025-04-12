@@ -23,11 +23,11 @@ graph TD
 
 ## 주요 Hook
 
-### 1. `useElementRegistry`
+### 1. `useSketchElementRegistry`
 > 캔버스 요소들의 중앙 저장소 역할을 하는 Hook 
 
 ```typescript
-export function useElementRegistry(): {
+export function useSketchElementRegistry(): {
   elementRegistry: ElementRegistry;
   elementRegistryAction: ElementRegistryAction;
 }
@@ -39,7 +39,7 @@ export function useElementRegistry(): {
     - 요소(Element)의 레이어 순서 관리
     - JSON 데이터를 요소인스턴스로 복원
 
-### 2. `useCanvasActionHandler`
+### 2. `useSketchActionHandler`
 > 캔버스의 모든 이벤트 핸들러를 관리하는 중앙 Hook
 
 - **처리하는 이벤트**:
@@ -74,7 +74,7 @@ export function useElementRegistry(): {
     - 다중 요소 동시 리사이즈
     - 비율 유지 리사이즈
 
-### 6. `usePaintingSketchBoard`
+### 6. `usePaintingSketch`
 > 캔버스를 표현하는 JSON 데이터를 실제 캔버스에 랜더링 시키는 Hook
 
 - **주요 기능**:

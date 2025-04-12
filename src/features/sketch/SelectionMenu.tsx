@@ -13,11 +13,11 @@ interface SelectionMenuProps {
 
 export const SelectionMenu = ({ moveState, selectState, deleteAction }: SelectionMenuProps) => {
   const { boundingBox, selectElements } = selectState;
-  const isActivate = !moveState.isMoving && Object.keys(selectElements).length > 0;
+  const isActivateMenu = !moveState.isMoving && Object.keys(selectElements).length > 0;
   const { colors, handleChangeBackgroundColor } = useChangeColorElementManager();
 
   return (
-    isActivate &&
+    isActivateMenu &&
     boundingBox && (
       <Container left={boundingBox.cx - 40} top={boundingBox.cy - boundingBox.height / 2 - 70}>
         <IconButton onClick={deleteAction.handleDeleteElements}>

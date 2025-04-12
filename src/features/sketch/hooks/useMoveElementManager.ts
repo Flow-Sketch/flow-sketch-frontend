@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { ElementRegistryAction, SelectManagerState } from '@/features/sketch/hooks/index.ts';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/features/sketch/constants';
-import { useCanvasViewStore } from 'src/core/stores';
+import { useSketchCameraViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 
 export type MoveManagerState = {
@@ -22,7 +22,7 @@ export function useMoveElementManager(
   moveState: MoveManagerState;
   moveAction: MoveManagerAction;
 } {
-  const viewState = useCanvasViewStore();
+  const viewState = useSketchCameraViewStore();
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
 

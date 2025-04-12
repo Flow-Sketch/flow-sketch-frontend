@@ -55,10 +55,14 @@ export function vectorLength(v: Point): number {
 /** 벡터를 단위벡터로 변환(길이 1, 방향만 가짐) */
 export function normalizeVector(v: Point): Point {
   const len = vectorLength(v);
+
+  // len 이 0 이면 나누기 시 런타임에러 발생확룰 있음
+  if (len === 0) return { x: 0, y: 0 };
+
   return { x: v.x / len, y: v.y / len };
 }
 
-/** 벡터의 수직(법선) 벡터를 반홤 */
+/** 벡터의 수직(법선) 벡터를 반환 */
 export function perpendicularVector(v: Point): Point {
   return { x: -v.y, y: v.x };
 }

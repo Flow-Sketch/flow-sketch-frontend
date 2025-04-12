@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShapeType, useCanvasRemoteStore, useCanvasViewStore } from 'src/core/stores';
-import { ElementRegistryAction } from '@/features/sketch/hooks/useElementRegistry.ts';
+import { ShapeType, useSketchRemoteStore, useSketchCameraViewStore } from 'src/core/stores';
+import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { RemoteManagerAction } from '@/features/sketch/hooks/useRemoteManager.ts';
 
 export type CreateElementManagerState = {
@@ -13,7 +13,7 @@ export type CreateElementManagerState = {
   shapeType: ShapeType;
 };
 
-export type CreateElementMangerAction = {
+export type CreateElementManagerAction = {
   handleStartElementCreation: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleUpdateElementSize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleFinalizeElementCreation: () => void;
@@ -24,14 +24,14 @@ export function useCreateElementManger(
   elementRegistryAction: ElementRegistryAction,
 ): {
   createState: CreateElementManagerState;
-  createAction: CreateElementMangerAction;
+  createAction: CreateElementManagerAction;
 } {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
 
-  const viewState = useCanvasViewStore();
-  const shapeType = useCanvasRemoteStore((store) => store.shapeType);
+  const viewState = useSketchCameraViewStore();
+  const shapeType = useSketchRemoteStore((store) => store.shapeType);
   const setShapeType = remoteAction.handleShapeTypeChange;
 
   /**

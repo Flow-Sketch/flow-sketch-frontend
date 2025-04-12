@@ -33,7 +33,7 @@ import {
  */
 type EditMode = 'idle' | 'resize' | 'move' | 'moveReady' | 'select' | 'selectReady';
 
-export function useCanvasActionHandler(action: {
+export function useSketchActionHandler(action: {
   viewAction: ViewManagerAction;
   selectAction: SelectManagerAction;
   createAction: CreateElementMangerAction;
