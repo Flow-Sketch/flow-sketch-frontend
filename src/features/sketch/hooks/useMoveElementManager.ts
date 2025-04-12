@@ -22,9 +22,9 @@ export function useMoveElementManager(
   moveState: MoveManagerState;
   moveAction: MoveManagerAction;
 } {
-  const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
-  const [isMoving, setIsMoving] = useState<boolean>(false);
   const viewState = useCanvasViewStore();
+  const [isMoving, setIsMoving] = useState<boolean>(false);
+  const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
 
   const handleStartElementMove = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !selectState.boundingBox) return;

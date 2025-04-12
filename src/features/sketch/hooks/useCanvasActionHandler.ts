@@ -118,8 +118,13 @@ export function useCanvasActionHandler(action: {
       if (editMode === 'move') {
         moveAction.handleFinalizeElementMove();
       }
-      if (editMode === 'moveReady' || editMode === 'selectReady') {
+      if (editMode === 'moveReady') {
         selectAction.handleSingleSelect(event);
+        moveAction.handleFinalizeElementMove();
+      }
+      if (editMode === 'selectReady') {
+        selectAction.handleSingleSelect(event);
+        selectAction.handleFinalizeMultiSelect();
       }
       setEditMode('idle');
       setTempStartPoint(null);

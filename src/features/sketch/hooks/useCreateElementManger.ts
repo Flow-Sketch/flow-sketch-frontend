@@ -29,9 +29,10 @@ export function useCreateElementManger(
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [startPoint, setStartPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 위치
   const [endPoint, setEndPosition] = useState<{ x: number; y: number } | null>(null); // 마우스를 놓은 순간의 위치
+
+  const viewState = useCanvasViewStore();
   const shapeType = useCanvasRemoteStore((store) => store.shapeType);
   const setShapeType = remoteAction.handleShapeTypeChange;
-  const viewState = useCanvasViewStore();
 
   /**
    * > 도형을 그릴 때 처음 point(좌측 상단)
