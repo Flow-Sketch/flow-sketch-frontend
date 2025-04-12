@@ -14,7 +14,7 @@ export { useSelectElementManager } from './useSelectElementManager.ts';
 export type { SelectManagerState, SelectManagerAction } from './useSelectElementManager.ts';
 
 export { useCreateElementManger } from './useCreateElementManger.ts';
-export type { CreateElementManagerState, CreateElementMangerAction } from './useCreateElementManger.ts';
+export type { CreateElementManagerState, CreateElementManagerAction } from './useCreateElementManger.ts';
 
 export { useDeleteElementManager } from './useDeleteElementManager.ts';
 export type { DeleteManagerState, DeleteManagerAction } from './useDeleteElementManager.ts';

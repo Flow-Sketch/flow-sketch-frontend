@@ -3,7 +3,7 @@ import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/features/sketch/constants';
 import { Point, isPointInOBB, vectorLength } from '@/shared/utils/collidingDetection';
 import { BoundingBox } from '@/shared/utils/boundingBox';
 import {
-  CreateElementMangerAction,
+  CreateElementManagerAction,
   DeleteManagerAction,
   MoveManagerAction,
   ResizeManagerAction,
@@ -36,7 +36,7 @@ type EditMode = 'idle' | 'resize' | 'move' | 'moveReady' | 'select' | 'selectRea
 export function useSketchActionHandler(action: {
   viewAction: ViewManagerAction;
   selectAction: SelectManagerAction;
-  createAction: CreateElementMangerAction;
+  createAction: CreateElementManagerAction;
   deleteAction: DeleteManagerAction;
   moveAction: MoveManagerAction;
   resizeAction: ResizeManagerAction;
