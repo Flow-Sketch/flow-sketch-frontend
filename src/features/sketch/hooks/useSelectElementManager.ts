@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { isOBBColliding, isPointInOBB, Point } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
-import { useElementRegistryStore, useCanvasViewStore, ViewState } from 'src/core/stores';
+import { useSketchElementRegistryStore, useSketchCameraViewStore, ViewState } from 'src/core/stores';
 import { convertSelectBoxList } from '@/features/sketch/utils';
 import { BaseSketchElement } from '@/core/models/sketchElement';
 import { ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile';
@@ -17,12 +17,12 @@ export type SelectManagerState = {
 };
 
 export type SelectManagerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartMultiSelect: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateMultiSelect: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleFinalizeMultiSelect: () => void;
   handleSingleSelect: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  resetElement: () => void;
-  handleUpdateSelectId: (selectKeys: string[]) => void;
+  handleClearSelection: () => void;
+  handleManualSelectIds: (selectKeys: string[]) => void;
 };
 
 const INIT_BOUNDINGBOX = {
@@ -60,9 +60,9 @@ export function useSelectElementManager(): {
   selectAction: SelectManagerAction;
 } {
   const userId = 'testUser';
-  const viewState = useCanvasViewStore();
-  const store = useElementRegistryStore();
-  const setElementRegistry = useElementRegistryStore.setState;
+  const viewState = useSketchCameraViewStore();
+  const store = useSketchElementRegistryStore();
+  const setElementRegistry = useSketchElementRegistryStore.setState;
   const userSelectState = store.selectElements[userId];
 
   // 선택된 elements 들의 bounding box 를 그리기
@@ -112,7 +112,7 @@ export function useSelectElementManager(): {
   };
 
   /** 선택 요소 초기화 */
-  const resetElement = () => {
+  const handleClearSelection = () => {
     // 스토어 업데이트
     setElementRegistry((state) => ({
       ...state,
@@ -126,12 +126,12 @@ export function useSelectElementManager(): {
     }));
   };
 
-  const handleUpdateSelectId = (selectIds: string[]) => {
+  const handleManualSelectIds = (selectIds: string[]) => {
     if (selectIds.length === 0) return;
     updateSelectIds(selectIds);
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleStartMultiSelect = (event: React.MouseEvent<HTMLCanvasElement>) => {
     // 마우스 좌클릭에만 해당
     if (!event || event.button !== 0) return;
 
@@ -156,7 +156,7 @@ export function useSelectElementManager(): {
     }));
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateMultiSelect = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const dragStartPoint = userSelectState.dragBox.startPoint;
 
     if (!event || !dragStartPoint) return;
@@ -186,7 +186,7 @@ export function useSelectElementManager(): {
     }));
   };
 
-  const handleMouseUp = () => {
+  const handleFinalizeMultiSelect = () => {
     // 스토어 업데이트
     setElementRegistry((state) => ({
       ...state,
@@ -225,12 +225,12 @@ export function useSelectElementManager(): {
 
   return {
     selectAction: {
-      handleMouseMove,
-      handleMouseDown,
-      handleMouseUp,
+      handleStartMultiSelect,
+      handleUpdateMultiSelect,
+      handleFinalizeMultiSelect,
       handleSingleSelect,
-      resetElement,
-      handleUpdateSelectId,
+      handleClearSelection,
+      handleManualSelectIds,
     },
     selectState: {
       dragBox: userSelectState.dragBox,

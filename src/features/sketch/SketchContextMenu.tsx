@@ -53,7 +53,7 @@ export const SketchContextMenu = ({ children, selectState, clipboardAction, dele
             <ContextMenuShortcut>⌘v</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={deleteAction.handleDeleteElement}>
+          <ContextMenuItem onClick={deleteAction.handleDeleteElements}>
             Delete
             <ContextMenuShortcut>⌫</ContextMenuShortcut>
           </ContextMenuItem>

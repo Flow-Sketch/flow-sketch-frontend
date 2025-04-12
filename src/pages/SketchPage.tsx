@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { SketchBoard, SketchToolbar } from '@/features/sketch';
 
-export const CanvasPage = () => {
+export const SketchPage = () => {
   return (
     <div
       css={css`

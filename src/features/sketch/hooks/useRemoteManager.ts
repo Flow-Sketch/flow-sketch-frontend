@@ -1,4 +1,4 @@
-import { RemoteMode, ShapeType, useCanvasRemoteStore } from 'src/core/stores';
+import { RemoteMode, ShapeType, useSketchRemoteStore } from 'src/core/stores';
 
 export type RemoteManagerState = {
   shapeType: ShapeType;
@@ -15,7 +15,7 @@ export type RemoteManagerAction = {
  *
  * #### 설명
  * > - 캔버스 리모트 컨트롤을 위한 상태 및 액션 관리 Hook
- * > - `useCanvasRemoteStore`의 상태를 읽고 업데이트하는 로직을 캡슐화
+ * > - `useSketchRemoteStore`의 상태를 읽고 업데이트하는 로직을 캡슐화
  * > - 컴포넌트에서 직접 스토어를 조작하는 대신 이 Hook 을 통해 상태 변경
  *
  * #### 반환값
@@ -58,8 +58,8 @@ export function useRemoteManager(): {
   remoteState: RemoteManagerState;
   remoteAction: RemoteManagerAction;
 } {
-  const { shapeType, remoteMode } = useCanvasRemoteStore();
-  const setRemoteStore = useCanvasRemoteStore.setState;
+  const { shapeType, remoteMode } = useSketchRemoteStore();
+  const setRemoteStore = useSketchRemoteStore.setState;
 
   const handleRemoteModeChange = (mode: RemoteMode[]) => {
     setRemoteStore({ remoteMode: mode[0] });

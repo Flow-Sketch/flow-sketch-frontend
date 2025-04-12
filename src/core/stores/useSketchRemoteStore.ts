@@ -11,7 +11,7 @@ interface RemoteState {
 }
 
 /**
- * ### useCanvasRemoteStore
+ * ### useSketchRemoteStore
  *
  * #### 설명
  * > - 캔버스 리모트 컨트롤을 위한 전역 상태 저장소
@@ -30,7 +30,7 @@ interface RemoteState {
  * #### 사용 예시
  * ```tsx
  * // 상태만 읽기 (읽기 전용)
- * const { remoteMode, shapeType } = useCanvasRemoteStore();
+ * const { remoteMode, shapeType } = useSketchRemoteStore();
  *
  * // 상태 변경은 useRemoteManager Hook을 통해 수행
  * const { remoteAction } = useRemoteManager();
@@ -53,7 +53,7 @@ interface RemoteState {
  * );
  * ```
  */
-export const useCanvasRemoteStore = create<RemoteState>(() => ({
+export const useSketchRemoteStore = create<RemoteState>(() => ({
   remoteMode: 'view',
   shapeType: null,
 }));

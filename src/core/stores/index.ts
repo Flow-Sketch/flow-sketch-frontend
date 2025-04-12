@@ -1,8 +1,8 @@
-export { useCanvasRemoteStore } from './useCanvasRemoteStore.ts';
-export type { ShapeType, RemoteMode } from './useCanvasRemoteStore.ts';
+export { useSketchRemoteStore } from './useSketchRemoteStore.ts';
+export type { ShapeType, RemoteMode } from './useSketchRemoteStore.ts';
 
-export { useCanvasViewStore } from './useCanvasViewStore.ts';
-export type { ViewState } from './useCanvasViewStore.ts';
+export { useSketchCameraViewStore } from './useSketchCameraViewStore.ts';
+export type { ViewState } from './useSketchCameraViewStore.ts';
 
-export { useElementRegistryStore } from './useElementRegistryStore.ts';
-export { useCanvasBoardRegistryStore } from './useCanvasBoardRegistryStore.ts';
+export { useSketchElementRegistryStore } from './useSketchElementRegistryStore.ts';
+export { useSketchFileRegistryStore } from './useSketchFileRegistryStore.ts';

@@ -5,7 +5,7 @@ import { SelectManagerState, ViewManagerState, CreateElementManagerState } from 
 import { ElementRegistry } from '@/core/models/sketchFile';
 
 /**
- * ### usePaintingSketchBoard()
+ * ### usePaintingSketch()
  * #### 설명
  * - 주어진 캔버스 ref 와 요소 레지스트리를 바탕으로 캔버스에 그림으로 표현
  * - `view` 상태를 기반으로 캔버스의 배율 및 위치를 조정
@@ -18,7 +18,7 @@ import { ElementRegistry } from '@/core/models/sketchFile';
  *   - `selectState`: 선택 상태 (드래그 박스의 시작 및 끝 지점, 선택된 요소들)
  *   - `createState`: 객체 생성 상태 (가이드 박스의 시작 및 끝 지점, 생성 객체 타입)
  */
-export function usePaintingSketchBoard(
+export function usePaintingSketch(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   state: {
     elementRegistry: ElementRegistry;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ElementRegistryAction } from '@/features/sketch/hooks/useElementRegistry.ts';
+import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { SelectManagerAction } from '@/features/sketch/hooks/useSelectElementManager.ts';
-import { useCanvasViewStore, useElementRegistryStore } from '@/core/stores';
+import { useSketchCameraViewStore, useSketchElementRegistryStore } from '@/core/stores';
 import { BaseSketchElement } from '@/core/models/sketchElement';
 import { OnlyClassProperties } from '@/shared/utils/common';
 import { getBoundingBox } from '@/shared/utils/boundingBox';
@@ -24,9 +24,9 @@ export function useClipboardElementManager(
   const userId = 'testUser';
   const [clipboards, setClipboard] = useState<OnlyClassProperties<BaseSketchElement>[] | null>(null);
 
-  const viewState = useCanvasViewStore();
-  const allElements = useElementRegistryStore((store) => store.elementRegistry);
-  const selectStateIds = useElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
+  const viewState = useSketchCameraViewStore();
+  const allElements = useSketchElementRegistryStore((store) => store.elementRegistry);
+  const selectStateIds = useSketchElementRegistryStore((store) => store.selectElements[userId].selectElementIds);
 
   const handleCopyElement = () => {
     if (selectStateIds.length === 0) return;
@@ -60,7 +60,7 @@ export function useClipboardElementManager(
     elementRegistryAction.createElements(newElements);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
-    selectAction.handleUpdateSelectId(newElementIds);
+    selectAction.handleManualSelectIds(newElementIds);
 
     // 3. clipBoard 에 새롭게 객체 업데이트
     setClipboard(newElements);
@@ -101,7 +101,7 @@ export function useClipboardElementManager(
     elementRegistryAction.createElements(newElements);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
-    selectAction.handleUpdateSelectId(newElementIds);
+    selectAction.handleManualSelectIds(newElementIds);
 
     // 3. clipBoard 에 새롭게 객체 업데이트
     setClipboard(newElements);

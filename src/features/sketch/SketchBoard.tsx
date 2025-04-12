@@ -1,36 +1,36 @@
 import styled from '@emotion/styled';
+import { SelectionMenu } from './SelectionMenu';
+import { SketchContextMenu } from './SketchContextMenu';
 import {
   useCanvas,
-  usePaintingSketchBoard,
+  usePaintingSketch,
   useCameraViewManager,
   useSelectElementManager,
-  useCanvasActionHandler,
-  useElementRegistry,
+  useSketchActionHandler,
+  useSketchElementRegistry,
   useCreateElementManger,
   useDeleteElementManager,
   useMoveElementManager,
   useResizeElementManager,
+  useClipboardElementManager,
   useRemoteManager,
 } from './hooks';
-import { SelectionMenu } from './SelectionMenu';
-import { useClipboardElementManager } from '@/features/sketch/hooks/useClipboardElementManager.ts';
-import { SketchContextMenu } from '@/features/sketch/SketchContextMenu.tsx';
 
 export const SketchBoard = () => {
   const { canvasRef } = useCanvas();
+  const { elementRegistry, elementRegistryAction } = useSketchElementRegistry();
+
+  // Element 조작기능 Hooks
   const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCameraViewManager();
   const { selectState, selectAction } = useSelectElementManager();
-  const { elementRegistry, elementRegistryAction } = useElementRegistry();
-
-  // Element 를 직접적으로 관리
-  const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
-  const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
+  const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
   const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
   const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
+  const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
 
-  const handler = useCanvasActionHandler({
+  const handler = useSketchActionHandler({
     viewAction,
     selectAction,
     createAction,
@@ -40,7 +40,7 @@ export const SketchBoard = () => {
     clipboardAction,
   });
 
-  usePaintingSketchBoard(canvasRef, {
+  usePaintingSketch(canvasRef, {
     elementRegistry,
     viewState,
     selectState,
@@ -49,7 +49,7 @@ export const SketchBoard = () => {
 
   return (
     <Container>
-      <SelectionMenu moveState={moveState} selectState={selectState} deleteAction={deleteAction} />
+      <SelectionMenu selectState={selectState} moveState={moveState} deleteAction={deleteAction} />
       <SketchContextMenu selectState={selectState} clipboardAction={clipboardAction} deleteAction={deleteAction}>
         <Canvas
           tabIndex={1}

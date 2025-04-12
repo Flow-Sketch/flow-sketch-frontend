@@ -3,7 +3,7 @@ import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/features/sketch/constants';
 import { Point, isPointInOBB, vectorLength } from '@/shared/utils/collidingDetection';
 import { BoundingBox } from '@/shared/utils/boundingBox';
 import {
-  CreateElementMangerAction,
+  CreateElementManagerAction,
   DeleteManagerAction,
   MoveManagerAction,
   ResizeManagerAction,
@@ -33,10 +33,10 @@ import {
  */
 type EditMode = 'idle' | 'resize' | 'move' | 'moveReady' | 'select' | 'selectReady';
 
-export function useCanvasActionHandler(action: {
+export function useSketchActionHandler(action: {
   viewAction: ViewManagerAction;
   selectAction: SelectManagerAction;
-  createAction: CreateElementMangerAction;
+  createAction: CreateElementManagerAction;
   deleteAction: DeleteManagerAction;
   moveAction: MoveManagerAction;
   resizeAction: ResizeManagerAction;
@@ -51,14 +51,14 @@ export function useCanvasActionHandler(action: {
   const { shapeType, remoteMode } = remoteState;
 
   const handleWheel = (() => {
-    if (remoteMode === 'view') return viewAction.handleWheel;
+    if (remoteMode === 'view') return viewAction.handleUpdateViewScale;
   })();
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
-    if (remoteMode === 'view') return viewAction.handleMouseDown(event);
+    if (remoteMode === 'view') return viewAction.handleStartViewAlignment(event);
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleMouseDown(event);
+      if (shapeType) return createAction.handleStartElementCreation(event);
       const point = {
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
@@ -69,27 +69,28 @@ export function useCanvasActionHandler(action: {
       if (isInOuterBox) {
         if (isInInnerBox) {
           setEditMode('moveReady');
-          return moveAction.handleMouseDown(event);
+          return moveAction.handleStartElementMove(event);
         }
         setEditMode('resize');
-        return resizeAction.handleMouseDown(event);
+        return resizeAction.handleStartElementResize(event);
       }
       setEditMode('selectReady');
-      return selectAction.handleMouseDown(event);
+      return selectAction.handleStartMultiSelect(event);
     }
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (event.buttons !== 1) return; // 이미 좌클릭을 한 상태에서만 동작
-    if (remoteMode === 'view') return viewAction.handleMouseMove(event);
+    // 좌클릭을 한 상태에서만 동작
+    if (!event || event.buttons !== 1) return;
+    if (remoteMode === 'view') return viewAction.handleUpdateViewOffset(event);
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleMouseMove(event);
+      if (shapeType) return createAction.handleUpdateElementSize(event);
       if (!tempStartPoint) return;
-      const deltaVector = {
+
+      const distanceToTempPoint = vectorLength({
         x: event.nativeEvent.offsetX - tempStartPoint.x,
         y: event.nativeEvent.offsetY - tempStartPoint.y,
-      };
-      const distanceToTempPoint = vectorLength(deltaVector);
+      });
 
       // 두 사이의 거리가 10px 을 넘지 않으면 mode 변경을 하지 않음
       if (distanceToTempPoint > 10) {
@@ -97,28 +98,33 @@ export function useCanvasActionHandler(action: {
         if (editMode === 'selectReady') return setEditMode('select');
       }
 
-      if (editMode === 'move') return moveAction.handleMouseMove(event);
-      if (editMode === 'resize') return resizeAction.handleMouseMove(event);
-      if (editMode === 'select') return selectAction.handleMouseMove(event);
+      if (editMode === 'move') return moveAction.handleUpdateElementPosition(event);
+      if (editMode === 'resize') return resizeAction.handleUpdateElementSize(event);
+      if (editMode === 'select') return selectAction.handleUpdateMultiSelect(event);
     }
   };
 
   const handleMouseUp = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
-    if (remoteMode === 'view') return viewAction.handleMouseUp();
+    if (remoteMode === 'view') return viewAction.handleResetViewAlignment();
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleMouseUp();
+      if (shapeType) return createAction.handleFinalizeElementCreation();
       if (editMode === 'select') {
-        selectAction.handleMouseUp();
+        selectAction.handleFinalizeMultiSelect();
       }
       if (editMode === 'resize') {
-        resizeAction.handleMouseUp();
+        resizeAction.handleFinalizeElementResize();
       }
       if (editMode === 'move') {
-        moveAction.handleMouseUp();
+        moveAction.handleFinalizeElementMove();
       }
-      if (editMode === 'moveReady' || editMode === 'selectReady') {
+      if (editMode === 'moveReady') {
         selectAction.handleSingleSelect(event);
+        moveAction.handleFinalizeElementMove();
+      }
+      if (editMode === 'selectReady') {
+        selectAction.handleSingleSelect(event);
+        selectAction.handleFinalizeMultiSelect();
       }
       setEditMode('idle');
       setTempStartPoint(null);
@@ -129,7 +135,7 @@ export function useCanvasActionHandler(action: {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (!event) return;
     if (remoteMode === 'edit') {
-      if (event.key === 'Delete' || event.key === 'Backspace') return deleteAction.handleDeleteElement();
+      if (event.key === 'Delete' || event.key === 'Backspace') return deleteAction.handleDeleteElements();
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case 'c':

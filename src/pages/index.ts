@@ -1,4 +1,4 @@
-export { CanvasPage } from './CanvasPage.tsx';
+export { SketchPage } from './SketchPage.tsx';
 export { HomePage } from './HomePage.tsx';
 export { LoginPage } from './LoginPage.tsx';
 export { SignupPage } from './SignupPage.tsx';

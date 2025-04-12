@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MouseEvent, useState } from 'react';
 import { ElementRegistryAction, SelectManagerState } from '@/features/sketch/hooks/index.ts';
 import { TRANSFORM_CONTROL_SIDE_WIDTH } from '@/features/sketch/constants';
-import { useCanvasViewStore } from 'src/core/stores';
+import { useSketchCameraViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 
 export type MoveManagerState = {
@@ -10,9 +10,9 @@ export type MoveManagerState = {
 };
 
 export type MoveManagerAction = {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: () => void;
+  handleStartElementMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleUpdateElementPosition: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleFinalizeElementMove: () => void;
 };
 
 export function useMoveElementManager(
@@ -22,11 +22,11 @@ export function useMoveElementManager(
   moveState: MoveManagerState;
   moveAction: MoveManagerAction;
 } {
-  const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
+  const viewState = useSketchCameraViewStore();
   const [isMoving, setIsMoving] = useState<boolean>(false);
-  const viewState = useCanvasViewStore();
+  const [alignmentPoint, setAlignmentPoint] = useState<{ x: number; y: number } | null>(null); // 마우스를 클릭한 순간의 지정
 
-  const handleMouseDown = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleStartElementMove = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !selectState.boundingBox) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -48,7 +48,7 @@ export function useMoveElementManager(
     }
   };
 
-  const handleMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+  const handleUpdateElementPosition = (event: MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isMoving || !alignmentPoint) return;
 
     const currentX = event.nativeEvent.offsetX;
@@ -63,7 +63,7 @@ export function useMoveElementManager(
     setAlignmentPoint({ x: currentX, y: currentY });
   };
 
-  const handleMouseUp = () => {
+  const handleFinalizeElementMove = () => {
     if (!isMoving || !alignmentPoint) return;
 
     setIsMoving(false);
@@ -75,9 +75,9 @@ export function useMoveElementManager(
       isMoving,
     },
     moveAction: {
-      handleMouseDown,
-      handleMouseMove,
-      handleMouseUp,
+      handleStartElementMove,
+      handleUpdateElementPosition,
+      handleFinalizeElementMove,
     },
   };
 }

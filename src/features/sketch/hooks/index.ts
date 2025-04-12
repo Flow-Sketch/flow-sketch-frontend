@@ -1,11 +1,11 @@
 export { useCanvas } from './useCanvas.ts';
-export { useCanvasActionHandler } from './useCanvasActionHandler.ts';
-export { usePaintingSketchBoard } from './usePaintingSketchBoard.ts';
+export { useSketchActionHandler } from './useSketchActionHandler.ts';
+export { usePaintingSketch } from './usePaintingSketch.ts';
 
 /* Canvas Manager Hook 들의 export */
 
-export { useElementRegistry } from './useElementRegistry.ts';
-export type { ElementRegistryAction } from './useElementRegistry.ts';
+export { useSketchElementRegistry } from './useSketchElementRegistry.ts';
+export type { ElementRegistryAction } from './useSketchElementRegistry.ts';
 
 export { useCameraViewManager } from './useCameraViewManager.ts';
 export type { ViewManagerState, ViewManagerAction } from './useCameraViewManager.ts';
@@ -14,7 +14,7 @@ export { useSelectElementManager } from './useSelectElementManager.ts';
 export type { SelectManagerState, SelectManagerAction } from './useSelectElementManager.ts';
 
 export { useCreateElementManger } from './useCreateElementManger.ts';
-export type { CreateElementManagerState, CreateElementMangerAction } from './useCreateElementManger.ts';
+export type { CreateElementManagerState, CreateElementManagerAction } from './useCreateElementManger.ts';
 
 export { useDeleteElementManager } from './useDeleteElementManager.ts';
 export type { DeleteManagerState, DeleteManagerAction } from './useDeleteElementManager.ts';

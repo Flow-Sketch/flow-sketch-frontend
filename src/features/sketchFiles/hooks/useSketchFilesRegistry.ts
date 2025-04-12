@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { CanvasMetadata, CanvasRegistryState, createSketchFile, isValidElementRegistry, isValidMetadata } from '@/core/models/sketchFile';
-import { useCanvasBoardRegistryStore } from 'src/core/stores';
+import { useSketchFileRegistryStore } from 'src/core/stores';
 import { CANVAS_STORAGE } from '../constants';
 
 interface CanvasBoardState {
@@ -19,8 +19,8 @@ export function useSketchFilesRegistry(): {
   boardAction: CanvasBoardAction;
 } {
   const userId = 'testUser'; // 임시로 userId 처리
-  const allMetaData = useCanvasBoardRegistryStore((store) => store.canvasList);
-  const setMetaData = useCanvasBoardRegistryStore.setState;
+  const allMetaData = useSketchFileRegistryStore((store) => store.canvasList);
+  const setMetaData = useSketchFileRegistryStore.setState;
 
   // state 와 localStorage 의 싱크를 맞춤
   useEffect(() => {
