@@ -13,7 +13,6 @@ import {
   useSelectElementManager,
   useRemoteManager,
 } from '@/features/sketch/hooks/index.ts';
-import * as React from 'react';
 
 /**
  * ### EditMode
