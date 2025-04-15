@@ -58,7 +58,6 @@ export const SketchBoard = () => {
           onMouseDown={handler.handleMouseDown}
           onMouseUp={handler.handleMouseUp}
           onMouseMove={handler.handleMouseMove}
-          onKeyDown={handler.handleKeyDown}
         />
       </SketchContextMenu>
     </Container>
