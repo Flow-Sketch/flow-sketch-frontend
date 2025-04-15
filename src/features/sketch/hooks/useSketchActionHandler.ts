@@ -138,8 +138,8 @@ export function useSketchActionHandler(action: {
     if (remoteMode === 'edit') {
       if (event.key === 'Delete' || event.key === 'Backspace') return deleteAction.handleDeleteElements();
       if (event.key === 'Escape' || event.key === 'Esc') {
-        if (shapeType) createAction.handleCancelCreation();
-        moveAction.handleCancelMove();
+        if (shapeType) createAction.handleCancelElementCreation();
+        moveAction.handleCancelElementMove();
         selectAction.handleClearSelection();
         setEditMode('idle');
         return;

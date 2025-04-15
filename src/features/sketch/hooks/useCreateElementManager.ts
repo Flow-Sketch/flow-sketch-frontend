@@ -18,10 +18,10 @@ export type CreateElementManagerAction = {
   handleStartElementCreation: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleUpdateElementSize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleFinalizeElementCreation: () => void;
-  handleCancelCreation: () => void;
+  handleCancelElementCreation: () => void;
 };
 
-export function useCreateElementManger(
+export function useCreateElementManager(
   remoteAction: RemoteManagerAction,
   elementRegistryAction: ElementRegistryAction,
 ): {
@@ -82,8 +82,7 @@ export function useCreateElementManger(
     setEndPosition(null);
   };
 
-  const handleCancelCreation = () => {
-    console.log(startPoint, endPoint);
+  const handleCancelElementCreation = () => {
     setStartPosition(null);
     setEndPosition(null);
     setShapeType([null]);
@@ -101,7 +100,7 @@ export function useCreateElementManger(
       handleStartElementCreation,
       handleUpdateElementSize,
       handleFinalizeElementCreation,
-      handleCancelCreation,
+      handleCancelElementCreation,
     },
   };
 }

@@ -13,7 +13,7 @@ export type MoveManagerAction = {
   handleStartElementMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleUpdateElementPosition: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleFinalizeElementMove: () => void;
-  handleCancelMove: () => void;
+  handleCancelElementMove: () => void;
 };
 
 export function useMoveElementManager(
@@ -71,7 +71,7 @@ export function useMoveElementManager(
     setAlignmentPoint(null);
   };
 
-  const handleCancelMove = () => {
+  const handleCancelElementMove = () => {
     setIsMoving(false);
     setAlignmentPoint(null);
   };
@@ -84,7 +84,7 @@ export function useMoveElementManager(
       handleStartElementMove,
       handleUpdateElementPosition,
       handleFinalizeElementMove,
-      handleCancelMove,
+      handleCancelElementMove,
     },
   };
 }
