@@ -14,12 +14,14 @@ export type CreateElementManagerState = {
 };
 
 export type CreateElementManagerAction = {
+  // end
   handleStartElementCreation: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleUpdateElementSize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleFinalizeElementCreation: () => void;
+  handleCancelElementCreation: () => void;
 };
 
-export function useCreateElementManger(
+export function useCreateElementManager(
   remoteAction: RemoteManagerAction,
   elementRegistryAction: ElementRegistryAction,
 ): {
@@ -80,6 +82,12 @@ export function useCreateElementManger(
     setEndPosition(null);
   };
 
+  const handleCancelElementCreation = () => {
+    setStartPosition(null);
+    setEndPosition(null);
+    setShapeType([null]);
+  };
+
   return {
     createState: {
       guideBox: {
@@ -92,6 +100,7 @@ export function useCreateElementManger(
       handleStartElementCreation,
       handleUpdateElementSize,
       handleFinalizeElementCreation,
+      handleCancelElementCreation,
     },
   };
 }

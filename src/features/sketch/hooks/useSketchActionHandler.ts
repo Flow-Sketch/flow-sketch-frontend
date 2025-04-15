@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/features/sketch/constants';
 import { Point, isPointInOBB, vectorLength } from '@/shared/utils/collidingDetection';
 import { BoundingBox } from '@/shared/utils/boundingBox';
@@ -50,9 +50,9 @@ export function useSketchActionHandler(action: {
   const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction, clipboardAction } = action;
   const { shapeType, remoteMode } = remoteState;
 
-  const handleWheel = (() => {
-    if (remoteMode === 'view') return viewAction.handleUpdateViewScale;
-  })();
+  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+    if (remoteMode === 'view') return viewAction.handleUpdateViewScale(event);
+  };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event) return;
@@ -132,10 +132,17 @@ export function useSketchActionHandler(action: {
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (!event) return;
     if (remoteMode === 'edit') {
       if (event.key === 'Delete' || event.key === 'Backspace') return deleteAction.handleDeleteElements();
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        if (shapeType) createAction.handleCancelElementCreation();
+        moveAction.handleCancelElementMove();
+        selectAction.handleClearSelection();
+        setEditMode('idle');
+        return;
+      }
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case 'c':
@@ -152,12 +159,16 @@ export function useSketchActionHandler(action: {
     }
   };
 
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   return {
     handleWheel,
     handleMouseDown,
     handleMouseUp,
     handleMouseMove,
-    handleKeyDown,
   };
 }
 

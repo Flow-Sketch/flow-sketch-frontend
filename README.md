@@ -92,17 +92,34 @@ graph TD
 ```tsx
 export const Canvas = () => {
   const { canvasRef } = useCanvas();
-  const { viewState, viewAction } = useCameraViewManager();
   const { elementRegistry, elementRegistryAction } = useSketchElementRegistry();
-  const { selectState, selectAction } = useCanvasSelectManager(elementRegistry, viewState);
-  const { createState, createAction } = useCreateElementManger(viewState, elementRegistryAction);
+
+  // Element 조작기능 Hooks
+  const { remoteAction } = useRemoteManager();
+  const { viewState, viewAction } = useCameraViewManager();
+  const { selectState, selectAction } = useSelectElementManager();
+  const { createState, createAction } = useCreateElementManager(remoteAction, elementRegistryAction);
+  const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
+  const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
   const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
-  const { moveAction } = useMoveElementManager(viewState, selectState, elementRegistryAction);
-  const { resizeAction } = useResizeElementManager(viewState, selectState, elementRegistryAction);
+  const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
 
-  const handler = useSketchActionHandler(selectState, viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction);
-  usePaintingSketch(canvasRef, elementRegistry, viewState, selectState, createState);
-
+  const handler = useSketchActionHandler({
+    viewAction,
+    selectAction,
+    createAction,
+    deleteAction,
+    moveAction,
+    resizeAction,
+    clipboardAction,
+  });
+  
+  usePaintingSketch(canvasRef, {
+    elementRegistry,
+    viewState,
+    selectState,
+    createState,
+  });
   // 렌더링 로직...
 };
 ```
