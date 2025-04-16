@@ -8,7 +8,7 @@ import {
   useSelectElementManager,
   useSketchActionHandler,
   useSketchElementRegistry,
-  useCreateElementManger,
+  useCreateElementManager,
   useDeleteElementManager,
   useMoveElementManager,
   useResizeElementManager,
@@ -24,10 +24,10 @@ export const SketchBoard = () => {
   const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCameraViewManager();
   const { selectState, selectAction } = useSelectElementManager();
+  const { createState, createAction } = useCreateElementManager(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
-  const { createState, createAction } = useCreateElementManger(remoteAction, elementRegistryAction);
-  const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
   const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
+  const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);
   const { resizeAction } = useResizeElementManager(selectState, elementRegistryAction);
 
   const handler = useSketchActionHandler({
@@ -58,7 +58,6 @@ export const SketchBoard = () => {
           onMouseDown={handler.handleMouseDown}
           onMouseUp={handler.handleMouseUp}
           onMouseMove={handler.handleMouseMove}
-          onKeyDown={handler.handleKeyDown}
         />
       </SketchContextMenu>
     </Container>
