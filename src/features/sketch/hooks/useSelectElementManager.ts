@@ -80,7 +80,7 @@ export function useSelectElementManager(): {
     const elementList = selectElementIds.reduce((cur, elementId) => {
       const originalElement = store.elementRegistry.elements[elementId];
       if (originalElement) return [...cur, originalElement];
-      return [...cur];
+      return cur;
     }, [] as SketchElement[]);
 
     const selectBoxList = convertSelectBoxList(elementList, viewState);
