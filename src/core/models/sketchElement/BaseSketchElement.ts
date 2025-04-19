@@ -1,8 +1,6 @@
+import { Point } from '@/shared/utils/collidingDetection';
 import { SketchElementStyle } from './SketchElementStyle.ts';
-import { EllipseType } from '@/core/models/sketchElement/EllipseSketchElement.ts';
-import { RectType } from '@/core/models/sketchElement/RectSketchElement.ts';
-
-export type BaseSketchElementType = RectType | EllipseType;
+import { SketchElementType } from '@/core/models/sketchElement/FactorySketchElement.ts';
 
 interface DefaultElementStyle extends SketchElementStyle {
   borderWidth: number;
@@ -10,21 +8,21 @@ interface DefaultElementStyle extends SketchElementStyle {
   background: string;
 }
 
-export interface BaseSketchElementParams {
+export interface BaseSketchElementParams<T extends SketchElementType> {
   id: string;
-  type: BaseSketchElementType;
+  type: T;
   width: number;
   height: number;
   x: number;
   y: number;
   elementStyle?: SketchElementStyle;
   rotation?: number; // 단위 : 라디안(360도 === 2 * PI)
-  points?: { x: number; y: number }[];
+  points: Point[] | null;
 }
 
-export abstract class BaseSketchElement {
+export abstract class BaseSketchElement<T extends SketchElementType> {
   id: string;
-  type: BaseSketchElementType;
+  type: T;
   width: number;
   height: number;
   x: number;
@@ -32,8 +30,9 @@ export abstract class BaseSketchElement {
   elementStyle: DefaultElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   isEditable: boolean; //
-  points?: { x: number; y: number }[];
-  constructor(params: BaseSketchElementParams) {
+  points: Point[] | null;
+
+  constructor(params: BaseSketchElementParams<T>) {
     this.id = params.id;
     this.type = params.type;
     this.width = params.width;

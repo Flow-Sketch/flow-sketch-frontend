@@ -21,7 +21,7 @@ export type CreateElementManagerAction = {
   handleCancelElementCreation: () => void;
 };
 
-export function useCreateElementManager(
+export function useCreateShapeManager(
   remoteAction: RemoteManagerAction,
   elementRegistryAction: ElementRegistryAction,
 ): {
@@ -74,6 +74,7 @@ export function useCreateElementManager(
       height: convertHeight,
       x: convertOffsetX + convertWidth / 2,
       y: convertOffsetY + convertHeight / 2,
+      points: null,
     });
 
     setShapeType([null]);

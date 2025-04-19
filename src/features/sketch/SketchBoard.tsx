@@ -8,7 +8,7 @@ import {
   useSelectElementManager,
   useSketchActionHandler,
   useSketchElementRegistry,
-  useCreateElementManager,
+  useCreateShapeManager,
   useDeleteElementManager,
   useMoveElementManager,
   useResizeElementManager,
@@ -24,7 +24,7 @@ export const SketchBoard = () => {
   const { remoteAction } = useRemoteManager();
   const { viewState, viewAction } = useCameraViewManager();
   const { selectState, selectAction } = useSelectElementManager();
-  const { createState, createAction } = useCreateElementManager(remoteAction, elementRegistryAction);
+  const { createState, createAction } = useCreateShapeManager(remoteAction, elementRegistryAction);
   const { moveState, moveAction } = useMoveElementManager(selectState, elementRegistryAction);
   const { clipboardAction } = useClipboardElementManager(selectAction, elementRegistryAction);
   const { deleteAction } = useDeleteElementManager(selectState, selectAction, elementRegistryAction);

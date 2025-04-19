@@ -4,7 +4,7 @@ import { isOBBColliding, isPointInOBB, Point } from '@/shared/utils/collidingDet
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
 import { useSketchElementRegistryStore, useSketchCameraViewStore, ViewState } from 'src/core/stores';
 import { convertSelectBoxList } from '@/features/sketch/utils';
-import { BaseSketchElement } from '@/core/models/sketchElement';
+import { SketchElement } from '@/core/models/sketchElement';
 import { ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile';
 
 export type SelectManagerState = {
@@ -80,8 +80,8 @@ export function useSelectElementManager(): {
     const elementList = selectElementIds.reduce((cur, elementId) => {
       const originalElement = store.elementRegistry.elements[elementId];
       if (originalElement) return [...cur, originalElement];
-      return [...cur];
-    }, [] as BaseSketchElement[]);
+      return cur;
+    }, [] as SketchElement[]);
 
     const selectBoxList = convertSelectBoxList(elementList, viewState);
 

@@ -4,7 +4,7 @@ import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
 import { useSketchElementRegistryStore } from 'src/core/stores';
 import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
 import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
-import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/core/models/sketchElement';
+import { FactorySketchElement, SketchElementParams, SketchElementStyle, SketchElementType } from '@/core/models/sketchElement';
 import { useThrottle } from 'src/shared/hooks';
 
 interface ResizeParams {
@@ -19,8 +19,8 @@ interface MoveParams {
 }
 
 export interface ElementRegistryAction {
-  createElements: <T extends BaseSketchElementType>(params: SketchElementParams<T>[]) => void;
-  createSingleElement: <T extends BaseSketchElementType>(params: SketchElementParams<T>) => void;
+  createElements: <T extends SketchElementType>(params: SketchElementParams<T>[]) => void;
+  createSingleElement: <T extends SketchElementType>(params: SketchElementParams<T>) => void;
   deleteElements: (ids: string[]) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
@@ -52,20 +52,20 @@ export function useSketchElementRegistry(): {
     if (!canvasListStr) return;
 
     const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
-    const selectCanvasRegistry = canvasStorage[canvasId];
+    const selectSketchFile = canvasStorage[canvasId];
 
     // json -> element 인스턴스로 변환
-    selectCanvasRegistry.elementRegistry['elements'] = selectCanvasRegistry.elementRegistry.layerOrder.reduce(
+    selectSketchFile.elementRegistry['elements'] = selectSketchFile.elementRegistry.layerOrder.reduce(
       (acc, elementId) => {
-        acc[elementId] = SketchElement.convertElement(selectCanvasRegistry.elementRegistry['elements'][elementId]);
+        acc[elementId] = FactorySketchElement.convertElement(selectSketchFile.elementRegistry['elements'][elementId]);
         return acc;
       },
       {} as ElementRegistry['elements'],
     );
-    selectCanvasRegistry.isInitialized = true;
+    selectSketchFile.isInitialized = true;
 
     // 최종 ElementStore 에 업데이트
-    setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
+    setElementRegistry((prev) => ({ ...prev, ...selectSketchFile }));
 
     // 페이지를 나가면, store 를 초기화
     return () => {
@@ -81,9 +81,9 @@ export function useSketchElementRegistry(): {
     throttleEditElementBoard(canvasId, elementRegistry);
   }, [canvasId, elementRegistry]);
 
-  const createElements = <T extends BaseSketchElementType>(params: SketchElementParams<T>[]) => {
+  const createElements = <T extends SketchElementType>(params: SketchElementParams<T>[]) => {
     const newElements = params.reduce((cur, param) => {
-      return { ...cur, [param.id]: SketchElement.createElement(param) };
+      return { ...cur, [param.id]: FactorySketchElement.createElement(param) };
     }, {});
     const newIds = params.map((param) => param.id);
     setElementRegistry((prev) => ({
@@ -95,11 +95,11 @@ export function useSketchElementRegistry(): {
     }));
   };
 
-  const createSingleElement = <T extends BaseSketchElementType>(params: SketchElementParams<T>) => {
+  const createSingleElement = <T extends SketchElementType>(params: SketchElementParams<T>) => {
     setElementRegistry((prev) => ({
       ...prev,
       elementRegistry: {
-        elements: { ...prev.elementRegistry.elements, [params.id]: SketchElement.createElement(params) },
+        elements: { ...prev.elementRegistry.elements, [params.id]: FactorySketchElement.createElement(params) },
         layerOrder: [...prev.elementRegistry.layerOrder, params.id],
       },
     }));

@@ -13,8 +13,8 @@ export type { ViewManagerState, ViewManagerAction } from './useCameraViewManager
 export { useSelectElementManager } from './useSelectElementManager.ts';
 export type { SelectManagerState, SelectManagerAction } from './useSelectElementManager.ts';
 
-export { useCreateElementManager } from './useCreateElementManager.ts';
-export type { CreateElementManagerState, CreateElementManagerAction } from './useCreateElementManager.ts';
+export { useCreateShapeManager } from './useCreateShapeManager.ts';
+export type { CreateElementManagerState, CreateElementManagerAction } from './useCreateShapeManager.ts';
 
 export { useDeleteElementManager } from './useDeleteElementManager.ts';
 export type { DeleteManagerState, DeleteManagerAction } from './useDeleteElementManager.ts';
