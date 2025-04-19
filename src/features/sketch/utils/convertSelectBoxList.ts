@@ -1,9 +1,9 @@
 import { BaseSelectBox } from '@/core/models/selectionBox';
-import { BaseSketchElement } from '@/core/models/sketchElement';
+import { SketchElement } from '@/core/models/sketchElement';
 import { ViewState } from '@/core/stores';
 import { OnlyClassProperties } from '@/shared/utils/common';
 
-export function convertSelectBoxList(elementList: OnlyClassProperties<BaseSketchElement>[], viewState: ViewState) {
+export function convertSelectBoxList(elementList: OnlyClassProperties<SketchElement>[], viewState: ViewState) {
   if (elementList.length < 0) return [];
 
   return elementList.map(
