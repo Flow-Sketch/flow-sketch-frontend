@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { SelectManagerAction } from '@/features/sketch/hooks/useSelectElementManager.ts';
+import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { useSketchCameraViewStore, useSketchElementRegistryStore } from '@/core/stores';
 import { SketchElement } from '@/core/models/sketchElement';
 import { OnlyClassProperties } from '@/shared/utils/common';
@@ -57,7 +57,7 @@ export function useClipboardElementManager(
     }
 
     // 1. 새로운 객체 생성
-    elementRegistryAction.createElements(newElements);
+    elementRegistryAction.pasteElements(newElements as SketchElement[]);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
     selectAction.handleManualSelectIds(newElementIds);
@@ -98,7 +98,7 @@ export function useClipboardElementManager(
     }
 
     // 1. 새로운 객체 생성
-    elementRegistryAction.createElements(newElements);
+    elementRegistryAction.pasteElements(newElements as SketchElement[]);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
     selectAction.handleManualSelectIds(newElementIds);

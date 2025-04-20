@@ -62,8 +62,6 @@ export function useCreateLineManager(
     if (!isDrawing || !startPoint || !endPoint) return;
     if (!isLineType(shapeType)) return;
 
-    console.log(viewState, startPoint);
-
     const convertWidth = Math.abs(endPoint.x - startPoint.x) / viewState.scale;
     const convertHeight = Math.abs(endPoint.y - startPoint.y) / viewState.scale;
     const convertOffsetX = (Math.abs(viewState.offset.x) + Math.min(startPoint.x, endPoint.x)) / viewState.scale; // View 좌표계 -> 절대 좌표계로 변경
@@ -84,7 +82,7 @@ export function useCreateLineManager(
       height: convertHeight,
       x: convertOffsetX + convertWidth / 2,
       y: convertOffsetY + convertHeight / 2,
-      points: [convertStartPoint, convertEndPoint],
+      initPoints: [convertStartPoint, convertEndPoint],
       elementStyle: {
         borderWidth: 2,
         borderColor: '#000000',

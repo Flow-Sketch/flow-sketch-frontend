@@ -4,7 +4,13 @@ import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
 import { useSketchElementRegistryStore } from 'src/core/stores';
 import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
 import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
-import { FactorySketchElement, SketchElementParams, SketchElementStyle, SketchElementType } from '@/core/models/sketchElement';
+import {
+  FactorySketchElement,
+  SketchElement,
+  SketchElementParams,
+  SketchElementStyle,
+  SketchElementType,
+} from '@/core/models/sketchElement';
 import { useThrottle } from 'src/shared/hooks';
 
 interface ResizeParams {
@@ -20,6 +26,7 @@ interface MoveParams {
 
 export interface ElementRegistryAction {
   createElements: <T extends SketchElementType>(params: SketchElementParams<T>[]) => void;
+  pasteElements: <T extends SketchElementType>(params: SketchElement<T>[]) => void;
   createSingleElement: <T extends SketchElementType>(params: SketchElementParams<T>) => void;
   deleteElements: (ids: string[]) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
@@ -86,6 +93,20 @@ export function useSketchElementRegistry(): {
   const createElements = <T extends SketchElementType>(params: SketchElementParams<T>[]) => {
     const newElements = params.reduce((cur, param) => {
       return { ...cur, [param.id]: FactorySketchElement.createElement(param) };
+    }, {});
+    const newIds = params.map((param) => param.id);
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: { ...prev.elementRegistry.elements, ...newElements },
+        layerOrder: [...prev.elementRegistry.layerOrder, ...newIds],
+      },
+    }));
+  };
+
+  const pasteElements = <T extends SketchElementType>(params: SketchElement<T>[]) => {
+    const newElements = params.reduce((cur, param) => {
+      return { ...cur, [param.id]: FactorySketchElement.convertElement(param) };
     }, {});
     const newIds = params.map((param) => param.id);
     setElementRegistry((prev) => ({
@@ -184,6 +205,7 @@ export function useSketchElementRegistry(): {
     elementRegistryAction: {
       createSingleElement,
       createElements,
+      pasteElements,
       deleteElements,
       moveElement,
       resizeElement,

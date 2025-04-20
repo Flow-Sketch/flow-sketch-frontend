@@ -8,7 +8,7 @@ export interface EllipseSketchElementParams extends BaseSketchElementParams<Elli
 
 export class EllipseSketchElement extends BaseSketchElement<EllipseType> {
   constructor(params: EllipseSketchElementParams) {
-    super({ ...params, points: null });
+    super({ ...params, initPoints: null });
   }
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();

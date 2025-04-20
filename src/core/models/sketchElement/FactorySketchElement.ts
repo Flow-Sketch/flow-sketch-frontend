@@ -50,11 +50,11 @@ export class FactorySketchElement {
   static convertElement<T extends SketchElementType>(param: SketchElement<T>) {
     switch (param.type) {
       case 'ellipse':
-        return Object.assign(new EllipseSketchElement(param), param);
+        return Object.assign(new EllipseSketchElement({ ...param, initPoints: null }), param);
       case 'rect':
-        return Object.assign(new RectSketchElement(param), param);
+        return Object.assign(new RectSketchElement({ ...param, initPoints: null }), param);
       case 'line':
-        return Object.assign(new LineSketchElement(param), param);
+        return Object.assign(new LineSketchElement({ ...param, initPoints: [] }), param);
       default:
         throw new Error('잘못된 sketchElement type');
     }

@@ -1,6 +1,8 @@
-import { Point } from '@/shared/utils/collidingDetection';
 import { SketchElementStyle } from './SketchElementStyle.ts';
 import { SketchElementType } from '@/core/models/sketchElement/FactorySketchElement.ts';
+import { ElementPoint } from '@/core/models/sketchElement/LineSketchElement.ts';
+import { Point } from '@/shared/utils/collidingDetection';
+import { nanoid } from 'nanoid';
 
 interface DefaultElementStyle extends SketchElementStyle {
   borderWidth: number;
@@ -17,7 +19,7 @@ export interface BaseSketchElementParams<T extends SketchElementType> {
   y: number; // 객체의 중심점 Y
   elementStyle?: SketchElementStyle;
   rotation?: number; // 단위 : 라디안(360도 === 2 * PI)
-  points: Point[] | null;
+  initPoints: Point[] | null;
 }
 
 export abstract class BaseSketchElement<T extends SketchElementType> {
@@ -30,7 +32,8 @@ export abstract class BaseSketchElement<T extends SketchElementType> {
   elementStyle: DefaultElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   isEditable: boolean; //
-  points: Point[] | null;
+  points: Record<string, ElementPoint> | null;
+  pointIds: string[] | null;
 
   constructor(params: BaseSketchElementParams<T>) {
     this.id = params.id;
@@ -45,9 +48,30 @@ export abstract class BaseSketchElement<T extends SketchElementType> {
       background: params.elementStyle?.background ? params.elementStyle.background : 'transparent',
       ...params.elementStyle,
     };
-    this.points = params.points;
     this.rotation = params.rotation ? params.rotation : 0;
     this.isEditable = false;
+    this.pointIds = null;
+    this.points = null;
+
+    if (params.initPoints) {
+      const { convertIds, convertPoint } = this._convertLinePoint(params.initPoints);
+      this.points = convertPoint;
+      this.pointIds = convertIds;
+    }
+  }
+
+  _convertLinePoint(points: Point[]) {
+    const convertIds: string[] = [];
+    const convertPoint: Record<string, ElementPoint> = {};
+    points.forEach((point) => {
+      const pointId = nanoid();
+      convertIds.push(pointId);
+      convertPoint[pointId] = { ...point, id: pointId };
+    });
+    return {
+      convertIds,
+      convertPoint,
+    };
   }
 
   // 모든 객체가 공통적으로 가지는 메서드
@@ -57,6 +81,20 @@ export abstract class BaseSketchElement<T extends SketchElementType> {
   move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
+
+    if (this.points && this.pointIds) {
+      const updatePoint = this.pointIds.reduce(
+        (acc, id) => {
+          if (this.points && this.points[id]) {
+            const updatePoint = { ...this.points[id], x: this.points[id].x + dx, y: this.points[id].y + dy };
+            return { ...acc, [id]: updatePoint };
+          }
+          return acc;
+        },
+        {} as Record<string, ElementPoint>,
+      );
+      this.points = updatePoint;
+    }
   }
 
   /**

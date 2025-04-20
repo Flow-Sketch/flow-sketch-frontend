@@ -75,7 +75,7 @@ export function useCreateShapeManager(
       height: convertHeight,
       x: convertOffsetX + convertWidth / 2,
       y: convertOffsetY + convertHeight / 2,
-      points: null,
+      initPoints: null,
     });
 
     handleCancelElementCreation();
