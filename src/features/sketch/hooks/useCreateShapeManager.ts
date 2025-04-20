@@ -53,7 +53,6 @@ export function useCreateShapeManager(
 
   const handleUpdateElementSize = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isDrawing || !startPoint) return;
-
     setEndPosition({
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
@@ -79,16 +78,14 @@ export function useCreateShapeManager(
       points: null,
     });
 
+    handleCancelElementCreation();
+  };
+
+  const handleCancelElementCreation = () => {
     setShapeType([null]);
     setIsDrawing(false);
     setStartPosition(null);
     setEndPosition(null);
-  };
-
-  const handleCancelElementCreation = () => {
-    setStartPosition(null);
-    setEndPosition(null);
-    setShapeType([null]);
   };
 
   return {

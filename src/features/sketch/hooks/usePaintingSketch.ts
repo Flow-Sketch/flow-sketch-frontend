@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { colorToken } from '@/shared/styles/color';
-import { SelectManagerState, ViewManagerState, CreateElementManagerState } from '@/features/sketch/hooks/index.ts';
+import { SelectManagerState, ViewManagerState, CreateElementManagerState, CreateLineManagerState } from '@/features/sketch/hooks/index.ts';
 import { ElementRegistry } from '@/core/models/sketchFile';
 
 /**
@@ -25,9 +25,10 @@ export function usePaintingSketch(
     viewState: ViewManagerState;
     selectState: SelectManagerState;
     createState: CreateElementManagerState;
+    createLineState: CreateLineManagerState;
   },
 ) {
-  const { elementRegistry, viewState, selectState, createState } = state;
+  const { elementRegistry, viewState, selectState, createState, createLineState } = state;
   useEffect(() => {
     const { elements, layerOrder } = elementRegistry;
     const canvas = canvasRef.current;
@@ -116,6 +117,25 @@ export function usePaintingSketch(
     // 도형(객체) 생성 가이드박스
     if (createState.guideBox.startPoint && createState.guideBox.endPoint) {
       const { startPoint, endPoint } = createState.guideBox;
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = colorToken['focusColor'];
+      ctx.fillStyle = 'transparent';
+
+      ctx.beginPath();
+      ctx.rect(
+        Math.min(startPoint.x, endPoint.x),
+        Math.min(startPoint.y, endPoint.y),
+        Math.abs(startPoint.x - endPoint.x),
+        Math.abs(startPoint.y - endPoint.y),
+      );
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // 선(객체) 생성 가이드박스
+    if (createLineState.dragElement.startPoint && createLineState.dragElement.endPoint) {
+      const { startPoint, endPoint } = createLineState.dragElement;
 
       ctx.lineWidth = 2;
       ctx.strokeStyle = colorToken['focusColor'];

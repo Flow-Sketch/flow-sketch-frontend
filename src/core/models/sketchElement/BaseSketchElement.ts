@@ -13,8 +13,8 @@ export interface BaseSketchElementParams<T extends SketchElementType> {
   type: T;
   width: number;
   height: number;
-  x: number;
-  y: number;
+  x: number; // 객체의 중심점 X
+  y: number; // 객체의 중심점 Y
   elementStyle?: SketchElementStyle;
   rotation?: number; // 단위 : 라디안(360도 === 2 * PI)
   points: Point[] | null;

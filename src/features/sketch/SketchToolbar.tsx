@@ -3,13 +3,22 @@ import { ROUTE_PATH } from '@/app/route';
 import { useNavigate } from 'react-router-dom';
 import { colorToken } from '@/shared/styles/color';
 import { MoreVertical, Undo2 } from 'lucide-react';
-import { TbPointerFilled, TbHandStop, TbRectangle, TbCircle, TbArrowGuideFilled, TbTriangleSquareCircle, TbTextSize } from 'react-icons/tb';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/components/ui/dropdown-menu.tsx';
 import { IconButton, IconButtonGroup } from '@/shared/components/IconButton.tsx';
 import { SubRemote, SubRemoteGroup } from '@/shared/components/SubRemote.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useRemoteManager } from './hooks/useRemoteManager';
 import { RemoteMode, ShapeType } from 'src/core/stores';
+import {
+  TbPointerFilled,
+  TbHandStop,
+  TbRectangle,
+  TbCircle,
+  TbArrowGuideFilled,
+  TbTriangleSquareCircle,
+  TbTextSize,
+  TbLine,
+} from 'react-icons/tb';
 
 export const SketchToolbar = () => {
   const navigate = useNavigate();
@@ -50,7 +59,11 @@ export const SketchToolbar = () => {
           </IconButtonGroup>
         </SubRemote>
         <SubRemote remoteName={'line'} triggerComponent={<TbArrowGuideFilled size={24} />}>
-          <span>추후 추가예정</span>
+          <IconButtonGroup isBorder={false} variant={'singleCheck'} value={remoteState.shapeType} onChange={handleElementCreate}>
+            <IconButton value={'line'}>
+              <TbLine size={20} />
+            </IconButton>
+          </IconButtonGroup>
         </SubRemote>
         <SubRemote remoteName={'Text'} triggerComponent={<TbTextSize size={24} />}>
           <span>추후 추가예정</span>

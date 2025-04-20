@@ -12,7 +12,9 @@ import {
   ClipboardManagerAction,
   useSelectElementManager,
   useRemoteManager,
+  CreateLineManagerAction,
 } from '@/features/sketch/hooks/index.ts';
+import { isLineType, isShapeType } from '@/features/sketch/utils';
 
 /**
  * ### EditMode
@@ -37,6 +39,7 @@ export function useSketchActionHandler(action: {
   viewAction: ViewManagerAction;
   selectAction: SelectManagerAction;
   createAction: CreateElementManagerAction;
+  createLineAction: CreateLineManagerAction;
   deleteAction: DeleteManagerAction;
   moveAction: MoveManagerAction;
   resizeAction: ResizeManagerAction;
@@ -47,7 +50,7 @@ export function useSketchActionHandler(action: {
   const [editMode, setEditMode] = useState<EditMode>('idle');
   const [tempStartPoint, setTempStartPoint] = useState<null | Point>(null); // 마우스 down 시 잘못클릭한 것인지 파악하기 위한 용도
 
-  const { viewAction, selectAction, createAction, deleteAction, moveAction, resizeAction, clipboardAction } = action;
+  const { viewAction, selectAction, createAction, createLineAction, deleteAction, moveAction, resizeAction, clipboardAction } = action;
   const { shapeType, remoteMode } = remoteState;
 
   const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
@@ -58,7 +61,10 @@ export function useSketchActionHandler(action: {
     if (!event) return;
     if (remoteMode === 'view') return viewAction.handleStartViewAlignment(event);
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleStartElementCreation(event);
+      if (shapeType) {
+        if (isLineType(shapeType)) return createLineAction.handleStartLineCreation(event);
+        if (isShapeType(shapeType)) return createAction.handleStartElementCreation(event);
+      }
       const point = {
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
@@ -84,7 +90,10 @@ export function useSketchActionHandler(action: {
     if (!event || event.buttons !== 1) return;
     if (remoteMode === 'view') return viewAction.handleUpdateViewOffset(event);
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleUpdateElementSize(event);
+      if (shapeType) {
+        if (isShapeType(shapeType)) return createAction.handleUpdateElementSize(event);
+        if (isLineType(shapeType)) return createLineAction.handleUpdateLineEndPosition(event);
+      }
       if (!tempStartPoint) return;
 
       const distanceToTempPoint = vectorLength({
@@ -108,7 +117,10 @@ export function useSketchActionHandler(action: {
     if (!event) return;
     if (remoteMode === 'view') return viewAction.handleResetViewAlignment();
     if (remoteMode === 'edit') {
-      if (shapeType) return createAction.handleFinalizeElementCreation();
+      if (shapeType) {
+        if (isLineType(shapeType)) return createLineAction.handleFinalizeLineCreation();
+        if (isShapeType(shapeType)) return createAction.handleFinalizeElementCreation();
+      }
       if (editMode === 'select') {
         selectAction.handleFinalizeMultiSelect();
       }

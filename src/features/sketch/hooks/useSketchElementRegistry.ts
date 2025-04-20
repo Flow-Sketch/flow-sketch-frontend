@@ -41,6 +41,8 @@ export function useSketchElementRegistry(): {
   const elementRegistry = useSketchElementRegistryStore((store) => store.elementRegistry);
   const setElementRegistry = useSketchElementRegistryStore.setState;
 
+  // console.log(elementRegistry.elements);
+
   /** A. 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당 **/
   useEffect(() => {
     if (!canvasId) return;
