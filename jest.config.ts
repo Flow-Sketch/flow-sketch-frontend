@@ -8,7 +8,6 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleDirectories: ['node_modules', 'src'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
-  transformIgnorePatterns: ['<rootDir>/node_modules/(?!nanoid)'],
   moduleNameMapper: {
     '@/(.*)$': '<rootDir>/src/$1',
     '^.+\\.svg$': 'jest-svg-transformer',
