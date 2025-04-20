@@ -6,6 +6,7 @@ import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
 import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
 import {
   FactorySketchElement,
+  LineSketchElement,
   SketchElement,
   SketchElementParams,
   SketchElementStyle,
@@ -19,6 +20,12 @@ interface ResizeParams {
   pointDirection: ('right' | 'left' | 'top' | 'bottom')[];
 }
 
+interface PointParams {
+  dx: number;
+  dy: number;
+  pointDirection: 'point-start' | 'point-end';
+}
+
 interface MoveParams {
   moveX: number;
   moveY: number;
@@ -27,8 +34,9 @@ interface MoveParams {
 export interface ElementRegistryAction {
   createElements: <T extends SketchElementType>(params: SketchElementParams<T>[]) => void;
   pasteElements: <T extends SketchElementType>(params: SketchElement<T>[]) => void;
-  createSingleElement: <T extends SketchElementType>(params: SketchElementParams<T>) => void;
   deleteElements: (ids: string[]) => void;
+  createSingleElement: <T extends SketchElementType>(params: SketchElementParams<T>) => void;
+  moveLinePoint: (id: string, transformParam: PointParams) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
   updateStyleElement: (id: string, transformParam: SketchElementStyle) => void;
@@ -168,6 +176,22 @@ export function useSketchElementRegistry(): {
     }));
   };
 
+  const moveLinePoint = (id: string, params: PointParams) => {
+    const updateElement = elementRegistry.elements[id];
+    const updateElements = { ...elementRegistry.elements };
+    if (updateElement instanceof LineSketchElement) {
+      updateElement.changePoint(params.dx, params.dy, params.pointDirection);
+      updateElements[id] = updateElement;
+    }
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: updateElements,
+        layerOrder: prev.elementRegistry.layerOrder,
+      },
+    }));
+  };
+
   const resizeElement = (id: string, params: ResizeParams) => {
     const updateElement = elementRegistry.elements[id];
     const updateElements = { ...elementRegistry.elements };
@@ -210,6 +234,7 @@ export function useSketchElementRegistry(): {
       moveElement,
       resizeElement,
       updateStyleElement,
+      moveLinePoint,
     },
   };
 }

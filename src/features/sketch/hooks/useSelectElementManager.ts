@@ -3,16 +3,18 @@ import { useEffect, useState } from 'react';
 import { isOBBColliding, isPointInOBB, Point } from '@/shared/utils/collidingDetection';
 import { BoundingBox, getBoundingBox } from '@/shared/utils/boundingBox';
 import { useSketchElementRegistryStore, useSketchCameraViewStore, ViewState } from 'src/core/stores';
-import { convertSelectBoxList } from '@/features/sketch/utils';
+import { convertSelectBoxList, isLineType, convertSelectLine, BoundingLine } from '@/features/sketch/utils';
 import { SketchElement } from '@/core/models/sketchElement';
 import { ElementRegistry, SelectElementRegistry } from '@/core/models/sketchFile';
+import { LineType } from '@/core/models/sketchElement/LineSketchElement.ts';
 
 export type SelectManagerState = {
   dragBox: {
     startPoint: { x: number; y: number } | null;
     endPoint: { x: number; y: number } | null;
   };
-  boundingBox: BoundingBox;
+  boundingBox: BoundingBox | null;
+  boundingLine: BoundingLine | null;
   selectElements: string[];
 };
 
@@ -23,17 +25,6 @@ export type SelectManagerAction = {
   handleSingleSelect: (event: React.MouseEvent<HTMLCanvasElement>) => void;
   handleClearSelection: () => void;
   handleManualSelectIds: (selectKeys: string[]) => void;
-};
-
-const INIT_BOUNDINGBOX = {
-  minX: 0,
-  maxX: 0,
-  minY: 0,
-  maxY: 0,
-  cx: 0,
-  cy: 0,
-  width: 0,
-  height: 0,
 };
 
 /**
@@ -66,15 +57,29 @@ export function useSelectElementManager(): {
   const userSelectState = store.selectElements[userId];
 
   // 선택된 elements 들의 bounding box 를 그리기
-  const [boundingBox, setBoundingBox] = useState<BoundingBox>(INIT_BOUNDINGBOX);
+  const [boundingBox, setBoundingBox] = useState<BoundingBox | null>(null);
+  const [boundingLine, setBoundingLine] = useState<BoundingLine | null>(null);
 
   /** offset 을 변경, scale 변경, 요소 변경 시 선택된 사각형의 표시가 View 에 그대로 표시되게 하기 위함 */
   useEffect(() => {
     const selectElementIds = userSelectState.selectElementIds;
 
     if (selectElementIds.length === 0) {
-      setBoundingBox(() => INIT_BOUNDINGBOX);
+      setBoundingBox(() => null);
+      setBoundingLine(() => null);
       return;
+    }
+
+    if (selectElementIds.length === 1) {
+      const singleSelectElement = store.elementRegistry.elements[selectElementIds[0]];
+      if (isLineType(singleSelectElement.type)) {
+        const LineElement = singleSelectElement as SketchElement<LineType>;
+        const convertLine = convertSelectLine(LineElement, viewState);
+        if (!convertLine) return;
+        setBoundingBox(() => null);
+        setBoundingLine(convertLine);
+        return;
+      }
     }
 
     const elementList = selectElementIds.reduce((cur, elementId) => {
@@ -83,11 +88,10 @@ export function useSelectElementManager(): {
       return cur;
     }, [] as SketchElement[]);
 
-    const selectBoxList = convertSelectBoxList(elementList, viewState);
-
+    setBoundingLine(() => null); // 단일선택을 벗어나면 boundingLine 은 초기화
     setBoundingBox(() =>
       getBoundingBox(
-        selectBoxList.map((item) => ({
+        convertSelectBoxList(elementList, viewState).map((item) => ({
           cx: item.viewX,
           cy: item.viewY,
           width: item.width,
@@ -236,6 +240,7 @@ export function useSelectElementManager(): {
       dragBox: userSelectState.dragBox,
       selectElements: userSelectState.selectElementIds,
       boundingBox,
+      boundingLine,
     },
   };
 }

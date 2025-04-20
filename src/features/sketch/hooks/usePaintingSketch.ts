@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { colorToken } from '@/shared/styles/color';
-import { SelectManagerState, ViewManagerState, CreateElementManagerState, CreateLineManagerState } from '@/features/sketch/hooks/index.ts';
 import { ElementRegistry } from '@/core/models/sketchFile';
+import { SelectManagerState, ViewManagerState, CreateElementManagerState, CreateLineManagerState } from '@/features/sketch/hooks/index.ts';
 
 /**
  * ### usePaintingSketch()
@@ -54,44 +54,67 @@ export function usePaintingSketch(
     ctx.restore();
 
     if (selectState.selectElements.length > 0) {
-      if (!selectState.boundingBox) return;
-
-      const { cx, cy, width, height } = selectState.boundingBox;
-
-      ctx.save();
       const resizeAnchorWidth = 8; // 앵커의 길이
       const resizeAnchorRadius = 2; // 모서리 반경 설정
-      const resizeAnchorPosition = [
-        { x: cx - width / 2, y: cy - height / 2 }, // 왼쪽 상단
-        { x: cx - width / 2, y: cy + height / 2 }, // 왼쪽 하단
-        { x: cx + width / 2, y: cy - height / 2 }, // 오른쪽 상단
-        { x: cx + width / 2, y: cy + height / 2 }, // 오른쪽 하단
-      ];
 
-      // 스타일 적용
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = colorToken['focusColor'];
-      ctx.fillStyle = 'transparent';
+      if (selectState.boundingBox) {
+        const { cx, cy, width, height } = selectState.boundingBox;
 
-      // 사각형 그리기
-      ctx.beginPath(); // 다른 도형들과 분리되어 독립적으로 처리
-      ctx.rect(cx - width / 2, cy - height / 2, width, height);
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
+        ctx.save();
+        const resizeAnchorPosition = [
+          { x: cx - width / 2, y: cy - height / 2 }, // 왼쪽 상단
+          { x: cx - width / 2, y: cy + height / 2 }, // 왼쪽 하단
+          { x: cx + width / 2, y: cy - height / 2 }, // 오른쪽 상단
+          { x: cx + width / 2, y: cy + height / 2 }, // 오른쪽 하단
+        ];
 
-      // 앵커 사각형 그리기
-      for (const anchorPosition of resizeAnchorPosition) {
-        const { x, y } = anchorPosition;
-        ctx.lineWidth = 3;
+        // 스타일 적용
+        ctx.lineWidth = 2;
         ctx.strokeStyle = colorToken['focusColor'];
-        ctx.fillStyle = colorToken['white'];
+        ctx.fillStyle = 'transparent';
 
-        ctx.beginPath();
-        ctx.roundRect(x - resizeAnchorWidth / 2, y - resizeAnchorWidth / 2, resizeAnchorWidth, resizeAnchorWidth, resizeAnchorRadius);
-        ctx.stroke();
+        // 사각형 그리기
+        ctx.beginPath(); // 다른 도형들과 분리되어 독립적으로 처리
+        ctx.rect(cx - width / 2, cy - height / 2, width, height);
         ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+
+        // 앵커 사각형 그리기
+        for (const anchorPosition of resizeAnchorPosition) {
+          const { x, y } = anchorPosition;
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = colorToken['focusColor'];
+          ctx.fillStyle = colorToken['white'];
+
+          ctx.beginPath();
+          ctx.roundRect(x - resizeAnchorWidth / 2, y - resizeAnchorWidth / 2, resizeAnchorWidth, resizeAnchorWidth, resizeAnchorRadius);
+          ctx.stroke();
+          ctx.fill();
+        }
       }
+
+      // boundingLine 그리기
+      if (selectState.boundingLine) {
+        const boundingLineValue = [selectState.boundingLine.startPoint, selectState.boundingLine.endPoint];
+
+        for (const point of boundingLineValue) {
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = colorToken['focusColor'];
+          ctx.fillStyle = colorToken['white'];
+          ctx.beginPath();
+          ctx.roundRect(
+            point.x - resizeAnchorWidth / 2,
+            point.y - resizeAnchorWidth / 2,
+            resizeAnchorWidth,
+            resizeAnchorWidth,
+            resizeAnchorRadius,
+          );
+          ctx.stroke();
+          ctx.fill();
+        }
+      }
+
       ctx.restore();
     }
 

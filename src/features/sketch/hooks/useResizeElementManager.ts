@@ -5,9 +5,21 @@ import { SelectManagerState, ElementRegistryAction } from '@/features/sketch/hoo
 import { useSketchCameraViewStore } from 'src/core/stores';
 import { isPointInOBB } from '@/shared/utils/collidingDetection';
 import { BoundingBox } from '@/shared/utils/boundingBox';
+import { BoundingLine } from '@/features/sketch/utils';
 
 // 리사이즈 핸들 위치 타입 정의
-export type ResizeHandlePosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' | 'right' | 'bottom' | 'left' | null;
+export type ResizeHandlePosition =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'top'
+  | 'right'
+  | 'bottom'
+  | 'left'
+  | 'point-start'
+  | 'point-end'
+  | null;
 
 export type ResizeManagerAction = {
   handleStartElementResize: (event: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -34,38 +46,38 @@ export function useResizeElementManager(
   resizeAction: ResizeManagerAction;
 } {
   const viewState = useSketchCameraViewStore();
-
-  const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [isResizing, setIsResizing] = useState<boolean>(false); // 현재 드래그 중인지 여부
+  const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null); // 리사이즈 시작 위치
   const [activeHandle, setActiveHandle] = useState<ResizeHandlePosition>(null); // 현재 드래그 중인 핸들 위치
-  const [initialBoundingBox, setInitialBoundingBox] = useState<{
-    cx: number;
-    cy: number;
-    width: number;
-    height: number;
-  } | null>(null); // 리사이즈 시작 시 바운딩 박스 초기 크기
 
   /**
    * 마우스 다운 이벤트 핸들러
    * 리사이즈 시작 위치와 활성 핸들을 설정
    */
   const handleStartElementResize = (event: MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !selectState.boundingBox) return;
-
+    // 선택된 요소가 없으면 리턴
+    if (!event || selectState.selectElements.length === 0) return;
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
 
-    // 선택된 요소가 없으면 리턴
-    if (selectState.selectElements.length === 0) return;
+    if (selectState.boundingBox) {
+      const handlePosition = getResizeHandleAtPosition(currentX, currentY, selectState.boundingBox);
+      if (handlePosition) {
+        setActiveHandle(handlePosition);
+        setStartPoint({ x: currentX, y: currentY });
+        setIsResizing(true);
+      }
+      return;
+    }
 
-    // 마우스 위치가 어떤 핸들 위에 있는지 확인
-    const handlePosition = getResizeHandleAtPosition(currentX, currentY, selectState.boundingBox);
-
-    if (handlePosition) {
-      setActiveHandle(handlePosition);
-      setStartPoint({ x: currentX, y: currentY });
-      setInitialBoundingBox({ ...selectState.boundingBox });
-      setIsResizing(true);
+    if (selectState.boundingLine) {
+      const handlePosition = getChangePointAtHandlePosition(currentX, currentY, selectState.boundingLine);
+      if (handlePosition) {
+        setActiveHandle(handlePosition);
+        setStartPoint({ x: currentX, y: currentY });
+        setIsResizing(true);
+      }
+      return;
     }
   };
 
@@ -74,7 +86,7 @@ export function useResizeElementManager(
    * 활성 핸들에 따라 요소 크기 조절
    */
   const handleUpdateElementSize = (event: MouseEvent<HTMLCanvasElement>) => {
-    if (!event || !isResizing || !startPoint || !initialBoundingBox || !activeHandle) return;
+    if (!event || !isResizing || !startPoint || !activeHandle) return;
 
     const currentX = event.nativeEvent.offsetX;
     const currentY = event.nativeEvent.offsetY;
@@ -83,12 +95,25 @@ export function useResizeElementManager(
     const deltaX = (currentX - startPoint.x) / viewState.scale;
     const deltaY = (currentY - startPoint.y) / viewState.scale;
 
-    // 선택된 모든 요소에 대해 크기 조절 적용
-    for (const selectKey of selectState.selectElements) {
-      elementRegistryAction.resizeElement(selectKey, {
-        resizeX: deltaX,
-        resizeY: deltaY,
-        pointDirection: activeHandle.split('-') as ('top' | 'right' | 'bottom' | 'left')[],
+    // 선택된 요소들을 변경
+    if (selectState.boundingBox) {
+      // 선택된 모든 요소에 대해 크기 조절 적용
+      for (const selectKey of selectState.selectElements) {
+        elementRegistryAction.resizeElement(selectKey, {
+          resizeX: deltaX,
+          resizeY: deltaY,
+          pointDirection: activeHandle.split('-') as ('top' | 'right' | 'bottom' | 'left')[],
+        });
+      }
+    }
+
+    // 선의 점을 변경
+    if ((selectState.boundingLine && activeHandle === 'point-start') || activeHandle === 'point-end') {
+      const selectLineId = selectState.selectElements[0];
+      elementRegistryAction.moveLinePoint(selectLineId, {
+        dx: deltaX,
+        dy: deltaY,
+        pointDirection: activeHandle,
       });
     }
 
@@ -104,7 +129,6 @@ export function useResizeElementManager(
 
     setIsResizing(false);
     setStartPoint(null);
-    setInitialBoundingBox(null);
     setActiveHandle(null);
   };
 
@@ -181,6 +205,26 @@ function getResizeHandleAtPosition(mouseX: number, mouseY: number, boundingBox: 
     { x: mouseX, y: mouseY },
   );
   if (left) return 'left';
+
+  return null;
+}
+
+function getChangePointAtHandlePosition(mouseX: number, mouseY: number, boundingLine: BoundingLine) {
+  const { startPoint, endPoint } = boundingLine;
+  const cornerSize = TRANSFORM_CONTROL_CORNER_WIDTH;
+
+  // 모서리 핸들 (코너)
+  const startHandle = isPointInOBB(
+    { cx: startPoint.x, cy: startPoint.y, width: cornerSize, height: cornerSize, rotation: 0 },
+    { x: mouseX, y: mouseY },
+  );
+  if (startHandle) return 'point-start';
+
+  const endHandle = isPointInOBB(
+    { cx: endPoint.x, cy: endPoint.y, width: cornerSize, height: cornerSize, rotation: 0 },
+    { x: mouseX, y: mouseY },
+  );
+  if (endHandle) return 'point-end';
 
   return null;
 }
