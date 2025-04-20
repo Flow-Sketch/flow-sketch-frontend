@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ShapeType, useSketchRemoteStore, useSketchCameraViewStore } from 'src/core/stores';
 import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { RemoteManagerAction } from '@/features/sketch/hooks/useRemoteManager.ts';
+import { isShapeType } from '@/features/sketch/utils';
 
 export type CreateElementManagerState = {
   guideBox: {
@@ -60,7 +61,8 @@ export function useCreateShapeManager(
   };
 
   const handleFinalizeElementCreation = () => {
-    if (!isDrawing || !startPoint || !endPoint || !shapeType) return;
+    if (!isDrawing || !startPoint || !endPoint) return;
+    if (!isShapeType(shapeType)) return;
 
     const convertWidth = Math.abs(endPoint.x - startPoint.x) / viewState.scale;
     const convertHeight = Math.abs(endPoint.y - startPoint.y) / viewState.scale;
