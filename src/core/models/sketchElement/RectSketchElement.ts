@@ -9,7 +9,7 @@ export interface RectSketchElementParams extends BaseSketchElementParams<RectTyp
 
 export class RectSketchElement extends BaseSketchElement<RectType> {
   constructor(params: RectSketchElementParams) {
-    super({ ...params, points: null });
+    super({ ...params, initPoints: null });
   }
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
@@ -30,12 +30,6 @@ export class RectSketchElement extends BaseSketchElement<RectType> {
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-
-    // 글자 작성
-    ctx.font = '80px';
-    ctx.fillStyle = 'black';
-    ctx.fillText(`x : ${this.x}, y : ${this.y}`, this.x, this.y);
-    ctx.fillText(`x : ${this.width}, y : ${this.height}`, this.x, this.y + 20);
   }
 }
 

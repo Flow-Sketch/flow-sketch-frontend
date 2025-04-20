@@ -16,6 +16,9 @@ export type { SelectManagerState, SelectManagerAction } from './useSelectElement
 export { useCreateShapeManager } from './useCreateShapeManager.ts';
 export type { CreateElementManagerState, CreateElementManagerAction } from './useCreateShapeManager.ts';
 
+export { useCreateLineManager } from './useCreateLineManager.ts';
+export type { CreateLineManagerState, CreateLineManagerAction } from './useCreateLineManager.ts';
+
 export { useDeleteElementManager } from './useDeleteElementManager.ts';
 export type { DeleteManagerState, DeleteManagerAction } from './useDeleteElementManager.ts';
 

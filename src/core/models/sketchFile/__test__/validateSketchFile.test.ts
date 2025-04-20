@@ -1,7 +1,14 @@
-import { expect, describe, it } from '@jest/globals';
+import { expect, describe, it, jest } from '@jest/globals';
 import { isValidCanvasRegistryState } from '../validateSketchFile.ts';
 import { RectSketchElement } from '@/core/models/sketchElement';
 import { CanvasRegistryState } from '@/core/models/sketchFile';
+
+// nanoid 를 import 하지 못해서 우회
+jest.mock('nanoid', () => {
+  return {
+    nanoid: () => Math.random().toString(),
+  };
+});
 
 describe('validateAndParseCanvasRegistry', () => {
   // 유효한 캔버스 레지스트리 데이터 모킹
@@ -70,7 +77,7 @@ describe('validateAndParseCanvasRegistry', () => {
               y: 0,
               width: 100,
               height: 100,
-              points: null,
+              initPoints: null,
             }),
           },
           layerOrder: ['element-1'],

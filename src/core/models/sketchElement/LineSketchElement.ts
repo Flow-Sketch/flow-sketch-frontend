@@ -3,8 +3,10 @@ import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketch
 
 export type LineType = 'line';
 
-export interface LineSketchElementParams extends Omit<BaseSketchElementParams<LineType>, 'points'> {
-  points: Point[];
+export type ElementPoint = Point & { id: string };
+
+export interface LineSketchElementParams extends Omit<BaseSketchElementParams<LineType>, 'initPoints'> {
+  initPoints: Point[];
   type: LineType;
 }
 
@@ -13,11 +15,15 @@ export interface LineSketchElementParams extends Omit<BaseSketchElementParams<Li
  * > LineElement 는 무조건 points 로 시작해야 함
  */
 export class LineSketchElement extends BaseSketchElement<LineType> {
-  points: Point[]; // points 네로잉
+  points: Record<string, ElementPoint>; // points 네로잉
+  pointIds: string[];
 
   constructor(props: LineSketchElementParams) {
     super(props);
-    this.points = props.points;
+
+    const { convertIds, convertPoint } = this._convertLinePoint(props.initPoints);
+    this.points = convertPoint;
+    this.pointIds = convertIds;
   }
   draw(ctx: CanvasRenderingContext2D) {
     if (!this.points) return;
@@ -35,11 +41,21 @@ export class LineSketchElement extends BaseSketchElement<LineType> {
 
     // Line 그리기
     ctx.beginPath();
-    this.points.forEach((linePoint, id) => {
+    this.pointIds.forEach((pointId, id) => {
+      const linePoint = this.points[pointId];
       if (id === 0) return ctx.lineTo(linePoint.x, linePoint.y);
       ctx.lineTo(linePoint.x, linePoint.y);
     });
     ctx.stroke();
     ctx.restore();
+  }
+
+  /**
+   * @remarks
+   * - Shape(도형)과는 다른 `resize` 메소드 필요
+   * - `BaseSketchElement` 의 `resize` 메소드 오버라이딩
+   */
+  resize(dx: number, dy: number, directions: ('top' | 'right' | 'bottom' | 'left')[]) {
+    console.log(dx, dy, directions);
   }
 }
