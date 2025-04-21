@@ -1,5 +1,6 @@
 import { Point } from '@/shared/utils/collidingDetection';
 import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketchElement/BaseSketchElement.ts';
+import { getArrayFirst, getArrayLast } from '@/shared/utils/common';
 
 export type LineType = 'line';
 
@@ -20,7 +21,6 @@ export class LineSketchElement extends BaseSketchElement<LineType> {
 
   constructor(props: LineSketchElementParams) {
     super(props);
-
     const { convertIds, convertPoint } = this._convertLinePoint(props.initPoints);
     this.points = convertPoint;
     this.pointIds = convertIds;
@@ -48,6 +48,49 @@ export class LineSketchElement extends BaseSketchElement<LineType> {
     });
     ctx.stroke();
     ctx.restore();
+  }
+
+  changePoint(dx: number, dy: number, directions: 'point-start' | 'point-end') {
+    const startPointId = getArrayFirst(this.pointIds);
+    const endPointId = getArrayLast(this.pointIds);
+
+    if (!startPointId || !endPointId) {
+      throw new Error('changePoint Error');
+    }
+
+    const startPoint = this.points[startPointId];
+    const endPoint = this.points[endPointId];
+
+    // 포인트 위치 업데이트
+    if (directions === 'point-start') {
+      this.points[startPointId] = {
+        ...startPoint,
+        x: startPoint.x + dx,
+        y: startPoint.y + dy,
+      };
+    } else {
+      this.points[endPointId] = {
+        ...endPoint,
+        x: endPoint.x + dx,
+        y: endPoint.y + dy,
+      };
+    }
+
+    // 업데이트된 포인트 가져오기
+    const updatedStartPoint = this.points[startPointId];
+    const updatedEndPoint = this.points[endPointId];
+
+    // 엘리먼트 크기 및 위치 계산
+    const minX = Math.min(updatedStartPoint.x, updatedEndPoint.x);
+    const maxX = Math.max(updatedStartPoint.x, updatedEndPoint.x);
+    const minY = Math.min(updatedStartPoint.y, updatedEndPoint.y);
+    const maxY = Math.max(updatedStartPoint.y, updatedEndPoint.y);
+
+    // 엘리먼트 속성 업데이트
+    this.width = maxX - minX;
+    this.height = maxY - minY;
+    this.x = minX + this.width / 2; // 중심점 X
+    this.y = minY + this.height / 2; // 중심점 Y
   }
 
   /**

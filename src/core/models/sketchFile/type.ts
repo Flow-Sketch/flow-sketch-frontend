@@ -1,9 +1,8 @@
-import { EllipseSketchElement, RectSketchElement } from '@/core/models/sketchElement';
-import { LineSketchElement } from '@/core/models/sketchElement/LineSketchElement.ts';
+import { SketchElement } from '@/core/models/sketchElement';
 
 export interface ElementRegistry {
   elements: {
-    [id: string]: EllipseSketchElement | RectSketchElement | LineSketchElement;
+    [id: string]: SketchElement;
   };
   layerOrder: string[];
 }

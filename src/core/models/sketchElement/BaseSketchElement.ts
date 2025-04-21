@@ -60,6 +60,9 @@ export abstract class BaseSketchElement<T extends SketchElementType> {
     }
   }
 
+  // 모든 객체가 공통적으로 가지는 메서드
+  abstract draw(ctx: CanvasRenderingContext2D): void;
+
   _convertLinePoint(points: Point[]) {
     const convertIds: string[] = [];
     const convertPoint: Record<string, ElementPoint> = {};
@@ -73,9 +76,6 @@ export abstract class BaseSketchElement<T extends SketchElementType> {
       convertPoint,
     };
   }
-
-  // 모든 객체가 공통적으로 가지는 메서드
-  abstract draw(ctx: CanvasRenderingContext2D): void;
 
   // 이동(드래그) 시 위치 변경
   move(dx: number, dy: number) {

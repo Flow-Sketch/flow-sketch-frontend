@@ -22,8 +22,10 @@ export const SketchContextMenu = ({ children, selectState, clipboardAction, dele
 
   const handleChangeMenu = useCallback(
     (event: any) => {
+      if (!selectState.boundingBox) return;
       const clientX = event.clientX;
       const clientY = event.clientY;
+
       if (isPointInAABB(selectState.boundingBox, { x: clientX, y: clientY })) {
         setMenuMode('selection');
       } else {

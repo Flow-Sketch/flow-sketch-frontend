@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TRANSFORM_CONTROL_CORNER_WIDTH } from '@/features/sketch/constants';
 import { Point, isPointInOBB, vectorLength } from '@/shared/utils/collidingDetection';
-import { BoundingBox } from '@/shared/utils/boundingBox';
 import {
   CreateElementManagerAction,
   DeleteManagerAction,
@@ -13,6 +12,7 @@ import {
   useSelectElementManager,
   useRemoteManager,
   CreateLineManagerAction,
+  SelectManagerState,
 } from '@/features/sketch/hooks/index.ts';
 import { isLineType, isShapeType } from '@/features/sketch/utils';
 
@@ -65,13 +65,13 @@ export function useSketchActionHandler(action: {
         if (isLineType(shapeType)) return createLineAction.handleStartLineCreation(event);
         if (isShapeType(shapeType)) return createAction.handleStartElementCreation(event);
       }
+
       const point = {
         x: event.nativeEvent.offsetX,
         y: event.nativeEvent.offsetY,
       };
       setTempStartPoint(point); // 초기마우스위치 저장
-      const { isInOuterBox, isInInnerBox } = checkBoundingBoxCollision(point, selectState.boundingBox);
-
+      const { isInOuterBox, isInInnerBox } = checkBoundingBoxCollision(point, selectState);
       if (isInOuterBox) {
         if (isInInnerBox) {
           setEditMode('moveReady');
@@ -199,25 +199,54 @@ export function useSketchActionHandler(action: {
  * // 실제 객체 영역(내부)에 있는 경우
  * isInOuterBox === true && isInInnerBox === true
  */
-function checkBoundingBoxCollision(point: Point, boundingBox: BoundingBox) {
-  const outerBox = {
-    cx: boundingBox.cx,
-    cy: boundingBox.cy,
-    width: boundingBox.width + TRANSFORM_CONTROL_CORNER_WIDTH,
-    height: boundingBox.height + TRANSFORM_CONTROL_CORNER_WIDTH,
-    rotation: 0,
-  };
+function checkBoundingBoxCollision(point: Point, selectState: SelectManagerState) {
+  if (selectState.boundingBox) {
+    const boundingBox = selectState.boundingBox;
+    const outerBox = {
+      cx: boundingBox.cx,
+      cy: boundingBox.cy,
+      width: boundingBox.width + TRANSFORM_CONTROL_CORNER_WIDTH,
+      height: boundingBox.height + TRANSFORM_CONTROL_CORNER_WIDTH,
+      rotation: 0,
+    };
+    const innerBox = {
+      cx: boundingBox.cx,
+      cy: boundingBox.cy,
+      width: boundingBox.width - TRANSFORM_CONTROL_CORNER_WIDTH,
+      height: boundingBox.height - TRANSFORM_CONTROL_CORNER_WIDTH,
+      rotation: 0,
+    };
 
-  const innerBox = {
-    cx: boundingBox.cx,
-    cy: boundingBox.cy,
-    width: boundingBox.width - TRANSFORM_CONTROL_CORNER_WIDTH,
-    height: boundingBox.height - TRANSFORM_CONTROL_CORNER_WIDTH,
-    rotation: 0,
-  };
+    return {
+      isInOuterBox: isPointInOBB(outerBox, point),
+      isInInnerBox: isPointInOBB(innerBox, point),
+    };
+  }
+  if (selectState.boundingLine) {
+    const boundingLine = selectState.boundingLine;
+    const outerBox = {
+      cx: boundingLine.cx,
+      cy: boundingLine.cy,
+      width: boundingLine.length + TRANSFORM_CONTROL_CORNER_WIDTH,
+      height: TRANSFORM_CONTROL_CORNER_WIDTH / 2,
+      rotation: boundingLine.rotation,
+    };
+    const innerBox = {
+      cx: boundingLine.cx,
+      cy: boundingLine.cy,
+      width: boundingLine.length - TRANSFORM_CONTROL_CORNER_WIDTH,
+      height: TRANSFORM_CONTROL_CORNER_WIDTH,
+      rotation: boundingLine.rotation,
+    };
+
+    return {
+      isInOuterBox: isPointInOBB(outerBox, point),
+      isInInnerBox: isPointInOBB(innerBox, point),
+    };
+  }
 
   return {
-    isInOuterBox: isPointInOBB(outerBox, point),
-    isInInnerBox: isPointInOBB(innerBox, point),
+    isInOuterBox: false,
+    isInInnerBox: false,
   };
 }
