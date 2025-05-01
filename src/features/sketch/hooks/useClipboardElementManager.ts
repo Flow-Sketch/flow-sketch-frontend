@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { SelectManagerAction } from '@/features/sketch/hooks/useSelectElementManager.ts';
+import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { useSketchCameraViewStore, useSketchElementRegistryStore } from '@/core/stores';
-import { BaseSketchElement } from '@/core/models/sketchElement';
+import { SketchElement } from '@/core/models/sketchElement';
 import { OnlyClassProperties } from '@/shared/utils/common';
 import { getBoundingBox } from '@/shared/utils/boundingBox';
 import { convertSelectBoxList } from '@/features/sketch/utils';
@@ -22,7 +22,7 @@ export function useClipboardElementManager(
   clipboardAction: ClipboardManagerAction;
 } {
   const userId = 'testUser';
-  const [clipboards, setClipboard] = useState<OnlyClassProperties<BaseSketchElement>[] | null>(null);
+  const [clipboards, setClipboard] = useState<OnlyClassProperties<SketchElement>[] | null>(null);
 
   const viewState = useSketchCameraViewStore();
   const allElements = useSketchElementRegistryStore((store) => store.elementRegistry);
@@ -38,7 +38,7 @@ export function useClipboardElementManager(
       } else {
         return current;
       }
-    }, [] as BaseSketchElement[]);
+    }, [] as SketchElement[]);
 
     setClipboard(selectElements);
   };
@@ -48,7 +48,7 @@ export function useClipboardElementManager(
 
     // 0. 새로운 id 를 생성
     const newElementIds: string[] = [];
-    const newElements: OnlyClassProperties<BaseSketchElement>[] = [];
+    const newElements: OnlyClassProperties<SketchElement>[] = [];
 
     for (const clip of clipboards) {
       const newId = uuidv4();
@@ -57,7 +57,7 @@ export function useClipboardElementManager(
     }
 
     // 1. 새로운 객체 생성
-    elementRegistryAction.createElements(newElements);
+    elementRegistryAction.pasteElements(newElements as SketchElement[]);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
     selectAction.handleManualSelectIds(newElementIds);
@@ -89,7 +89,7 @@ export function useClipboardElementManager(
 
     // 0. 새로운 id 를 생성
     const newElementIds: string[] = [];
-    const newElements: OnlyClassProperties<BaseSketchElement>[] = [];
+    const newElements: OnlyClassProperties<SketchElement>[] = [];
 
     for (const clip of clipboards) {
       const newId = uuidv4();
@@ -98,7 +98,7 @@ export function useClipboardElementManager(
     }
 
     // 1. 새로운 객체 생성
-    elementRegistryAction.createElements(newElements);
+    elementRegistryAction.pasteElements(newElements as SketchElement[]);
 
     // 2. 새롭게 생성된 객체의 id 를 업데이트 -> 복사/붙여넣기 시, 자동선택되게 함
     selectAction.handleManualSelectIds(newElementIds);
@@ -116,7 +116,7 @@ export function useClipboardElementManager(
       } else {
         return current;
       }
-    }, [] as BaseSketchElement[]);
+    }, [] as SketchElement[]);
 
     setClipboard(selectElements);
     elementRegistryAction.deleteElements(selectStateIds);

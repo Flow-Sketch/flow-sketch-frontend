@@ -2,28 +2,14 @@ import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketch
 
 export type RectType = 'rect';
 
-export interface RectSketchElementParams extends BaseSketchElementParams {
+export interface RectSketchElementParams extends BaseSketchElementParams<RectType> {
   type: RectType;
-  id: string;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
   rotation?: number;
 }
 
-export class RectSketchElement extends BaseSketchElement {
+export class RectSketchElement extends BaseSketchElement<RectType> {
   constructor(params: RectSketchElementParams) {
-    super({
-      id: params.id,
-      type: params.type,
-      width: params.width,
-      height: params.height,
-      x: params.x,
-      y: params.y,
-      rotation: params.rotation ? params.rotation : 0, // 최초 생성 시, rotation 은 0 으로 시작
-      elementStyle: params.elementStyle,
-    });
+    super({ ...params, initPoints: null });
   }
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
@@ -44,12 +30,6 @@ export class RectSketchElement extends BaseSketchElement {
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-
-    // 글자 작성
-    ctx.font = '80px';
-    ctx.fillStyle = 'black';
-    ctx.fillText(`x : ${this.x}, y : ${this.y}`, this.x, this.y);
-    ctx.fillText(`x : ${this.width}, y : ${this.height}`, this.x, this.y + 20);
   }
 }
 

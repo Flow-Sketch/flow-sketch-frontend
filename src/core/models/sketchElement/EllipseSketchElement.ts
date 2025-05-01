@@ -2,28 +2,13 @@ import { BaseSketchElement, BaseSketchElementParams } from '@/core/models/sketch
 
 export type EllipseType = 'ellipse';
 
-export interface EllipseSketchElementParams extends BaseSketchElementParams {
-  id: string;
-  type: EllipseType;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
+export interface EllipseSketchElementParams extends BaseSketchElementParams<EllipseType> {
   rotation?: number;
 }
 
-export class EllipseSketchElement extends BaseSketchElement {
+export class EllipseSketchElement extends BaseSketchElement<EllipseType> {
   constructor(params: EllipseSketchElementParams) {
-    super({
-      id: params.id,
-      type: 'ellipse',
-      width: params.width,
-      height: params.height,
-      x: params.x,
-      y: params.y,
-      rotation: params.rotation ? params.rotation : 0, // 최초 생성 시, rotation 은 0 으로 시작
-      elementStyle: params.elementStyle,
-    });
+    super({ ...params, initPoints: null });
   }
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();

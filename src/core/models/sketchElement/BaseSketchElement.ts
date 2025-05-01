@@ -1,8 +1,8 @@
 import { SketchElementStyle } from './SketchElementStyle.ts';
-import { EllipseType } from '@/core/models/sketchElement/EllipseSketchElement.ts';
-import { RectType } from '@/core/models/sketchElement/RectSketchElement.ts';
-
-export type BaseSketchElementType = RectType | EllipseType;
+import { SketchElementType } from '@/core/models/sketchElement/FactorySketchElement.ts';
+import { ElementPoint } from '@/core/models/sketchElement/LineSketchElement.ts';
+import { Point } from '@/shared/utils/collidingDetection';
+import { nanoid } from 'nanoid';
 
 interface DefaultElementStyle extends SketchElementStyle {
   borderWidth: number;
@@ -10,21 +10,21 @@ interface DefaultElementStyle extends SketchElementStyle {
   background: string;
 }
 
-export interface BaseSketchElementParams {
+export interface BaseSketchElementParams<T extends SketchElementType> {
   id: string;
-  type: BaseSketchElementType;
+  type: T;
   width: number;
   height: number;
-  x: number;
-  y: number;
+  x: number; // 객체의 중심점 X
+  y: number; // 객체의 중심점 Y
   elementStyle?: SketchElementStyle;
   rotation?: number; // 단위 : 라디안(360도 === 2 * PI)
-  points?: { x: number; y: number }[];
+  initPoints: Point[] | null;
 }
 
-export abstract class BaseSketchElement {
+export abstract class BaseSketchElement<T extends SketchElementType> {
   id: string;
-  type: BaseSketchElementType;
+  type: T;
   width: number;
   height: number;
   x: number;
@@ -32,8 +32,10 @@ export abstract class BaseSketchElement {
   elementStyle: DefaultElementStyle;
   rotation: number; // 단위 : 라디안(360도 === 2 * PI)
   isEditable: boolean; //
-  points?: { x: number; y: number }[];
-  constructor(params: BaseSketchElementParams) {
+  points: Record<string, ElementPoint> | null;
+  pointIds: string[] | null;
+
+  constructor(params: BaseSketchElementParams<T>) {
     this.id = params.id;
     this.type = params.type;
     this.width = params.width;
@@ -46,18 +48,53 @@ export abstract class BaseSketchElement {
       background: params.elementStyle?.background ? params.elementStyle.background : 'transparent',
       ...params.elementStyle,
     };
-    this.points = params.points;
     this.rotation = params.rotation ? params.rotation : 0;
     this.isEditable = false;
+    this.pointIds = null;
+    this.points = null;
+
+    if (params.initPoints) {
+      const { convertIds, convertPoint } = this._convertLinePoint(params.initPoints);
+      this.points = convertPoint;
+      this.pointIds = convertIds;
+    }
   }
 
   // 모든 객체가 공통적으로 가지는 메서드
   abstract draw(ctx: CanvasRenderingContext2D): void;
 
+  _convertLinePoint(points: Point[]) {
+    const convertIds: string[] = [];
+    const convertPoint: Record<string, ElementPoint> = {};
+    points.forEach((point) => {
+      const pointId = nanoid();
+      convertIds.push(pointId);
+      convertPoint[pointId] = { ...point, id: pointId };
+    });
+    return {
+      convertIds,
+      convertPoint,
+    };
+  }
+
   // 이동(드래그) 시 위치 변경
   move(dx: number, dy: number) {
     this.x += dx;
     this.y += dy;
+
+    if (this.points && this.pointIds) {
+      const updatePoint = this.pointIds.reduce(
+        (acc, id) => {
+          if (this.points && this.points[id]) {
+            const updatePoint = { ...this.points[id], x: this.points[id].x + dx, y: this.points[id].y + dy };
+            return { ...acc, [id]: updatePoint };
+          }
+          return acc;
+        },
+        {} as Record<string, ElementPoint>,
+      );
+      this.points = updatePoint;
+    }
   }
 
   /**

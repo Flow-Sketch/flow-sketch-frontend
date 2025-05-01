@@ -4,7 +4,14 @@ import { CANVAS_STORAGE } from '@/features/sketchFiles/constants';
 import { useSketchElementRegistryStore } from 'src/core/stores';
 import { useSketchFilesRegistry } from '@/features/sketchFiles/hooks';
 import { CanvasRegistryState, ElementRegistry, resetSketchFile } from '@/core/models/sketchFile';
-import { SketchElement, SketchElementParams, SketchElementStyle, BaseSketchElementType } from '@/core/models/sketchElement';
+import {
+  FactorySketchElement,
+  LineSketchElement,
+  SketchElement,
+  SketchElementParams,
+  SketchElementStyle,
+  SketchElementType,
+} from '@/core/models/sketchElement';
 import { useThrottle } from 'src/shared/hooks';
 
 interface ResizeParams {
@@ -13,15 +20,23 @@ interface ResizeParams {
   pointDirection: ('right' | 'left' | 'top' | 'bottom')[];
 }
 
+interface PointParams {
+  dx: number;
+  dy: number;
+  pointDirection: 'point-start' | 'point-end';
+}
+
 interface MoveParams {
   moveX: number;
   moveY: number;
 }
 
 export interface ElementRegistryAction {
-  createElements: <T extends BaseSketchElementType>(params: SketchElementParams<T>[]) => void;
-  createSingleElement: <T extends BaseSketchElementType>(params: SketchElementParams<T>) => void;
+  createElements: <T extends SketchElementType>(params: SketchElementParams<T>[]) => void;
+  pasteElements: <T extends SketchElementType>(params: SketchElement<T>[]) => void;
   deleteElements: (ids: string[]) => void;
+  createSingleElement: <T extends SketchElementType>(params: SketchElementParams<T>) => void;
+  moveLinePoint: (id: string, transformParam: PointParams) => void;
   moveElement: (id: string, transformParam: MoveParams) => void;
   resizeElement: (id: string, transformParam: ResizeParams) => void;
   updateStyleElement: (id: string, transformParam: SketchElementStyle) => void;
@@ -41,6 +56,8 @@ export function useSketchElementRegistry(): {
   const elementRegistry = useSketchElementRegistryStore((store) => store.elementRegistry);
   const setElementRegistry = useSketchElementRegistryStore.setState;
 
+  // console.log(elementRegistry.elements);
+
   /** A. 페이지의 pathParams 로 전달된 id 를 기준으로 스토리지 값을 호출 및 store 에 할당 **/
   useEffect(() => {
     if (!canvasId) return;
@@ -52,20 +69,20 @@ export function useSketchElementRegistry(): {
     if (!canvasListStr) return;
 
     const canvasStorage: Record<string, CanvasRegistryState> = JSON.parse(canvasListStr);
-    const selectCanvasRegistry = canvasStorage[canvasId];
+    const selectSketchFile = canvasStorage[canvasId];
 
     // json -> element 인스턴스로 변환
-    selectCanvasRegistry.elementRegistry['elements'] = selectCanvasRegistry.elementRegistry.layerOrder.reduce(
+    selectSketchFile.elementRegistry['elements'] = selectSketchFile.elementRegistry.layerOrder.reduce(
       (acc, elementId) => {
-        acc[elementId] = SketchElement.convertElement(selectCanvasRegistry.elementRegistry['elements'][elementId]);
+        acc[elementId] = FactorySketchElement.convertElement(selectSketchFile.elementRegistry['elements'][elementId]);
         return acc;
       },
       {} as ElementRegistry['elements'],
     );
-    selectCanvasRegistry.isInitialized = true;
+    selectSketchFile.isInitialized = true;
 
     // 최종 ElementStore 에 업데이트
-    setElementRegistry((prev) => ({ ...prev, ...selectCanvasRegistry }));
+    setElementRegistry((prev) => ({ ...prev, ...selectSketchFile }));
 
     // 페이지를 나가면, store 를 초기화
     return () => {
@@ -81,9 +98,9 @@ export function useSketchElementRegistry(): {
     throttleEditElementBoard(canvasId, elementRegistry);
   }, [canvasId, elementRegistry]);
 
-  const createElements = <T extends BaseSketchElementType>(params: SketchElementParams<T>[]) => {
+  const createElements = <T extends SketchElementType>(params: SketchElementParams<T>[]) => {
     const newElements = params.reduce((cur, param) => {
-      return { ...cur, [param.id]: SketchElement.createElement(param) };
+      return { ...cur, [param.id]: FactorySketchElement.createElement(param) };
     }, {});
     const newIds = params.map((param) => param.id);
     setElementRegistry((prev) => ({
@@ -95,11 +112,25 @@ export function useSketchElementRegistry(): {
     }));
   };
 
-  const createSingleElement = <T extends BaseSketchElementType>(params: SketchElementParams<T>) => {
+  const pasteElements = <T extends SketchElementType>(params: SketchElement<T>[]) => {
+    const newElements = params.reduce((cur, param) => {
+      return { ...cur, [param.id]: FactorySketchElement.convertElement(param) };
+    }, {});
+    const newIds = params.map((param) => param.id);
     setElementRegistry((prev) => ({
       ...prev,
       elementRegistry: {
-        elements: { ...prev.elementRegistry.elements, [params.id]: SketchElement.createElement(params) },
+        elements: { ...prev.elementRegistry.elements, ...newElements },
+        layerOrder: [...prev.elementRegistry.layerOrder, ...newIds],
+      },
+    }));
+  };
+
+  const createSingleElement = <T extends SketchElementType>(params: SketchElementParams<T>) => {
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: { ...prev.elementRegistry.elements, [params.id]: FactorySketchElement.createElement(params) },
         layerOrder: [...prev.elementRegistry.layerOrder, params.id],
       },
     }));
@@ -134,6 +165,22 @@ export function useSketchElementRegistry(): {
     const updateElements = { ...elementRegistry.elements };
     if (updateElement) {
       updateElement.move(params.moveX, params.moveY);
+      updateElements[id] = updateElement;
+    }
+    setElementRegistry((prev) => ({
+      ...prev,
+      elementRegistry: {
+        elements: updateElements,
+        layerOrder: prev.elementRegistry.layerOrder,
+      },
+    }));
+  };
+
+  const moveLinePoint = (id: string, params: PointParams) => {
+    const updateElement = elementRegistry.elements[id];
+    const updateElements = { ...elementRegistry.elements };
+    if (updateElement instanceof LineSketchElement) {
+      updateElement.changePoint(params.dx, params.dy, params.pointDirection);
       updateElements[id] = updateElement;
     }
     setElementRegistry((prev) => ({
@@ -182,10 +229,12 @@ export function useSketchElementRegistry(): {
     elementRegistryAction: {
       createSingleElement,
       createElements,
+      pasteElements,
       deleteElements,
       moveElement,
       resizeElement,
       updateStyleElement,
+      moveLinePoint,
     },
   };
 }

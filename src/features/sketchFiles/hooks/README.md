@@ -24,7 +24,7 @@ const CANVAS_STORAGE = 'canvasStorage'
       isPublic: boolean;
     },
     elementRegistry: {
-      elements: { [elementId: string]: SketchElement },
+      elements: { [elementId: string]: FactorySketchElement },
       layerOrder: string[]
     },
     selectElements: {

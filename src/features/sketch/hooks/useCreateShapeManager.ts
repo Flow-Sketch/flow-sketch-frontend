@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ShapeType, useSketchRemoteStore, useSketchCameraViewStore } from 'src/core/stores';
 import { ElementRegistryAction } from '@/features/sketch/hooks/useSketchElementRegistry.ts';
 import { RemoteManagerAction } from '@/features/sketch/hooks/useRemoteManager.ts';
+import { isShapeType } from '@/features/sketch/utils';
 
 export type CreateElementManagerState = {
   guideBox: {
@@ -21,7 +22,7 @@ export type CreateElementManagerAction = {
   handleCancelElementCreation: () => void;
 };
 
-export function useCreateElementManager(
+export function useCreateShapeManager(
   remoteAction: RemoteManagerAction,
   elementRegistryAction: ElementRegistryAction,
 ): {
@@ -52,7 +53,6 @@ export function useCreateElementManager(
 
   const handleUpdateElementSize = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!event || !isDrawing || !startPoint) return;
-
     setEndPosition({
       x: event.nativeEvent.offsetX,
       y: event.nativeEvent.offsetY,
@@ -60,7 +60,8 @@ export function useCreateElementManager(
   };
 
   const handleFinalizeElementCreation = () => {
-    if (!isDrawing || !startPoint || !endPoint || !shapeType) return;
+    if (!isDrawing || !startPoint || !endPoint) return;
+    if (!isShapeType(shapeType)) return;
 
     const convertWidth = Math.abs(endPoint.x - startPoint.x) / viewState.scale;
     const convertHeight = Math.abs(endPoint.y - startPoint.y) / viewState.scale;
@@ -74,18 +75,17 @@ export function useCreateElementManager(
       height: convertHeight,
       x: convertOffsetX + convertWidth / 2,
       y: convertOffsetY + convertHeight / 2,
+      initPoints: null,
     });
 
+    handleCancelElementCreation();
+  };
+
+  const handleCancelElementCreation = () => {
     setShapeType([null]);
     setIsDrawing(false);
     setStartPosition(null);
     setEndPosition(null);
-  };
-
-  const handleCancelElementCreation = () => {
-    setStartPosition(null);
-    setEndPosition(null);
-    setShapeType([null]);
   };
 
   return {

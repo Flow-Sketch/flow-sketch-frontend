@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { useSketchCameraViewStore } from 'src/core/stores';
+import { useWindowSize } from '@/shared/hooks';
 
 const CANVAS_WIDTH = 20000; // 실제 캔버스의 크기
 const CANVAS_HEIGHT = 20000; // 실제 캔버스의 크기
-const VIEW_WIDTH = 1000; // 사용자가 보는 화면의 크기
-const VIEW_HEIGHT = 800; // 사용자가 보는 화면의 크기
 
 export type ViewManagerState = {
   offset: { x: number; y: number };
@@ -53,6 +52,7 @@ export function useCameraViewManager(): {
   // Zustand 스토어에서 상태 가져오기
   const viewState = useSketchCameraViewStore();
   const setState = useSketchCameraViewStore.setState;
+  const { width: VIEW_WIDTH, height: VIEW_HEIGHT } = useWindowSize();
 
   /**
    * > View 시점 변경 시, 변화량 측정에 필요한 기준점을 지정하는 함수
